@@ -1,0 +1,7 @@
+# Cloudflare Pages: public/ = 앱 화면, functions/ = 번역·음성 인식 API (Workers AI)
+name = "interpreter-for-koreans"
+pages_build_output_dir = "public"
+compatibility_date = "2026-10-01"
+
+[ai]
+binding = "AI"

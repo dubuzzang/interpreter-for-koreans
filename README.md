@@ -1,0 +1,57 @@
+# Tercüman — 한국어 · 튀르키예어 · 영어 통역
+
+말하면 바로 통역해서 상대 언어로 읽어 주는 웹앱입니다. 휴대폰 브라우저에서 바로 쓰고, 홈 화면에 추가하면 앱처럼 열립니다.
+
+**바로 쓰기 → https://interpreter-for-koreans.pages.dev/**
+
+| 화면 | 하는 일 |
+|---|---|
+| 대화 | 나(🇰🇷)·상대(🇹🇷/🇺🇸)가 각자 버튼을 누르고 말하면 → 받아쓰기 → 번역 → 상대 언어로 읽어 주기. 들은 말이 틀리면 ✎로 고쳐 다시 번역, ⌨로 글 입력, ⤢로 상대에게 크게 보여 주기 |
+| 마주 보기 | 휴대폰을 탁자에 놓고 쓰는 모드 — 상대 쪽 절반을 뒤집어 상대 언어로 보여 주고, 버튼도 양쪽에 |
+| 번역 | 글 번역(언어 자동 감지) · 🎤 받아쓰기 · 듣기 · 복사 · 크게 보기 |
+| 표현 | 인사 · 소통 · 식당 · 쇼핑 · 길·교통 · 숙소 · 긴급 70여 문장 (인터넷 없이도 됨) |
+| 기록 | 지난 통역 (이 기기에만 저장) |
+
+- 튀르키예어 번역 밑에는 **한글 발음**(Merhaba → 메르하바)을, 상대에게 보이는 한국어에는 **로마자**(안녕하세요 → Annyeonghaseyo)를 같이 보여 줍니다.
+- 말투: 존댓말(siz) / 반말(sen). 최근 대화를 맥락으로 함께 보내 대명사·생략을 자연스럽게 옮깁니다.
+
+## 구조
+
+| 부분 | 내용 |
+|---|---|
+| 화면 | `public/` — 빌드 도구 없는 HTML·CSS·ES 모듈, PWA(서비스 워커: 화면·표현집은 오프라인, 번역은 늘 서버) |
+| 번역 API | `functions/api/translate.js` — Cloudflare Workers AI. 통역 지시문 + 최근 대화 맥락 |
+| 음성 인식 | 브라우저 음성 인식(말하는 동안 글자가 보임) → 안 되는 브라우저는 녹음해서 `functions/api/stt.js`(Whisper large-v3 turbo) |
+| 읽어 주기 | 기기 목소리(speechSynthesis). 아이폰은 첫 터치 때 소리를 풀어 둔다 |
+| 공용 코드 | `lib/translate-core.mjs`(검사·지시문·출력 정리·오류 안내) · `lib/guard.mjs`(이 앱 화면에서 온 요청만 · IP당 요청 제한) |
+
+### 번역 엔진 (2026-10-08 비교)
+
+한·튀·영 예문 7개를 모델마다 번역해 비교했습니다.
+
+| 모델 | 결과 |
+|---|---|
+| **Gemma 4 26B (생각 끔)** | 가장 자연스러움, 1~1.5초 → 기본 |
+| Gemma 4 (생각 켬) | 5~17초, 빈 답도 나옴 → `chat_template_kwargs.enable_thinking=false` 필수 |
+| Qwen 3.8 27B | 자연스럽지만 튀르키예어 격조사 실수(otobüsü binmek), 1~29초로 들쭉날쭉 |
+| Llama 3.3 70B | 무난, 고유명사 실수(Taksim → 택심) → 1차 예비 |
+| Mistral Small 3.1 | 가장 빠름(1초), 튀르키예어 문법 실수가 더 많음 → 2차 예비 |
+| m2m100 1.2B (번역 전용) | 뜻이 틀림(매워요 → "Bu çok basit") → **쓰지 않음**. 틀린 통역보다 오류 안내가 낫다 |
+
+모델마다 9~12초 제한, 실패·빈 답·글자 체계가 틀린 답이면 다음 모델로 넘어갑니다. Workers AI 무료 사용량(하루 10,000 뉴런 ≈ 번역 천여 번)을 다 쓰면 "오늘 무료 번역 한도" 안내가 나옵니다.
+
+## 개발
+
+```powershell
+npm test                 # 단위 테스트 (가짜 AI로 API까지)
+npm run dev              # 로컬 서버 http://127.0.0.1:8788 (AI는 Cloudflare 계정으로 실제 호출)
+npm run build:sw         # public/ 파일을 바꾼 뒤 서비스 워커 갱신
+npm run deploy           # Cloudflare Pages 배포 (wrangler 로그인 필요)
+```
+
+- 버전을 올릴 때: `package.json`·`public/js/version.js`·`CHANGELOG.md`를 함께 바꾸고 `npm run build:sw`.
+- GitHub Actions는 테스트만 돌립니다. 배포는 번역 API(Pages Functions + Workers AI)가 필요해서 Cloudflare Pages로만 합니다.
+
+## 개인정보
+
+말한 내용과 글은 번역·인식을 위해 Cloudflare Workers AI로 보내고, 서버에 저장하지 않습니다. 통역 기록·설정은 이 기기(localStorage)에만 남습니다.

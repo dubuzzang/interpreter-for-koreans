@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5b50f0"/>
+      <stop offset="1" stop-color="#0e9f8f"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#g)"/>
+  <path d="M80 108h196a34 34 0 0 1 34 34v100a34 34 0 0 1-34 34H170l-58 48v-48H80a34 34 0 0 1-34-34V142a34 34 0 0 1 34-34Z" fill="#fff"/>
+  <text x="178" y="231" text-anchor="middle" font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif" font-size="116" font-weight="800" fill="#4f46e5">가</text>
+  <path d="M432 250H262a32 32 0 0 0-32 32v94a32 32 0 0 0 32 32h20v46l56-46h94a32 32 0 0 0 32-32v-94a32 32 0 0 0-32-32Z" fill="#fff" opacity=".97"/>
+  <text x="347" y="371" text-anchor="middle" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="108" font-weight="800" fill="#0d9488">Ç</text>
+</svg>
