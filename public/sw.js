@@ -1,5 +1,5 @@
 /* Tercüman 서비스 워커 — scripts/gen-sw.mjs가 만든 파일 (직접 고치지 마세요) */
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 const CACHE = `tercuman-${VERSION}`;
 const ASSETS = [
   "/",
@@ -32,9 +32,11 @@ function isAppPage(pathname) {
   return !/\.[a-z0-9]+$/i.test(pathname) || /\/index\.html$/.test(pathname);
 }
 
+// 새 버전은 받자마자 적용 대기 없이 넘어간다. 열려 있는 화면은 "업데이트" 버튼(index.html)을 누르면 새로 고쳐진다
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
+self.addEventListener('message', (e) => { if (e.data === 'SKIP_WAITING') self.skipWaiting(); });
 self.addEventListener('activate', (e) => {
   e.waitUntil((async () => {
     for (const k of await caches.keys()) if (k.startsWith('tercuman-') && k !== CACHE) await caches.delete(k);
@@ -45,7 +47,7 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return; // 번역·음성 인식은 늘 서버로
+  if (url.origin !== self.location.origin || url.pathname.startsWith('/api/') || url.pathname === '/version.json') return; // 번역·음성 인식·새 버전 확인은 늘 서버로
   if (req.mode === 'navigate') {
     if (!isAppPage(url.pathname)) return;
     e.respondWith(fetch(req).catch(async () => (await caches.match('/', { cacheName: CACHE })) || Response.error()));

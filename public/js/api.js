@@ -34,6 +34,19 @@ export async function translate(text, from, to, { context = [], formal = true } 
   return data.text;
 }
 
+/** 일본어 → 히라가나 읽기 (한글 발음을 보여 주려고). 실패해도 번역은 그대로라 빈 값 */
+const kanaCache = new Map();
+export async function kana(text) {
+  const t = String(text).trim();
+  if (!t) return '';
+  if (kanaCache.has(t)) return kanaCache.get(t);
+  try {
+    const data = await call('/api/kana', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: t }) }, 20000);
+    kanaCache.set(t, data.kana || '');
+    return data.kana || '';
+  } catch { return ''; }
+}
+
 /** 녹음 → 글 (브라우저 음성 인식이 없을 때) */
 export async function transcribe(blob, lang) {
   const data = await call(`/api/stt?lang=${encodeURIComponent(lang)}`, {

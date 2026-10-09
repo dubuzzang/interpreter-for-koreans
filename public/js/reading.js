@@ -130,9 +130,88 @@ export function koToRoman(text) {
   return res.replace(/(^|[.!?]\s+)([a-z])/g, (_, a, b) => a + b.toUpperCase());
 }
 
-/** 화면에 같이 보일 읽는 법: 튀르키예어는 한글로(내가 한국어 사용자면), 한국어는 로마자로(상대가 볼 때) */
-export function readingFor(text, lang, viewer = 'ko') {
+// ---------- 일본어(히라가나 읽기) → 한글 발음 ----------
+// 일본어 한글 표기 관례: 낱말 첫머리 か·た행은 예사소리(곤니치와, 도코), 가운데는 거센소리(이타다키마스),
+// っ → ㅅ받침(깃푸), ん → ㄴ받침(문장 끝은 ㅇ: 스미마셍), 장음(ー, 오·우단 뒤 う)은 적지 않는다(도쿄).
+const JA = {
+  あ: '아', い: '이', う: '우', え: '에', お: '오',
+  か: ['카', '가'], き: ['키', '기'], く: ['쿠', '구'], け: ['케', '게'], こ: ['코', '고'],
+  が: '가', ぎ: '기', ぐ: '구', げ: '게', ご: '고',
+  さ: '사', し: '시', す: '스', せ: '세', そ: '소',
+  ざ: '자', じ: '지', ず: '즈', ぜ: '제', ぞ: '조',
+  た: ['타', '다'], ち: ['치', '지'], つ: '츠', て: ['테', '데'], と: ['토', '도'],
+  だ: '다', ぢ: '지', づ: '즈', で: '데', ど: '도',
+  な: '나', に: '니', ぬ: '누', ね: '네', の: '노',
+  は: '하', ひ: '히', ふ: '후', へ: '헤', ほ: '호',
+  ば: '바', び: '비', ぶ: '부', べ: '베', ぼ: '보',
+  ぱ: '파', ぴ: '피', ぷ: '푸', ぺ: '페', ぽ: '포',
+  ま: '마', み: '미', む: '무', め: '메', も: '모',
+  や: '야', ゆ: '유', よ: '요',
+  ら: '라', り: '리', る: '루', れ: '레', ろ: '로',
+  わ: '와', ゐ: '이', ゑ: '에', を: '오', ゔ: '부',
+  ぁ: '아', ぃ: '이', ぅ: '우', ぇ: '에', ぉ: '오', ゃ: '야', ゅ: '유', ょ: '요', ゎ: '와',
+};
+// 작은 ゃゅょ가 붙는 소리 [ゃ, ゅ, ょ] (첫머리가 다르면 [가운데, 첫머리])
+const YOON = {
+  き: [['캬', '갸'], ['큐', '규'], ['쿄', '교']], ぎ: ['갸', '규', '교'], し: ['샤', '슈', '쇼'], じ: ['자', '주', '조'],
+  ち: [['차', '자'], ['추', '주'], ['초', '조']], ぢ: ['자', '주', '조'], に: ['냐', '뉴', '뇨'], ひ: ['햐', '휴', '효'],
+  び: ['뱌', '뷰', '뵤'], ぴ: ['퍄', '퓨', '표'], み: ['먀', '뮤', '묘'], り: ['랴', '류', '료'],
+};
+// 외래어의 작은 모음 (てぃ → 티 …)
+const SMALL = {
+  てぃ: '티', でぃ: '디', とぅ: '투', どぅ: '두', ふぁ: '파', ふぃ: '피', ふぇ: '페', ふぉ: '포', うぃ: '위', うぇ: '웨', うぉ: '워',
+  しぇ: '셰', じぇ: '제', ちぇ: ['체', '제'], つぁ: '차', ゔぁ: '바', ゔぃ: '비', ゔぇ: '베', ゔぉ: '보', いぇ: '예',
+};
+const PUNCT = { '。': '.', '、': ',', '？': '?', '！': '!', '・': ' ' };
+const LONG_AFTER = new Set([8, 12, 13, 17, 18]); // ㅗ ㅛ ㅜ ㅠ ㅡ 뒤의 う는 장음
+const pick = (v, initial) => (Array.isArray(v) ? v[initial ? 1 : 0] : v);
+const vowelOf = (syl) => Math.floor(((syl.charCodeAt(0) - 0xac00) % 588) / 28);
+const withFinal = (syl, t) => ((syl.charCodeAt(0) - 0xac00) % 28 ? syl : String.fromCharCode(syl.charCodeAt(0) + t));
+
+function jaWord(word, utteranceEnd) {
+  const out = [];
+  const chars = [...word];
+  for (let i = 0; i < chars.length; i++) {
+    const c = chars[i], next = chars[i + 1];
+    const initial = out.length === 0;
+    if (c === 'ー') continue;
+    if (c === 'っ') { if (out.length) out[out.length - 1] = withFinal(out.at(-1), 19); continue; }
+    if (c === 'ん') {
+      if (!out.length) { out.push('응'); continue; }
+      const end = i === chars.length - 1 && utteranceEnd;
+      out[out.length - 1] = withFinal(out.at(-1), end ? 21 : 4);
+      continue;
+    }
+    if (c === 'う' && out.length && LONG_AFTER.has(vowelOf(out.at(-1)))) continue;
+    if (next && 'ゃゅょ'.includes(next) && YOON[c]) { out.push(pick(YOON[c]['ゃゅょ'.indexOf(next)], initial)); i++; continue; }
+    if (next && SMALL[c + next]) { out.push(pick(SMALL[c + next], initial)); i++; continue; }
+    if (JA[c]) out.push(pick(JA[c], initial));
+    else out.push(c);
+  }
+  return out.join('');
+}
+
+/** 히라가나(가타카나) 읽기 → 한글 발음. 예) こんにちわ → 곤니치와, すみません → 스미마셍 */
+export function jaKanaToHangul(kana) {
+  if (!kana) return '';
+  const s = String(kana).replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
+  const parts = s.split(/([\s。、？！・?!,.]+)/);
+  return parts.map((p, k) => {
+    if (!p) return '';
+    if (/^[\s。、？！・?!,.]+$/.test(p)) return [...p].map((c) => PUNCT[c] ?? c).join('');
+    const after = parts.slice(k + 1).join('');
+    const utteranceEnd = !after.trim() || /^[。？！?!.]/.test(after.trimStart());
+    return jaWord(p, utteranceEnd);
+  }).join('');
+}
+
+/**
+ * 화면에 같이 보일 읽는 법 — 그 글을 읽는 사람에게 필요한 것만:
+ * 튀르키예어·일본어는 한국 사용자에게 한글로(일본어는 서버에서 받은 히라가나 읽기 kana가 있어야), 한국어는 상대에게 로마자로
+ */
+export function readingFor(text, lang, viewer = 'ko', kana = '') {
   if (lang === 'tr' && viewer === 'ko') return trToHangul(text);
+  if (lang === 'ja' && viewer === 'ko') return kana ? jaKanaToHangul(kana) : '';
   if (lang === 'ko' && viewer !== 'ko') return koToRoman(text);
   return '';
 }

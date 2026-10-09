@@ -6,7 +6,24 @@ import { voicesFor, speak, unlockSpeech, hasBrowserSTT, canRecord, canSpeak } fr
 import { applyTheme } from '../app.js';
 import { VERSION, RELEASED } from '../version.js';
 
-const SAMPLE = { ko: '안녕하세요. 만나서 반가워요.', tr: 'Merhaba, tanıştığımıza memnun oldum.', en: 'Hello, nice to meet you.' };
+const SAMPLE = { ko: '안녕하세요. 만나서 반가워요.', tr: 'Merhaba, tanıştığımıza memnun oldum.', en: 'Hello, nice to meet you.', ja: 'こんにちは。はじめまして。' };
+
+/** 설정의 "업데이트 확인" — 새 버전이 있으면 바로 바꾼다 (index.html의 업데이트 도우미) */
+function updateCard() {
+  const status = h('p', { class: 'muted small' }, `지금 버전 v${VERSION} (${RELEASED})`);
+  const btn = h('button', { class: 'btn soft block', type: 'button', onclick: async () => {
+    const u = window.__tercumanUpdate;
+    if (!u) { location.reload(); return; }
+    btn.disabled = true; btn.textContent = '확인 중…';
+    const r = await u.check();
+    if (r.update) { btn.textContent = `v${r.latest}로 바꾸는 중…`; u.apply(); return; }
+    btn.disabled = false; btn.textContent = '업데이트 확인';
+    if (r.offline) toast('인터넷에 연결되어 있지 않아요', 'bad');
+    else toast(`최신 버전이에요 (v${r.latest || VERSION})`, 'ok');
+  } }, '업데이트 확인');
+  return h('section', { class: 'card' }, h('div', { class: 'set-label' }, '업데이트'), status,
+    h('p', { class: 'muted small' }, '새 버전이 나오면 화면 위에 "업데이트" 버튼이 저절로 떠요. 여기서 직접 확인할 수도 있어요.'), btn);
+}
 
 function toggle(key, label, desc) {
   const input = h('input', { type: 'checkbox', checked: Boolean(state.settings[key]), onchange: (e) => setSetting(key, e.target.checked) });
@@ -56,7 +73,7 @@ export default {
         seg('formal', '말투', [[true, '존댓말 (siz)'], [false, '반말 (sen)']]),
         toggle('autoSpeak', '번역을 바로 읽어 주기', '대화에서 번역이 나오면 상대 언어로 소리 내어 읽어요'),
         h('div', { class: 'set-row col' }, h('div', { class: 'row between' }, h('div', { class: 'set-label' }, '읽는 속도'), rateVal), rate),
-        toggle('reading', '읽는 법 같이 보기', '튀르키예어 번역 밑에 한글 발음(메르하바), 상대에게 보이는 한국어엔 로마자')),
+        toggle('reading', '읽는 법 같이 보기', '튀르키예어·일본어 번역 밑에 한글 발음(메르하바 · 곤니치와), 상대에게 보이는 한국어엔 로마자')),
       h('section', { class: 'card' },
         h('div', { class: 'set-label' }, '목소리'),
         h('p', { class: 'muted small' }, '기기에 깔린 목소리로 읽어요. 튀르키예어 목소리가 없으면 휴대폰 설정 → 언어/음성(텍스트 음성 변환)에서 추가할 수 있어요.'),
@@ -70,9 +87,10 @@ export default {
         h('button', { class: 'btn ghost block', type: 'button', onclick: () => { if (confirm('기록을 모두 지울까요?')) { clearHistory(); toast('기록을 지웠어요', 'ok'); } } }, icon('trash', 18), ' 기록 모두 지우기')),
       h('section', { class: 'card' },
         seg('theme', '화면', [['auto', '기기 설정대로'], ['light', '밝게'], ['dark', '어둡게']], applyTheme)),
+      updateCard(),
       h('section', { class: 'card about' },
         h('div', { class: 'set-label' }, `Tercüman v${VERSION}`),
-        h('p', { class: 'muted small' }, `${RELEASED} · 한국어 · 튀르키예어 · 영어 통역`),
+        h('p', { class: 'muted small' }, `${RELEASED} · 한국어 · 튀르키예어 · 영어 · 일본어 통역`),
         h('p', { class: 'muted small' }, '번역: Cloudflare Workers AI (Gemma 4) · 음성 인식: 브라우저 / Whisper large-v3 turbo · 읽어 주기: 기기 목소리. 말한 내용은 번역을 위해 서버로 보내지고 저장되지 않아요. 기록은 이 기기에만 남아요.'),
         h('p', { class: 'muted small' }, '홈 화면에 추가하면 앱처럼 쓸 수 있어요 (아이폰: Safari 공유 → 홈 화면에 추가 · 안드로이드: Chrome 메뉴 → 앱 설치).')),
     );

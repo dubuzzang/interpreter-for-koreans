@@ -1,6 +1,8 @@
 # 서비스 워커는 매번 새로 확인해야 업데이트가 바로 전달된다
 /sw.js
   Cache-Control: no-cache
+/version.json
+  Cache-Control: no-cache
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { detectLang, LANGS, CODES, UI, otherLangs } from '../public/js/lang.js';
 import { PHRASES, PHRASE_CATS, phrasesFor } from '../public/js/phrases.js';
-import { render as renderSW, assetList, version, isAppPage } from '../scripts/gen-sw.mjs';
+import { render as renderSW, assetList, version, isAppPage, versionJson } from '../scripts/gen-sw.mjs';
 
 test('언어 알아보기', () => {
   assert.equal(detectLang('안녕하세요, 반가워요'), 'ko');
@@ -17,16 +17,16 @@ test('언어 알아보기', () => {
   assert.equal(detectLang('İstanbul havalimanı'), 'tr');
 });
 
-test('언어 정보 · 상대 쪽 문구가 세 언어 모두 있다', () => {
-  assert.deepEqual(CODES, ['ko', 'tr', 'en']);
+test('언어 정보 · 상대 쪽 문구가 네 언어 모두 있다', () => {
+  assert.deepEqual(CODES, ['ko', 'tr', 'en', 'ja']);
   for (const c of CODES) {
     assert.match(LANGS[c].bcp47, /^[a-z]{2}-[A-Z]{2}$/);
     for (const k of Object.keys(UI.ko)) assert.ok(UI[c][k], `${c}.${k}`);
   }
-  assert.deepEqual(otherLangs('ko'), ['tr', 'en']);
+  assert.deepEqual(otherLangs('ko'), ['tr', 'en', 'ja']);
 });
 
-test('표현집: 세 언어가 다 있고, 글자 체계가 맞고, 겹치지 않는다', () => {
+test('표현집: 네 언어가 다 있고, 글자 체계가 맞고, 겹치지 않는다', () => {
   const cats = new Set(PHRASE_CATS.map((c) => c.id));
   const seen = new Set();
   assert.ok(PHRASES.length >= 60);
@@ -37,7 +37,7 @@ test('표현집: 세 언어가 다 있고, 글자 체계가 맞고, 겹치지 �
     assert.doesNotMatch(p.en, /[가-힣çğışöü]/i, p.en);
     assert.ok(p.tr.trim() && p.en.trim(), p.ko);
     assert.match(p.tr, /[.!?]$/, `튀르키예어 문장 끝 부호: ${p.tr}`);
-    assert.ok(!p.only || ['tr', 'en'].includes(p.only));
+    assert.ok(!p.only || ['tr', 'en', 'ja'].includes(p.only));
     const key = `${p.cat}|${p.ko}`;
     assert.ok(!seen.has(key), `중복: ${p.ko}`);
     seen.add(key);
@@ -53,6 +53,9 @@ test('서비스 워커가 최신이고, 미리 저장할 파일이 모두 있다
   assert.ok(assetList().includes('/js/app.js') && assetList().includes('/icons/icon-192.png'));
   assert.ok(!assetList().some((a) => a.startsWith('/api')));
   assert.equal(JSON.parse(readFileSync('package.json', 'utf8')).version, version(), 'package.json과 version.js 버전');
+  assert.equal(readFileSync('public/version.json', 'utf8'), versionJson(), 'public/version.json이 오래됨 — npm run build:sw');
+  assert.match(readFileSync('CHANGELOG.md', 'utf8'), new RegExp(`## v${version().replace(/\./g, '\\.')} `), 'CHANGELOG에 이 버전');
+  assert.match(renderSW(), /url\.pathname === '\/version\.json'/, '새 버전 확인은 서비스 워커가 가로채지 않는다');
   for (const p of ['/', '/index.html', '/talk']) assert.ok(isAppPage(p), p);
   for (const p of ['/sw.js', '/icons/icon-512.png', '/manifest.webmanifest']) assert.ok(!isAppPage(p), p);
 });
@@ -68,4 +71,17 @@ test('배포 설정: Workers AI 연결 · 앱 화면 파일 · 매니페스트 �
   const html = readFileSync('public/index.html', 'utf8');
   for (const ref of html.match(/(?:href|src)="(\/[^"]+)"/g).map((s) => s.match(/"(.+)"/)[1])) assert.ok(existsSync(`public${ref}`), ref);
   assert.match(readFileSync('public/_headers', 'utf8'), /\/sw\.js\n\s+Cache-Control: no-cache/);
+  assert.match(readFileSync('public/_headers', 'utf8'), /\/version\.json\n\s+Cache-Control: no-cache/);
+});
+
+test('업데이트 버튼: HTML 안에 있어 예전 앱 코드에서도 동작하고, 앱 코드가 지금 버전을 알린다', () => {
+  const html = readFileSync('public/index.html', 'utf8');
+  assert.match(html, /fetch\('\/version\.json', \{ cache: 'no-store' \}\)/);
+  assert.match(html, /id = 'update-banner'/);
+  assert.match(html, /getAttribute\('data-version'\)/);
+  assert.match(html, /caches\.delete/);
+  assert.match(html, /location\.reload\(\)/);
+  // 예전 앱 코드(v1.0.0)가 찾는 요소들이 그대로 있어야 새 HTML + 예전 코드도 뜬다
+  for (const id of ['main', 'pair', 'tabbar', 'gear']) assert.match(html, new RegExp(`id="${id}"`), id);
+  assert.match(readFileSync('public/js/app.js', 'utf8'), /dataset\.version = VERSION/);
 });

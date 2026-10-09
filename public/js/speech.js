@@ -154,7 +154,7 @@ if (synth) { refreshVoices(); synth.addEventListener?.('voiceschanged', refreshV
 
 export const canSpeak = () => Boolean(synth);
 
-const GOOD = /(natural|neural|online|premium|enhanced|google|siri|yelda|yuna|samantha|ava|jenny|aria|sunhi|seoyeon|emel|ahmet)/i;
+const GOOD = /(natural|neural|online|premium|enhanced|google|siri|yelda|yuna|samantha|ava|jenny|aria|sunhi|seoyeon|emel|ahmet|kyoko|otoya|nanami|keita|haruka|ayumi|sayaka)/i;
 /** 언어별 목소리 후보 (좋은 것부터) */
 export function voicesFor(lang) {
   const tag = LANGS[lang].bcp47.toLowerCase();

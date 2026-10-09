@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-  <title>Tercüman · 한국어 튀르키예어 영어 통역</title>
-  <meta name="description" content="말하면 바로 통역 — 한국어 · 튀르키예어 · 영어. 마주 보기 대화, 글 번역, 여행 표현집, 한글 발음.">
+  <title>Tercüman · 한국어 튀르키예어 영어 일본어 통역</title>
+  <meta name="description" content="말하면 바로 통역 — 한국어 · 튀르키예어 · 영어 · 일본어. 마주 보기 대화, 글 번역, 여행 표현집, 한글 발음.">
   <meta name="theme-color" content="#f4f5fb">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/icons/favicon-32.png" sizes="32x32">
@@ -14,7 +14,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Tercüman">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta property="og:title" content="Tercüman · 한국어 ⇄ 튀르키예어 ⇄ 영어 통역">
+  <meta property="og:title" content="Tercüman · 한국어 · 튀르키예어 · 영어 · 일본어 통역">
   <meta property="og:description" content="말하면 바로 통역해서 읽어 줘요. 마주 보기 대화 · 글 번역 · 여행 표현집">
   <meta property="og:image" content="/icons/icon-512.png">
   <link rel="stylesheet" href="/css/app.css">
@@ -28,6 +28,88 @@
   <main id="main" tabindex="-1"></main>
   <nav id="tabbar" class="tabbar" aria-label="메뉴"></nav>
   <noscript><p style="padding:24px">이 앱은 자바스크립트가 필요해요.</p></noscript>
+  <script>
+  // 새 버전 알림 · 업데이트 버튼.
+  // 이 HTML은 열 때마다 서버에서 새로 받아서(서비스 워커도 페이지는 네트워크 먼저), 예전 버전 앱 코드가 돌고 있어도
+  // 이 부분은 늘 최신이다 → 기존 사용자도 버튼 하나로 새 버전으로 바뀐다. 앱 코드(app.js)가 html의 data-version에 지금 버전을 적는다.
+  (function () {
+    var shown = false, latest = null;
+    var running = function () { return document.documentElement.getAttribute('data-version'); };
+    function check() {
+      return fetch('/version.json', { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) {
+          latest = j && j.version;
+          var cur = running();
+          var update = Boolean(latest && cur && latest !== cur);
+          if (update) show(latest, cur);
+          return { update: update, latest: latest, current: cur };
+        })
+        .catch(function () { return { update: false, offline: true, current: running() }; });
+    }
+    function show(v, cur) {
+      if (shown) return;
+      shown = true;
+      var bar = document.createElement('div');
+      bar.id = 'update-banner';
+      bar.setAttribute('role', 'status');
+      bar.style.cssText = 'position:fixed;left:12px;right:12px;top:calc(66px + env(safe-area-inset-top));z-index:60;display:flex;align-items:center;gap:10px;' +
+        'padding:12px 12px 12px 16px;border-radius:16px;background:#1f2240;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.28);' +
+        'font:600 15px/1.35 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif;max-width:560px;margin:0 auto';
+      var text = document.createElement('div');
+      text.style.flex = '1';
+      text.textContent = '✨ 새 버전 v' + v + '이 나왔어요';
+      var sub = document.createElement('div');
+      sub.style.cssText = 'font-weight:400;font-size:12.5px;opacity:.75;margin-top:2px';
+      sub.textContent = '지금 v' + cur + ' · 누르면 바로 바뀌어요 (기록은 그대로)';
+      text.appendChild(sub);
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = '업데이트';
+      btn.style.cssText = 'border:0;border-radius:12px;padding:10px 16px;background:#6366f1;color:#fff;font:inherit;cursor:pointer;white-space:nowrap';
+      btn.onclick = function () { btn.disabled = true; btn.textContent = '바꾸는 중…'; apply(v); };
+      var later = document.createElement('button');
+      later.type = 'button';
+      later.setAttribute('aria-label', '나중에');
+      later.textContent = '✕';
+      later.style.cssText = 'border:0;background:transparent;color:#fff;opacity:.6;font:inherit;font-size:18px;padding:4px 6px;cursor:pointer';
+      later.onclick = function () { bar.remove(); shown = false; };
+      bar.appendChild(text); bar.appendChild(btn); bar.appendChild(later);
+      document.body.appendChild(bar);
+    }
+    // 새 서비스 워커를 받아 바로 적용하고, 예전 버전 파일 보관함을 지운 뒤 새로 고친다
+    function apply(v) {
+      var reload = function () { location.reload(); };
+      var dropOld = function () {
+        if (!window.caches) return Promise.resolve();
+        return caches.keys().then(function (keys) {
+          return Promise.all(keys.filter(function (k) { return k.indexOf('tercuman-') === 0 && k !== 'tercuman-' + v; }).map(function (k) { return caches.delete(k); }));
+        });
+      };
+      var sw = navigator.serviceWorker;
+      var ready = sw && sw.getRegistration ? sw.getRegistration().then(function (reg) {
+        if (!reg) return;
+        return reg.update().catch(function () {}).then(function () {
+          var w = reg.installing || reg.waiting;
+          if (!w) return;
+          return new Promise(function (done) {
+            w.postMessage('SKIP_WAITING');
+            w.addEventListener('statechange', function () { if (w.state === 'activated' || w.state === 'redundant') done(); });
+            setTimeout(done, 8000);
+          });
+        });
+      }).catch(function () {}) : Promise.resolve();
+      ready.then(dropOld).then(reload, reload);
+    }
+    window.__tercumanUpdate = {
+      check: check,
+      apply: function () { return latest ? apply(latest) : check().then(function (r) { if (r.update) apply(r.latest); }); },
+    };
+    addEventListener('load', function () { setTimeout(check, 1500); });
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') check(); });
+    setInterval(check, 30 * 60 * 1000);
+  })();
+  </script>
   <script type="module" src="/js/app.js"></script>
 </body>
 </html>

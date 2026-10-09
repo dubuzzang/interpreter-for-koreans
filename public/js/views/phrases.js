@@ -20,7 +20,7 @@ export default {
       }, c.icon, ' ', c.name)));
       list.replaceChildren(...phrasesFor(cat, partner).map((p) => {
         const say = p[partner];
-        const read = reading ? readingFor(say, partner, me) : '';
+        const read = reading ? readingFor(say, partner, me, p.jaKana) : '';
         return h('div', { class: 'phrase card' },
           h('button', { class: 'phrase-main', type: 'button', onclick: () => { unlockSpeech(); speak(say, partner); } },
             h('div', { class: 'phrase-me', lang: me }, p[me]),

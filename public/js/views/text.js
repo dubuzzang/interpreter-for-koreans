@@ -2,7 +2,7 @@
 import { h, icon, toast, copyText, showBig } from '../ui.js';
 import { LANGS, CODES, detectLang, UI } from '../lang.js';
 import { state, addHistory } from '../store.js';
-import { translate } from '../api.js';
+import { translate, kana as kanaReading } from '../api.js';
 import { listen, speak, unlockSpeech, sttMode } from '../speech.js';
 import { readingFor } from '../reading.js';
 
@@ -58,7 +58,7 @@ export default {
 
     function showResult(r) {
       if (!r) { result.replaceChildren(); return; }
-      const reading = s.reading ? readingFor(r.translation, r.to, s.me) : '';
+      const reading = s.reading ? readingFor(r.translation, r.to, s.me, r.kana) : '';
       result.replaceChildren(h('div', { class: 'card result-card' },
         h('div', { class: 'muted small' }, `${LANGS[r.from].flag} ${LANGS[r.from].name} → ${LANGS[r.to].flag} ${LANGS[r.to].name}`),
         h('div', { class: 'result-text', lang: r.to }, r.translation),
@@ -81,9 +81,13 @@ export default {
       goBtn.disabled = true; goBtn.textContent = '번역 중…';
       try {
         const translation = await translate(text, from, to, { formal: s.formal });
-        memo.result = { from, to, text, translation };
-        addHistory({ side: 'text', from, to, text, translation });
-        showResult(memo.result);
+        const r = { from, to, text, translation, kana: '' };
+        memo.result = r;
+        const entry = addHistory({ side: 'text', from, to, text, translation });
+        showResult(r);
+        if (to === 'ja' && s.reading && s.me === 'ko') {
+          kanaReading(translation).then((k) => { if (k && memo.result === r) { r.kana = k; entry.kana = k; showResult(r); } });
+        }
       } catch (e) {
         result.replaceChildren(h('div', { class: 'card b-error' }, e.message));
       } finally { goBtn.disabled = false; goBtn.textContent = '번역하기'; }

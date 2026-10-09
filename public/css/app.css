@@ -22,6 +22,11 @@ body {
   -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%;
 }
 button, input, select, textarea { font: inherit; color: inherit; }
+/* 일본어는 일본어 글꼴로(한국어 글꼴로 대신 그리면 가나 사이가 벌어진다), 줄바꿈은 글자 단위 */
+:lang(ja) {
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo, "Noto Sans JP", "Noto Sans CJK JP", var(--font);
+  word-break: normal; line-break: strict;
+}
 button { cursor: pointer; }
 a { color: var(--primary); }
 .ic { display: inline-flex; line-height: 0; }

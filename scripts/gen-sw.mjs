@@ -29,9 +29,11 @@ const ASSETS = ${JSON.stringify(assetList(), null, 2)};
 
 ${isAppPage.toString()}
 
+// 새 버전은 받자마자 적용 대기 없이 넘어간다. 열려 있는 화면은 "업데이트" 버튼(index.html)을 누르면 새로 고쳐진다
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
+self.addEventListener('message', (e) => { if (e.data === 'SKIP_WAITING') self.skipWaiting(); });
 self.addEventListener('activate', (e) => {
   e.waitUntil((async () => {
     for (const k of await caches.keys()) if (k.startsWith('tercuman-') && k !== CACHE) await caches.delete(k);
@@ -42,7 +44,7 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return; // 번역·음성 인식은 늘 서버로
+  if (url.origin !== self.location.origin || url.pathname.startsWith('/api/') || url.pathname === '/version.json') return; // 번역·음성 인식·새 버전 확인은 늘 서버로
   if (req.mode === 'navigate') {
     if (!isAppPage(url.pathname)) return;
     e.respondWith(fetch(req).catch(async () => (await caches.match('/', { cacheName: CACHE })) || Response.error()));
@@ -53,7 +55,11 @@ self.addEventListener('fetch', (e) => {
 `;
 }
 
+/** 지금 배포된 버전 (업데이트 버튼이 이것과 열려 있는 화면의 버전을 비교한다) */
+export const versionJson = () => `${JSON.stringify({ version: version() })}\n`;
+
 if (process.argv[1] && process.argv[1].endsWith('gen-sw.mjs')) {
   writeFileSync(join(PUB, 'sw.js'), render());
-  console.log(`public/sw.js 생성: v${version()}, 파일 ${assetList().length}개`);
+  writeFileSync(join(PUB, 'version.json'), versionJson());
+  console.log(`public/sw.js · version.json 생성: v${version()}, 파일 ${assetList().length}개`);
 }

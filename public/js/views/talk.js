@@ -1,10 +1,10 @@
 // 대화 통역: 나·상대가 각자 버튼을 누르고 말하면 → 받아쓰기 → 번역 → 상대 언어로 읽어 주기
 // 마주 보기: 휴대폰을 탁자에 놓고, 상대 쪽 절반을 뒤집어 상대 언어로 보여 준다
 import { h, icon, toast, copyText, showBig, fmtTime } from '../ui.js';
-import { LANGS, UI } from '../lang.js';
+import { LANGS, UI, PARTNER_HINT } from '../lang.js';
 import { state, setSetting, addHistory, updateHistory } from '../store.js';
 import { listen, speak, stopSpeaking, unlockSpeech, hasVoice, sttMode } from '../speech.js';
-import { translate } from '../api.js';
+import { translate, kana as kanaReading } from '../api.js';
 import { readingFor } from '../reading.js';
 
 const START_KEY = 'tercuman.convoStart';
@@ -34,9 +34,14 @@ async function translateTurn(turn) {
   try {
     const out = await translate(turn.text, turn.from, turn.to, { context: context(turn), formal: state.settings.formal });
     turn.translation = out;
+    turn.kana = '';
     turn.pending = false;
-    updateHistory(turn.id, { translation: out, text: turn.text });
+    updateHistory(turn.id, { translation: out, text: turn.text, kana: '' });
     redraw();
+    // 일본어로 옮겼으면 한국 사용자에게 한글 발음을 보여 주려고 읽기(히라가나)를 따로 받는다 (번역은 먼저 보여 줌)
+    if (turn.to === 'ja' && state.settings.reading && state.settings.me === 'ko') {
+      kanaReading(out).then((k) => { if (k && turn.translation === out) { turn.kana = k; updateHistory(turn.id, { kana: k }); redraw(); } });
+    }
     if (state.settings.autoSpeak) {
       if (!hasVoice(turn.to) && !warnedVoice.has(turn.to)) {
         warnedVoice.add(turn.to);
@@ -109,7 +114,7 @@ function bubble(turn) {
         h('button', { class: 'btn ghost sm', type: 'button', onclick: () => { turn.editing = false; redraw(); } }, '취소'),
       ));
   }
-  const reading = s.reading && turn.translation ? readingFor(turn.translation, turn.to, s.me) : '';
+  const reading = s.reading && turn.translation ? readingFor(turn.translation, turn.to, s.me, turn.kana) : '';
   return h('div', { class: `bubble ${turn.side}` },
     h('div', { class: 'b-orig', lang: turn.from }, h('span', { class: 'flag' }, LANGS[turn.from].flag), ' ', turn.text, turn.edited ? h('em', null, ' · 고침') : null),
     turn.pending ? h('div', { class: 'b-trans pending', lang: turn.to }, h('span', { class: 'dots' }), UI[turn.to].thinking)
@@ -160,7 +165,7 @@ function emptyHint() {
   return h('div', { class: 'empty' },
     h('div', { class: 'empty-icon' }, '🎙️'),
     h('p', null, h('b', null, `${LANGS[me].flag} 왼쪽`), ' 버튼은 나, ', h('b', null, `${LANGS[partner].flag} 오른쪽`), ' 버튼은 상대가 누르고 말해요.'),
-    h('p', { class: 'muted', lang: partner }, partner === 'tr' ? 'Sağdaki düğmeye dokunup Türkçe konuşun.' : partner === 'en' ? 'Tap the button on the right and speak English.' : '오른쪽 버튼을 누르고 한국어로 말하세요.'),
+    h('p', { class: 'muted', lang: partner }, PARTNER_HINT[partner]),
     h('p', { class: 'muted small' }, '말을 마치면 저절로 번역해서 읽어 줘요. 글로 쓰려면 가운데 ⌨ 버튼.'),
     !mode ? h('p', { class: 'warn' }, '이 브라우저는 마이크를 쓸 수 없어요. ⌨ 버튼으로 글을 입력해 주세요.') : null,
   );

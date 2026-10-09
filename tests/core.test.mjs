@@ -7,7 +7,8 @@ import {
 test('요청 검사: 글·언어·길이·맥락', () => {
   assert.ok(validateTranslate({ text: '안녕', from: 'ko', to: 'tr' }).value);
   assert.match(validateTranslate({ text: '  ', from: 'ko', to: 'tr' }).error, /비어/);
-  assert.match(validateTranslate({ text: 'x', from: 'ko', to: 'ja' }).error, /지원하지/);
+  assert.match(validateTranslate({ text: 'x', from: 'ko', to: 'zh' }).error, /지원하지/);
+  assert.ok(validateTranslate({ text: 'こんにちは', from: 'ja', to: 'tr' }).value, '일본어 지원');
   assert.match(validateTranslate({ text: 'x'.repeat(MAX_TEXT + 1), from: 'ko', to: 'en' }).error, /1000자/);
   assert.match(validateTranslate(null).error, /형식/);
   const v = validateTranslate({ text: 'a', from: 'en', to: 'ko', context: [{ lang: 'ko', text: '가' }, { lang: 'xx', text: 'bad' }, { lang: 'tr', text: '' }, ...Array(6).fill({ lang: 'en', text: 'y'.repeat(400) })] }).value;
