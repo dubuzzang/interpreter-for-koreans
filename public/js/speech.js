@@ -3,6 +3,7 @@
 import { LANGS } from './lang.js';
 import { transcribe } from './api.js';
 import { state } from './store.js';
+import { t } from './i18n.js';
 
 const SR = typeof window !== 'undefined' ? (window.SpeechRecognition || window.webkitSpeechRecognition) : null;
 export const hasBrowserSTT = () => Boolean(SR);
@@ -24,7 +25,7 @@ const FALLBACK_ERRORS = new Set(['network', 'service-not-allowed', 'language-not
  */
 export function listen(lang, on) {
   const mode = sttMode();
-  if (!mode) { on.error?.('이 브라우저는 마이크를 쓸 수 없어요. 글로 입력해 주세요.'); on.end?.(); return { stop() {} }; }
+  if (!mode) { on.error?.(t('err.noMic')); on.end?.(); return { stop() {} }; }
   return mode === 'browser' ? listenBrowser(lang, on) : listenServer(lang, on);
 }
 
@@ -51,14 +52,14 @@ function listenBrowser(lang, on) {
   rec.onerror = (e) => {
     if (e.error === 'aborted') return;
     if (e.error === 'no-speech') return; // onend에서 "못 들었어요"
-    if (e.error === 'not-allowed') { on.error?.('마이크 권한이 필요해요. 주소창 옆 자물쇠에서 마이크를 허용해 주세요.'); return; }
-    if (e.error === 'audio-capture') { on.error?.('마이크를 찾지 못했어요.'); return; }
+    if (e.error === 'not-allowed') { on.error?.(t('err.micPermission')); return; }
+    if (e.error === 'audio-capture') { on.error?.(t('err.micMissing')); return; }
     if (FALLBACK_ERRORS.has(e.error) && canRecord()) {
       // 브라우저 음성 인식이 이 언어·환경에서 안 되면 서버 방식으로 바로 이어서
       switched = listenServer(lang, on);
       return;
     }
-    on.error?.(`음성 인식 오류 (${e.error})`);
+    on.error?.(t('err.stt', { code: e.error }));
   };
   rec.onend = () => {
     if (switched || ended) return;
@@ -68,7 +69,7 @@ function listenBrowser(lang, on) {
     else on.nothing?.();
     on.end?.();
   };
-  try { rec.start(); } catch (e) { on.error?.('음성 인식을 시작하지 못했어요.'); on.end?.(); }
+  try { rec.start(); } catch (e) { on.error?.(t('err.sttStart')); on.end?.(); }
   return {
     stop() { if (switched) switched.stop(); else { try { rec.stop(); } catch {} } },
     mode: 'browser',
@@ -97,7 +98,7 @@ function listenServer(lang, on) {
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
     } catch {
-      on.error?.('마이크 권한이 필요해요. 주소창 옆 자물쇠에서 마이크를 허용해 주세요.'); on.end?.(); return;
+      on.error?.(t('err.micPermission')); on.end?.(); return;
     }
     if (stopped) { stream.getTracks().forEach((t) => t.stop()); on.end?.(); return; }
     const mime = pickMime();

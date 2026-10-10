@@ -5,7 +5,8 @@ import { buildMessages, looksValid, cleanTranscript, validateKana, cleanKana, bu
 import { onRequestPost as kanaApi } from '../functions/api/kana.js';
 import { _resetBuckets } from '../lib/guard.mjs';
 import { jaKanaToHangul, readingFor } from '../public/js/reading.js';
-import { detectLang, LANGS, UI, PARTNER_HINT } from '../public/js/lang.js';
+import { detectLang, LANGS } from '../public/js/lang.js';
+import { MESSAGES } from '../public/js/i18n.js';
 import { PHRASES, phrasesFor } from '../public/js/phrases.js';
 
 beforeEach(() => _resetBuckets());
@@ -58,7 +59,7 @@ test('일본어 읽기 → 한글 발음 (첫머리 예사소리 · っ ㅅ받�
   assert.equal(jaKanaToHangul(''), '');
   assert.equal(readingFor('駅はどこですか？', 'ja', 'ko', 'えきわ どこ ですか？'), '에키와 도코 데스카?');
   assert.equal(readingFor('駅はどこですか？', 'ja', 'ko'), '', '읽기를 아직 못 받았으면 비움');
-  assert.equal(readingFor('駅はどこですか？', 'ja', 'tr', 'えきわ'), '', '한국 사용자에게만');
+  assert.equal(readingFor('駅はどこですか？', 'ja', 'tr', 'えきわ'), 'Ekiwa', '튀르키예어 사용자에게는 로마자로 (v1.2.0)');
   assert.equal(readingFor('안녕하세요', 'ko', 'ja'), 'Annyeonghaseyo', '일본 상대에게 한국어는 로마자로');
 });
 
@@ -68,8 +69,8 @@ test('일본어 알아보기 · 언어 정보 · 상대 안내', () => {
   assert.equal(detectLang('안녕하세요'), 'ko');
   assert.equal(detectLang('Merhaba'), 'tr');
   assert.equal(LANGS.ja.bcp47, 'ja-JP');
-  for (const k of Object.keys(UI.ko)) assert.ok(UI.ja[k], k);
-  for (const c of CODES) assert.ok(PARTNER_HINT[c], c);
+  for (const k of Object.keys(MESSAGES.ko)) assert.ok(MESSAGES.ja[k], k);
+  for (const c of CODES) assert.ok(MESSAGES[c]['mic.partnerHint'], c);
 });
 
 test('표현집: 모든 문장에 일본어와 히라가나 읽기, 상대가 일본어일 때 맞는 문장', () => {

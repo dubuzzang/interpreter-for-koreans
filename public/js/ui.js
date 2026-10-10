@@ -1,4 +1,5 @@
 // 화면 도우미: 요소 만들기 · 아이콘 · 알림 · 큰 글씨 보여 주기
+import { t, locale } from './i18n.js';
 
 export function h(tag, attrs, ...children) {
   const el = document.createElement(tag);
@@ -38,6 +39,7 @@ const PATHS = {
   text: '<path d="M4 6h16M4 12h10M4 18h13"/>',
   book: '<path d="M4 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4V4ZM20 4h-4a2 2 0 0 0-2 2"/><path d="M14 18h6V4"/>',
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/>',
 };
 export const icon = (name, size = 22) => h('span', {
   class: 'ic', 'aria-hidden': 'true',
@@ -55,25 +57,28 @@ export function toast(message, kind = '') {
 }
 
 export async function copyText(text) {
-  try { await navigator.clipboard.writeText(text); toast('복사했어요', 'ok'); }
-  catch { toast('복사하지 못했어요', 'bad'); }
+  try { await navigator.clipboard.writeText(text); toast(t('ui.copied'), 'ok'); }
+  catch { toast(t('ui.copyFailed'), 'bad'); }
 }
+
+/** 사전 문구의 *굵게* 부분을 <b>로 */
+export const rich = (s) => String(s).split('*').map((part, i) => (i % 2 ? h('b', null, part) : part));
 
 /** 상대에게 화면을 보여 주는 큰 글씨 (탭하면 닫힘) */
 export function showBig(text, { lang, reading, onSpeak } = {}) {
   const close = () => { overlay.remove(); document.removeEventListener('keydown', esc); };
   const esc = (e) => { if (e.key === 'Escape') close(); };
-  const overlay = h('div', { class: 'bigview', role: 'dialog', 'aria-label': '크게 보기', onclick: close },
+  const overlay = h('div', { class: 'bigview', role: 'dialog', 'aria-label': t('ui.bigView'), onclick: close },
     h('div', { class: 'big-text', lang }, text),
     reading ? h('div', { class: 'big-reading' }, reading) : null,
     h('div', { class: 'big-actions' },
-      onSpeak ? h('button', { class: 'btn round', type: 'button', 'aria-label': '읽어 주기', onclick: (e) => { e.stopPropagation(); onSpeak(); } }, icon('speaker', 28)) : null,
-      h('button', { class: 'btn round ghost', type: 'button', 'aria-label': '닫기' }, icon('close', 28)),
+      onSpeak ? h('button', { class: 'btn round', type: 'button', 'aria-label': t('common.speak'), onclick: (e) => { e.stopPropagation(); onSpeak(); } }, icon('speaker', 28)) : null,
+      h('button', { class: 'btn round ghost', type: 'button', 'aria-label': t('common.close') }, icon('close', 28)),
     ),
   );
   document.addEventListener('keydown', esc);
   document.body.append(overlay);
 }
 
-export const fmtTime = (t) => new Date(t).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit' });
-export const fmtDate = (t) => new Date(t).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' });
+export const fmtTime = (at) => new Date(at).toLocaleTimeString(locale(), { hour: 'numeric', minute: '2-digit' });
+export const fmtDate = (at) => new Date(at).toLocaleDateString(locale(), { month: 'long', day: 'numeric', weekday: 'short' });

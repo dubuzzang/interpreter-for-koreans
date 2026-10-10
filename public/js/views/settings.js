@@ -1,28 +1,39 @@
-// 설정: 말투 · 읽어 주기 · 목소리 · 음성 인식 방식 · 기록 · 화면 · 앱 정보
+// 설정: 언어 · 말투 · 읽어 주기 · 목소리 · 음성 인식 방식 · 기록 · 화면 · 업데이트 · 앱 정보
 import { h, icon, toast } from '../ui.js';
 import { LANGS, CODES } from '../lang.js';
+import { t, tl, langName } from '../i18n.js';
 import { state, setSetting, clearHistory } from '../store.js';
 import { voicesFor, speak, unlockSpeech, hasBrowserSTT, canRecord, canSpeak } from '../speech.js';
-import { applyTheme } from '../app.js';
+import { applyTheme, setMyLang } from '../app.js';
 import { VERSION, RELEASED } from '../version.js';
-
-const SAMPLE = { ko: '안녕하세요. 만나서 반가워요.', tr: 'Merhaba, tanıştığımıza memnun oldum.', en: 'Hello, nice to meet you.', ja: 'こんにちは。はじめまして。' };
 
 /** 설정의 "업데이트 확인" — 새 버전이 있으면 바로 바꾼다 (index.html의 업데이트 도우미) */
 function updateCard() {
-  const status = h('p', { class: 'muted small' }, `지금 버전 v${VERSION} (${RELEASED})`);
+  const status = h('p', { class: 'muted small' }, t('set.version', { v: VERSION, date: RELEASED }));
   const btn = h('button', { class: 'btn soft block', type: 'button', onclick: async () => {
     const u = window.__tercumanUpdate;
     if (!u) { location.reload(); return; }
-    btn.disabled = true; btn.textContent = '확인 중…';
+    btn.disabled = true; btn.textContent = t('set.checking');
     const r = await u.check();
-    if (r.update) { btn.textContent = `v${r.latest}로 바꾸는 중…`; u.apply(); return; }
-    btn.disabled = false; btn.textContent = '업데이트 확인';
-    if (r.offline) toast('인터넷에 연결되어 있지 않아요', 'bad');
-    else toast(`최신 버전이에요 (v${r.latest || VERSION})`, 'ok');
-  } }, '업데이트 확인');
-  return h('section', { class: 'card' }, h('div', { class: 'set-label' }, '업데이트'), status,
-    h('p', { class: 'muted small' }, '새 버전이 나오면 화면 위에 "업데이트" 버튼이 저절로 떠요. 여기서 직접 확인할 수도 있어요.'), btn);
+    if (r.update) { btn.textContent = t('set.updating', { v: r.latest }); u.apply(); return; }
+    btn.disabled = false; btn.textContent = t('set.checkUpdate');
+    if (r.offline) toast(t('set.offline'), 'bad');
+    else toast(t('set.latest', { v: r.latest || VERSION }), 'ok');
+  } }, t('set.checkUpdate'));
+  return h('section', { class: 'card' }, h('div', { class: 'set-label' }, t('set.update')), status,
+    h('p', { class: 'muted small' }, t('set.updateHint')), btn);
+}
+
+/** 언어 / Language — 오른쪽 위 🌐 버튼과 같다. 각 언어를 그 언어 이름으로 */
+function languageCard() {
+  return h('section', { class: 'card' },
+    h('div', { class: 'set-row col' },
+      h('div', { class: 'set-label' }, t('app.language')),
+      h('div', { class: 'seg', role: 'radiogroup', 'aria-label': t('app.language') }, CODES.map((c) => h('button', {
+        type: 'button', lang: c, role: 'radio', class: state.settings.me === c ? 'on' : '', 'aria-checked': String(state.settings.me === c),
+        onclick: () => setMyLang(c),
+      }, LANGS[c].native))),
+      h('div', { class: 'muted small' }, t('set.languageHint'))));
 }
 
 function toggle(key, label, desc) {
@@ -30,69 +41,71 @@ function toggle(key, label, desc) {
   return h('label', { class: 'set-row' }, h('div', null, h('div', { class: 'set-label' }, label), desc ? h('div', { class: 'muted small' }, desc) : null), h('span', { class: 'switch' }, input, h('span', { class: 'slider' })));
 }
 
-function seg(key, label, options, onChange) {
+function seg(key, label, options, onChange, desc) {
   const wrap = h('div', { class: 'seg' });
-  const draw = () => wrap.replaceChildren(...options.map(([v, t]) => h('button', {
+  const draw = () => wrap.replaceChildren(...options.map(([v, text]) => h('button', {
     type: 'button', class: state.settings[key] === v ? 'on' : '', 'aria-pressed': String(state.settings[key] === v),
     onclick: () => { setSetting(key, v); draw(); onChange?.(v); },
-  }, t)));
+  }, text)));
   draw();
-  return h('div', { class: 'set-row col' }, h('div', { class: 'set-label' }, label), wrap);
+  return h('div', { class: 'set-row col' }, h('div', { class: 'set-label' }, label), wrap, desc ? h('div', { class: 'muted small' }, desc) : null);
 }
 
 export default {
   render(root) {
     const s = state.settings;
-    const rate = h('input', { type: 'range', min: '0.6', max: '1.2', step: '0.05', value: String(s.rate), 'aria-label': '읽는 속도' });
-    const rateVal = h('span', { class: 'muted small' }, `${Number(s.rate).toFixed(2)}배`);
-    rate.addEventListener('input', () => { setSetting('rate', Number(rate.value)); rateVal.textContent = `${Number(rate.value).toFixed(2)}배`; });
+    const rateText = (v) => t('set.rateValue', { x: Number(v).toFixed(2) });
+    const rate = h('input', { type: 'range', min: '0.6', max: '1.2', step: '0.05', value: String(s.rate), 'aria-label': t('set.rate') });
+    const rateVal = h('span', { class: 'muted small' }, rateText(s.rate));
+    rate.addEventListener('input', () => { setSetting('rate', Number(rate.value)); rateVal.textContent = rateText(rate.value); });
 
     const voiceRows = h('div');
     const drawVoices = () => voiceRows.replaceChildren(...CODES.map((c) => {
       const list = voicesFor(c);
-      const sel = h('select', { class: 'select', 'aria-label': `${LANGS[c].name} 목소리`, disabled: !list.length },
-        list.length ? list.map((v) => h('option', { value: v.voiceURI }, `${v.name}${v.localService ? '' : ' (온라인)'}`)) : h('option', null, '이 기기에 목소리 없음'));
+      const sel = h('select', { class: 'select', 'aria-label': t('set.voiceOf', { lang: langName(c) }), disabled: !list.length },
+        list.length ? list.map((v) => h('option', { value: v.voiceURI }, `${v.name}${v.localService ? '' : ` ${t('set.online')}`}`)) : h('option', null, t('set.noVoice')));
       if (s.voices[c]) sel.value = s.voices[c];
       sel.addEventListener('change', () => { s.voices[c] = sel.value; setSetting('voices', { ...s.voices }); });
       return h('div', { class: 'voice-row' },
-        h('span', { class: 'voice-lang' }, LANGS[c].flag, ' ', LANGS[c].name), sel,
-        h('button', { class: 'icon-btn sm', type: 'button', 'aria-label': `${LANGS[c].name} 들어 보기`, disabled: !list.length, onclick: () => { unlockSpeech(); speak(SAMPLE[c], c); } }, icon('speaker', 18)));
+        h('span', { class: 'voice-lang' }, LANGS[c].flag, ' ', langName(c)), sel,
+        h('button', { class: 'icon-btn sm', type: 'button', 'aria-label': t('set.voiceTry', { lang: langName(c) }), disabled: !list.length, onclick: () => { unlockSpeech(); speak(tl(c, 'set.voiceSample'), c); } }, icon('speaker', 18)));
     }));
     drawVoices();
     window.speechSynthesis?.addEventListener?.('voiceschanged', drawVoices, { once: true });
 
     const engine = [
-      hasBrowserSTT() ? '브라우저 음성 인식 사용 가능' : '브라우저 음성 인식 없음',
-      canRecord() ? '녹음(서버 인식) 가능' : '녹음 불가',
-      canSpeak() ? '읽어 주기 가능' : '읽어 주기 불가',
+      t(hasBrowserSTT() ? 'set.sttYes' : 'set.sttNo'),
+      t(canRecord() ? 'set.recYes' : 'set.recNo'),
+      t(canSpeak() ? 'set.ttsYes' : 'set.ttsNo'),
     ].join(' · ');
 
     root.append(
-      h('h1', { class: 'page-title' }, '설정'),
+      h('h1', { class: 'page-title' }, t('set.title')),
+      languageCard(),
       h('section', { class: 'card' },
-        seg('formal', '말투', [[true, '존댓말 (siz)'], [false, '반말 (sen)']]),
-        toggle('autoSpeak', '번역을 바로 읽어 주기', '대화에서 번역이 나오면 상대 언어로 소리 내어 읽어요'),
-        h('div', { class: 'set-row col' }, h('div', { class: 'row between' }, h('div', { class: 'set-label' }, '읽는 속도'), rateVal), rate),
-        toggle('reading', '읽는 법 같이 보기', '튀르키예어·일본어 번역 밑에 한글 발음(메르하바 · 곤니치와), 상대에게 보이는 한국어엔 로마자')),
+        seg('formal', t('set.tone'), [[true, t('set.formal')], [false, t('set.casual')]], null, t('set.toneHint')),
+        toggle('autoSpeak', t('set.autoSpeak'), t('set.autoSpeakHint')),
+        h('div', { class: 'set-row col' }, h('div', { class: 'row between' }, h('div', { class: 'set-label' }, t('set.rate')), rateVal), rate),
+        toggle('reading', t('set.reading'), t('set.readingHint'))),
       h('section', { class: 'card' },
-        h('div', { class: 'set-label' }, '목소리'),
-        h('p', { class: 'muted small' }, '기기에 깔린 목소리로 읽어요. 튀르키예어 목소리가 없으면 휴대폰 설정 → 언어/음성(텍스트 음성 변환)에서 추가할 수 있어요.'),
+        h('div', { class: 'set-label' }, t('set.voices')),
+        h('p', { class: 'muted small' }, t('set.voicesHint')),
         voiceRows),
       h('section', { class: 'card' },
-        seg('stt', '음성 인식 방식', [['auto', '자동'], ['browser', '브라우저'], ['server', '서버(Whisper)']]),
-        h('p', { class: 'muted small' }, '자동: 브라우저 음성 인식(말하는 동안 글자가 보임)을 쓰고, 안 되는 브라우저에서는 녹음해서 서버로 보내요.'),
-        h('p', { class: 'muted small' }, `이 기기: ${engine}`)),
+        seg('stt', t('set.stt'), [['auto', t('set.sttAuto')], ['browser', t('set.sttBrowser')], ['server', t('set.sttServer')]]),
+        h('p', { class: 'muted small' }, t('set.sttHint')),
+        h('p', { class: 'muted small' }, t('set.device', { list: engine }))),
       h('section', { class: 'card' },
-        toggle('saveHistory', '기록 남기기', '통역한 내용을 이 기기에만 저장해요'),
-        h('button', { class: 'btn ghost block', type: 'button', onclick: () => { if (confirm('기록을 모두 지울까요?')) { clearHistory(); toast('기록을 지웠어요', 'ok'); } } }, icon('trash', 18), ' 기록 모두 지우기')),
+        toggle('saveHistory', t('set.saveHistory'), t('set.saveHistoryHint')),
+        h('button', { class: 'btn ghost block', type: 'button', onclick: () => { if (confirm(t('hist.clearConfirm'))) { clearHistory(); toast(t('hist.cleared'), 'ok'); } } }, icon('trash', 18), ' ', t('set.clearHistory'))),
       h('section', { class: 'card' },
-        seg('theme', '화면', [['auto', '기기 설정대로'], ['light', '밝게'], ['dark', '어둡게']], applyTheme)),
+        seg('theme', t('set.theme'), [['auto', t('set.themeAuto')], ['light', t('set.themeLight')], ['dark', t('set.themeDark')]], applyTheme)),
       updateCard(),
       h('section', { class: 'card about' },
         h('div', { class: 'set-label' }, `Tercüman v${VERSION}`),
-        h('p', { class: 'muted small' }, `${RELEASED} · 한국어 · 튀르키예어 · 영어 · 일본어 통역`),
-        h('p', { class: 'muted small' }, '번역: Cloudflare Workers AI (Gemma 4) · 음성 인식: 브라우저 / Whisper large-v3 turbo · 읽어 주기: 기기 목소리. 말한 내용은 번역을 위해 서버로 보내지고 저장되지 않아요. 기록은 이 기기에만 남아요.'),
-        h('p', { class: 'muted small' }, '홈 화면에 추가하면 앱처럼 쓸 수 있어요 (아이폰: Safari 공유 → 홈 화면에 추가 · 안드로이드: Chrome 메뉴 → 앱 설치).')),
+        h('p', { class: 'muted small' }, t('set.about', { date: RELEASED })),
+        h('p', { class: 'muted small' }, t('set.privacy')),
+        h('p', { class: 'muted small' }, t('set.install'))),
     );
   },
 };

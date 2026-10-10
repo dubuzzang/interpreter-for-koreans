@@ -1,14 +1,14 @@
-// 표현집 (인터넷 없이도 됨) — 한국어 · 튀르키예어 · 영어 · 일본어
-// jaKana: 일본어 읽기(히라가나, 조사는 소리대로 わ·え·お, 낱말 띄어 쓰기) → 화면에서 한글 발음으로
-// only: 그 상대 언어일 때만 보이는 문장
+// 표현집 (인터넷 없이도 됨) — 한국어 · 튀르키예어 · 영어 · 일본어. 분류 이름은 i18n.js의 cat.<id>
+// jaKana: 일본어 읽기(히라가나, 조사는 소리대로 わ·え·お, 낱말 띄어 쓰기) → 화면에서 한글 발음 · 로마자로
+// only: 그 상대 언어일 때만 보이는 문장 · me: 그 언어 사용자에게만 보이는 문장 ("저는 한국 사람이에요" 같은 것)
 export const PHRASE_CATS = [
-  { id: 'greet', name: '인사', icon: '👋' },
-  { id: 'talk', name: '소통', icon: '💬' },
-  { id: 'food', name: '식당', icon: '🍽️' },
-  { id: 'shop', name: '쇼핑', icon: '🛍️' },
-  { id: 'move', name: '길·교통', icon: '🚌' },
-  { id: 'stay', name: '숙소', icon: '🏨' },
-  { id: 'help', name: '긴급', icon: '🚑' },
+  { id: 'greet', icon: '👋' },
+  { id: 'talk', icon: '💬' },
+  { id: 'food', icon: '🍽️' },
+  { id: 'shop', icon: '🛍️' },
+  { id: 'move', icon: '🚌' },
+  { id: 'stay', icon: '🏨' },
+  { id: 'help', icon: '🚑' },
 ];
 
 export const PHRASES = [
@@ -25,7 +25,10 @@ export const PHRASES = [
   { cat: 'greet', ko: '안녕히 계세요.', tr: 'Hoşça kalın.', en: 'Goodbye.', ja: 'さようなら。', jaKana: 'さようなら' },
   { cat: 'greet', ko: '좋은 하루 보내세요.', tr: 'İyi günler.', en: 'Have a nice day.', ja: 'よい一日を。', jaKana: 'よい いちにちお' },
   // 소통
-  { cat: 'talk', ko: '저는 한국 사람이에요.', tr: 'Ben Koreliyim.', en: "I'm Korean.", ja: '私は韓国人です。', jaKana: 'わたしわ かんこくじん です' },
+  { cat: 'talk', me: 'ko', ko: '저는 한국 사람이에요.', tr: 'Ben Koreliyim.', en: "I'm Korean.", ja: '私は韓国人です。', jaKana: 'わたしわ かんこくじん です' },
+  { cat: 'talk', me: 'tr', ko: '저는 튀르키예 사람이에요.', tr: 'Ben Türküm.', en: "I'm Turkish.", ja: '私はトルコ人です。', jaKana: 'わたしわ とるこじん です' },
+  { cat: 'talk', me: 'ja', ko: '저는 일본 사람이에요.', tr: 'Ben Japonum.', en: "I'm Japanese.", ja: '私は日本人です。', jaKana: 'わたしわ にほんじん です' },
+  { cat: 'talk', ko: '한국어를 잘 못해요.', tr: 'Koreceyi iyi konuşamıyorum.', en: "I don't speak Korean well.", ja: '韓国語はあまり話せません。', jaKana: 'かんこくごわ あまり はなせません', only: 'ko' },
   { cat: 'talk', ko: '튀르키예어를 잘 못해요.', tr: 'Türkçeyi iyi konuşamıyorum.', en: "I don't speak Turkish well.", ja: 'トルコ語はあまり話せません。', jaKana: 'とるこごわ あまり はなせません', only: 'tr' },
   { cat: 'talk', ko: '영어를 잘 못해요.', tr: 'İngilizceyi iyi konuşamıyorum.', en: "I don't speak English well.", ja: '英語はあまり話せません。', jaKana: 'えいごわ あまり はなせません', only: 'en' },
   { cat: 'talk', ko: '일본어를 잘 못해요.', tr: 'Japoncayı iyi konuşamıyorum.', en: "I don't speak Japanese well.", ja: '日本語はあまり話せません。', jaKana: 'にほんごわ あまり はなせません', only: 'ja' },
@@ -86,8 +89,11 @@ export const PHRASES = [
   { cat: 'help', ko: '배가 아파요.', tr: 'Midem ağrıyor.', en: 'I have a stomachache.', ja: 'お腹が痛いです。', jaKana: 'おなかが いたい です' },
   { cat: 'help', ko: '알레르기가 있어요.', tr: 'Alerjim var.', en: 'I have an allergy.', ja: 'アレルギーがあります。', jaKana: 'あれるぎーが あります' },
   { cat: 'help', ko: '여권을 잃어버렸어요.', tr: 'Pasaportumu kaybettim.', en: 'I lost my passport.', ja: 'パスポートをなくしました。', jaKana: 'ぱすぽーとお なくしました' },
-  { cat: 'help', ko: '한국 대사관에 연락해 주세요.', tr: "Lütfen Kore Büyükelçiliği'ni arayın.", en: 'Please contact the Korean Embassy.', ja: '韓国大使館に連絡してください。', jaKana: 'かんこく たいしかんに れんらく して ください' },
+  { cat: 'help', me: 'ko', ko: '한국 대사관에 연락해 주세요.', tr: "Lütfen Kore Büyükelçiliği'ni arayın.", en: 'Please contact the Korean Embassy.', ja: '韓国大使館に連絡してください。', jaKana: 'かんこく たいしかんに れんらく して ください' },
+  { cat: 'help', me: 'tr', ko: '튀르키예 대사관에 연락해 주세요.', tr: "Lütfen Türkiye Büyükelçiliği'ni arayın.", en: 'Please contact the Turkish Embassy.', ja: 'トルコ大使館に連絡してください。', jaKana: 'とるこ たいしかんに れんらく して ください' },
+  { cat: 'help', me: 'ja', ko: '일본 대사관에 연락해 주세요.', tr: "Lütfen Japonya Büyükelçiliği'ni arayın.", en: 'Please contact the Japanese Embassy.', ja: '日本大使館に連絡してください。', jaKana: 'にほん たいしかんに れんらく して ください' },
+  { cat: 'help', me: 'en', ko: '저희 나라 대사관에 연락해 주세요.', tr: 'Lütfen ülkemin büyükelçiliğini arayın.', en: 'Please contact my embassy.', ja: '私の国の大使館に連絡してください。', jaKana: 'わたしの くにの たいしかんに れんらく して ください' },
 ];
 
-/** 상대 언어에 맞는 표현 */
-export const phrasesFor = (cat, partner) => PHRASES.filter((p) => p.cat === cat && (!p.only || p.only === partner));
+/** 상대 언어 · 내 언어에 맞는 표현 */
+export const phrasesFor = (cat, partner, me = 'ko') => PHRASES.filter((p) => p.cat === cat && (!p.only || p.only === partner) && (!p.me || p.me === me));

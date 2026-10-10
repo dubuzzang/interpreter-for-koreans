@@ -1,4 +1,6 @@
-// 읽는 법 표시: 튀르키예어 → 한글 발음 (한국 사용자가 직접 말해 볼 수 있게) · 한국어 → 로마자 (상대가 읽어 볼 수 있게)
+// 읽는 법 표시 — 보는 사람이 읽을 수 있는 글자로:
+// 한국어 사용자에게 튀르키예어·일본어 → 한글 발음, 튀르키예어·영어·일본어 사용자에게 한국어 → 로마자,
+// 튀르키예어·영어 사용자에게 일본어 → 로마자. 라틴 문자 언어끼리는 적지 않는다.
 // 튀르키예어 규칙은 Merhaba(한국인을 위한 튀르키예어) 앱의 변환기와 같다.
 
 const trLower = (s) => String(s ?? '').normalize('NFC').toLocaleLowerCase('tr-TR').replace(/̇/g, '');
@@ -205,13 +207,80 @@ export function jaKanaToHangul(kana) {
   }).join('');
 }
 
+// ---------- 일본어(히라가나 읽기) → 로마자 (헵번식, 장음은 ā·ō·ū) ----------
+const ROMA = {
+  あ: 'a', い: 'i', う: 'u', え: 'e', お: 'o', か: 'ka', き: 'ki', く: 'ku', け: 'ke', こ: 'ko', が: 'ga', ぎ: 'gi', ぐ: 'gu', げ: 'ge', ご: 'go',
+  さ: 'sa', し: 'shi', す: 'su', せ: 'se', そ: 'so', ざ: 'za', じ: 'ji', ず: 'zu', ぜ: 'ze', ぞ: 'zo',
+  た: 'ta', ち: 'chi', つ: 'tsu', て: 'te', と: 'to', だ: 'da', ぢ: 'ji', づ: 'zu', で: 'de', ど: 'do',
+  な: 'na', に: 'ni', ぬ: 'nu', ね: 'ne', の: 'no', は: 'ha', ひ: 'hi', ふ: 'fu', へ: 'he', ほ: 'ho',
+  ば: 'ba', び: 'bi', ぶ: 'bu', べ: 'be', ぼ: 'bo', ぱ: 'pa', ぴ: 'pi', ぷ: 'pu', ぺ: 'pe', ぽ: 'po',
+  ま: 'ma', み: 'mi', む: 'mu', め: 'me', も: 'mo', や: 'ya', ゆ: 'yu', よ: 'yo', ら: 'ra', り: 'ri', る: 'ru', れ: 're', ろ: 'ro',
+  わ: 'wa', ゐ: 'i', ゑ: 'e', を: 'o', ゔ: 'vu', ぁ: 'a', ぃ: 'i', ぅ: 'u', ぇ: 'e', ぉ: 'o', ゃ: 'ya', ゅ: 'yu', ょ: 'yo', ゎ: 'wa',
+};
+// 작은 ゃゅょ가 붙는 소리의 앞부분 (きゃ → kya, しゃ → sha)
+const YOON_R = { き: 'ky', ぎ: 'gy', し: 'sh', じ: 'j', ち: 'ch', ぢ: 'j', に: 'ny', ひ: 'hy', び: 'by', ぴ: 'py', み: 'my', り: 'ry' };
+const SMALL_R = {
+  てぃ: 'ti', でぃ: 'di', とぅ: 'tu', どぅ: 'du', ふぁ: 'fa', ふぃ: 'fi', ふぇ: 'fe', ふぉ: 'fo', うぃ: 'wi', うぇ: 'we', うぉ: 'wo',
+  しぇ: 'she', じぇ: 'je', ちぇ: 'che', つぁ: 'tsa', ゔぁ: 'va', ゔぃ: 'vi', ゔぇ: 've', ゔぉ: 'vo', いぇ: 'ye',
+};
+const MACRON = { a: 'ā', i: 'ī', u: 'ū', e: 'ē', o: 'ō' };
+const PUNCT_R = { '。': '.', '、': ',', '？': '?', '！': '!', '・': ' ', '　': ' ' };
+
+function jaWordRoman(word) {
+  const out = [];   // 소리마디별 로마자
+  let geminate = false; // っ: 다음 소리의 첫 자음을 겹친다
+  const chars = [...word];
+  for (let i = 0; i < chars.length; i++) {
+    const c = chars[i], next = chars[i + 1];
+    const last = out.at(-1) || '';
+    const lastV = last.slice(-1);
+    if (c === 'っ') { geminate = true; continue; }
+    if (c === 'ー') { if (MACRON[lastV]) out[out.length - 1] = last.slice(0, -1) + MACRON[lastV]; continue; }
+    // 장음: おう · おお → ō, うう → ū, ああ → ā, ええ → ē (いい · えい는 그대로)
+    if ((c === 'う' && (lastV === 'o' || lastV === 'u')) || (c === 'お' && lastV === 'o') || (c === 'あ' && lastV === 'a') || (c === 'え' && lastV === 'e')) {
+      out[out.length - 1] = last.slice(0, -1) + MACRON[lastV];
+      continue;
+    }
+    let syl;
+    if (next && 'ゃゅょ'.includes(next) && YOON_R[c]) { syl = YOON_R[c] + ROMA[next].slice(1); i++; }
+    else if (next && SMALL_R[c + next]) { syl = SMALL_R[c + next]; i++; }
+    else if (c === 'ん') syl = 'n';
+    else syl = ROMA[c] ?? c;
+    if (geminate) { syl = (syl.startsWith('ch') ? 't' : /^[a-z]/.test(syl) && !/^[aeiou]/.test(syl) ? syl[0] : '') + syl; geminate = false; }
+    // ん 뒤에 모음·y가 오면 n' (きんえん → kin'en)
+    if (last === 'n' && /^[aeiouy]/.test(syl)) out[out.length - 1] = "n'";
+    out.push(syl);
+  }
+  return out.join('');
+}
+
+/** 히라가나(가타카나) 읽기 → 로마자. 예) こんにちわ → Konnichiwa, ありがとう ございます → Arigatō gozaimasu */
+export function jaKanaToRomaji(kana) {
+  if (!kana) return '';
+  const s = String(kana).replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
+  const res = s.split(/([\s。、？！・?!,.]+)/)
+    .map((p) => (/^[\s。、？！・?!,.]+$/.test(p) ? [...p].map((c) => PUNCT_R[c] ?? c).join('') : jaWordRoman(p)))
+    .join('');
+  return res.replace(/(^|[.!?]\s+)([a-zāīūēō])/g, (_, a, b) => a + b.toUpperCase());
+}
+
 /**
- * 화면에 같이 보일 읽는 법 — 그 글을 읽는 사람에게 필요한 것만:
- * 튀르키예어·일본어는 한국 사용자에게 한글로(일본어는 서버에서 받은 히라가나 읽기 kana가 있어야), 한국어는 상대에게 로마자로
+ * 화면에 같이 보일 읽는 법 — 그 글을 보는 사람(viewer)이 읽을 수 있는 글자로, 필요할 때만:
+ * - 한국어 사용자: 튀르키예어 → 한글 발음, 일본어 → 한글 발음 (서버에서 받은 히라가나 읽기 kana가 있어야)
+ * - 튀르키예어·영어 사용자: 한국어 → 로마자, 일본어 → 로마자 (kana가 있어야). 튀르키예어↔영어는 적지 않음
+ * - 일본어 사용자: 한국어 → 로마자. 튀르키예어·영어는 적지 않음 (가타카나 표기는 정확하게 만들기 어려워서)
  */
 export function readingFor(text, lang, viewer = 'ko', kana = '') {
-  if (lang === 'tr' && viewer === 'ko') return trToHangul(text);
-  if (lang === 'ja' && viewer === 'ko') return kana ? jaKanaToHangul(kana) : '';
-  if (lang === 'ko' && viewer !== 'ko') return koToRoman(text);
+  if (lang === viewer) return '';
+  if (viewer === 'ko') {
+    if (lang === 'tr') return trToHangul(text);
+    if (lang === 'ja') return kana ? jaKanaToHangul(kana) : '';
+    return '';
+  }
+  if (lang === 'ko') return koToRoman(text);
+  if (lang === 'ja') return kana ? jaKanaToRomaji(kana) : '';
   return '';
 }
+
+/** 이 사람에게 일본어 읽는 법을 보이려면 서버에서 히라가나 읽기를 받아야 하나 */
+export const needsKana = (lang, viewer) => lang === 'ja' && viewer !== 'ja';

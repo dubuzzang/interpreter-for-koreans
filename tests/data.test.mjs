@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
-import { detectLang, LANGS, CODES, UI, otherLangs } from '../public/js/lang.js';
+import { detectLang, LANGS, CODES, otherLangs } from '../public/js/lang.js';
+import { MESSAGES } from '../public/js/i18n.js';
 import { PHRASES, PHRASE_CATS, phrasesFor } from '../public/js/phrases.js';
 import { render as renderSW, assetList, version, isAppPage, versionJson } from '../scripts/gen-sw.mjs';
 
@@ -21,7 +22,7 @@ test('언어 정보 · 상대 쪽 문구가 네 언어 모두 있다', () => {
   assert.deepEqual(CODES, ['ko', 'tr', 'en', 'ja']);
   for (const c of CODES) {
     assert.match(LANGS[c].bcp47, /^[a-z]{2}-[A-Z]{2}$/);
-    for (const k of Object.keys(UI.ko)) assert.ok(UI[c][k], `${c}.${k}`);
+    for (const k of Object.keys(MESSAGES.ko)) assert.ok(MESSAGES[c][k], `${c}.${k}`);
   }
   assert.deepEqual(otherLangs('ko'), ['tr', 'en', 'ja']);
 });
@@ -37,7 +38,7 @@ test('표현집: 네 언어가 다 있고, 글자 체계가 맞고, 겹치지 �
     assert.doesNotMatch(p.en, /[가-힣çğışöü]/i, p.en);
     assert.ok(p.tr.trim() && p.en.trim(), p.ko);
     assert.match(p.tr, /[.!?]$/, `튀르키예어 문장 끝 부호: ${p.tr}`);
-    assert.ok(!p.only || ['tr', 'en', 'ja'].includes(p.only));
+    assert.ok(!p.only || CODES.includes(p.only), '상대 언어가 한국어일 때(튀르키예어·영어·일본어 사용자)를 위한 문장도 있다');
     const key = `${p.cat}|${p.ko}`;
     assert.ok(!seen.has(key), `중복: ${p.ko}`);
     seen.add(key);

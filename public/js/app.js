@@ -1,7 +1,8 @@
-// Tercüman — 한국어 · 튀르키예어 · 영어 통역 (화면 뼈대 · 화면 전환)
+// Tercüman — 한국어 · 튀르키예어 · 영어 · 일본어 통역 (화면 뼈대 · 화면 전환 · 화면 언어)
 import { h, icon } from './ui.js';
 import { LANGS } from './lang.js';
 import { state, setSetting } from './store.js';
+import { t, setUiLang, langName, pickLanguage } from './i18n.js';
 import { unlockSpeech } from './speech.js';
 import talk from './views/talk.js';
 import text from './views/text.js';
@@ -9,24 +10,27 @@ import phrases from './views/phrases.js';
 import history from './views/history.js';
 import settings from './views/settings.js';
 import { openLangPicker } from './views/langpicker.js';
+import { openLangMenu } from './views/langmenu.js';
 import { VERSION } from './version.js';
 
 const VIEWS = { talk, text, phrases, history, settings };
 const TABS = [
-  ['talk', '대화', 'chat'],
-  ['text', '번역', 'text'],
-  ['phrases', '표현', 'book'],
-  ['history', '기록', 'clock'],
+  ['talk', 'tab.talk', 'chat'],
+  ['text', 'tab.text', 'text'],
+  ['phrases', 'tab.phrases', 'book'],
+  ['history', 'tab.history', 'clock'],
 ];
 
 const main = document.getElementById('main');
 const pairBtn = document.getElementById('pair');
 const tabbar = document.getElementById('tabbar');
+const gearBtn = document.getElementById('gear');
+const langBtn = document.getElementById('lang');
 let cleanup = null;
 
 export function applyTheme() {
-  const t = state.settings.theme;
-  const dark = t === 'dark' || (t === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+  const th = state.settings.theme;
+  const dark = th === 'dark' || (th === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0f1220' : '#f4f5fb');
 }
@@ -35,11 +39,38 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applyThe
 export function renderPair() {
   const { me, partner } = state.settings;
   pairBtn.replaceChildren(
-    h('span', { class: 'pair-lang' }, LANGS[me].flag, ' ', LANGS[me].name),
+    h('span', { class: 'pair-lang' }, LANGS[me].flag),
     icon('swap', 16),
-    h('span', { class: 'pair-lang' }, LANGS[partner].flag, ' ', LANGS[partner].native),
+    h('span', { class: 'pair-lang', lang: partner }, LANGS[partner].flag, ' ', LANGS[partner].native),
   );
-  pairBtn.setAttribute('aria-label', `언어 바꾸기: 나 ${LANGS[me].name}, 상대 ${LANGS[partner].name}`);
+  pairBtn.setAttribute('aria-label', t('app.pair', { me: langName(me), partner: langName(partner) }));
+}
+
+/** 화면 뼈대(제목 · 위 막대 · 아래 탭)를 고른 언어로 */
+function applyLang() {
+  const me = setUiLang(state.settings.me);
+  document.documentElement.lang = me;
+  document.title = t('app.title');
+  document.querySelector('.brand')?.setAttribute('aria-label', t('app.home'));
+  gearBtn.setAttribute('aria-label', t('app.settings'));
+  tabbar.setAttribute('aria-label', t('app.menu'));
+  tabbar.replaceChildren(...TABS.map(([id, key, ic]) => h('a', { href: `#/${id}`, dataset: { tab: id } }, icon(ic, 22), h('span', null, t(key)))));
+  if (langBtn) {
+    langBtn.replaceChildren(icon('globe', 18), h('span', null, LANGS[me].short));
+    langBtn.setAttribute('aria-label', `${t('app.language')}: ${LANGS[me].native}`);
+    langBtn.hidden = false;
+  }
+  renderPair();
+}
+
+/** 내 언어(= 화면 언어)를 바꾼다. 상대 언어가 같아지면 서로 바꾸고, 새로 고침 없이 화면 전체를 다시 그린다 */
+export function setMyLang(code) {
+  const next = pickLanguage(state.settings, code);
+  if (next.me === state.settings.me) return;
+  setSetting('me', next.me);
+  setSetting('partner', next.partner);
+  applyLang();
+  render();
 }
 
 function route() {
@@ -60,10 +91,10 @@ export function render() {
 
 function init() {
   applyTheme();
-  renderPair();
-  tabbar.replaceChildren(...TABS.map(([id, label, ic]) => h('a', { href: `#/${id}`, dataset: { tab: id } }, icon(ic, 22), h('span', null, label))));
-  pairBtn.addEventListener('click', () => openLangPicker(() => { renderPair(); render(); }));
-  document.getElementById('gear').addEventListener('click', () => { location.hash = '#/settings'; });
+  applyLang();
+  pairBtn.addEventListener('click', () => openLangPicker({ onMyLang: setMyLang, onDone: () => { renderPair(); render(); } }));
+  gearBtn.addEventListener('click', () => { location.hash = '#/settings'; });
+  langBtn?.addEventListener('click', () => openLangMenu(langBtn, state.settings.me, setMyLang));
   document.documentElement.dataset.version = VERSION;
   addEventListener('hashchange', render);
   // 아이폰: 첫 터치 때 읽어 주기 소리를 풀어 둔다
@@ -72,5 +103,5 @@ function init() {
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
 
-window.__tercuman = { state, setSetting };
+window.__tercuman = { state, setSetting, setMyLang };
 init();
