@@ -411,7 +411,7 @@ test('함수들: AI는 모두 runAI로 부르고(env.AI.run 직접 X), 쉬는 �
 });
 
 // ---------- 화면 ----------
-test('화면: 쉬는 안내(err.paused)의 {time}을 그 사람 지역 시각으로 — 한국이면 오전 9:00, 10개 언어 모두', () => {
+test('화면: 쉬는 안내(err.paused)의 {time}을 그 사람 지역 시각으로 — 한국이면 오전 9:00, 모든 화면 언어', () => {
   const until = '2026-10-13T00:00:00.000Z';
   setUiLang('ko');
   assert.equal(resumeTime(until, { timeZone: 'Asia/Seoul' }), '오전 9:00');
@@ -424,7 +424,7 @@ test('화면: 쉬는 안내(err.paused)의 {time}을 그 사람 지역 시각으
   const now = Date.parse('2026-10-12T10:00:00Z');
   assert.equal(resumeTime(undefined, { now, timeZone: 'Asia/Seoul' }), '오전 9:00');
   assert.equal(resumeTime('nonsense', { now, timeZone: 'Asia/Seoul' }), '오전 9:00');
-  // 10개 언어: 서버 오류 → 그 언어 문장, {time}은 채워진다
+  // 모든 화면 언어(새 언어 포함): 서버 오류 → 그 언어 문장, {time}은 채워진다
   for (const c of CODES) {
     setUiLang(c);
     const msg = serverError({ error: '오늘은 사용량이 많아 이 기능을 쉬어요.', code: 'paused', until }, 503, 'photo');
