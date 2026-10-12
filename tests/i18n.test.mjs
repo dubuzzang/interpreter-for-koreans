@@ -20,8 +20,8 @@ const files = (dir) => readdirSync(dir).flatMap((f) => {
 const vars = (s) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join(',');
 const stripComments = (src) => src.replace(/\/\*[\s\S]*?\*\//g, '').split('\n').map((l) => l.replace(/(^|\s)\/\/.*$/, '')).join('\n');
 
-test('문구 사전: 네 언어의 키가 모두 같고, 빈 문구가 없고, 채울 자리·굵게 표시가 같다', () => {
-  assert.deepEqual(Object.keys(MESSAGES), ['ko', 'tr', 'en', 'ja']);
+test('문구 사전: 다섯 언어의 키가 모두 같고, 빈 문구가 없고, 채울 자리·굵게 표시가 같다', () => {
+  assert.deepEqual(Object.keys(MESSAGES), ['ko', 'tr', 'en', 'ja', 'zh']);
   const keys = Object.keys(MESSAGES.ko).sort();
   assert.ok(keys.length > 150, `문구 ${keys.length}개`);
   for (const c of CODES) {
@@ -90,7 +90,7 @@ test('서버 오류 코드마다 네 언어 문장이 있고, 화면은 오류 �
   assert.equal(aiError(new Error('4006 daily free allocation')).code, 'quota');
   assert.equal(aiError(new Error('weird'), '음성 인식').code, 'failed');
   assert.equal(validateTranslate({ text: '', from: 'ko', to: 'tr' }).code, 'empty');
-  assert.equal(validateTranslate({ text: 'x', from: 'ko', to: 'zh' }).code, 'unsupported_lang');
+  assert.equal(validateTranslate({ text: 'x', from: 'ko', to: 'xx' }).code, 'unsupported_lang');
   assert.equal(validateKana({ text: 'hello' }).code, 'not_japanese');
 
   setUiLang('tr');
@@ -118,7 +118,7 @@ test('처음 쓰는 사람의 기본 언어: 브라우저 언어 중 네 언어�
   assert.equal(defaultLang(['ja']), 'ja');
   assert.equal(defaultLang(['EN-gb']), 'en');
   assert.equal(defaultLang(['de-DE', 'ja-JP', 'en']), 'ja', '앞에서부터 처음 맞는 것');
-  assert.equal(defaultLang(['zh_CN', 'ko']), 'ko');
+  assert.equal(defaultLang(['zh_CN', 'ko']), 'zh', '중국어 (v1.3.0)');
   assert.equal(defaultLang(['de-DE', 'fr']), 'en', '네 언어가 아니면 영어');
   assert.equal(defaultLang([]), 'en');
   assert.equal(defaultLang(undefined), 'en');
@@ -138,7 +138,7 @@ test('앱을 열 때의 언어: 처음이면 브라우저 언어, 이미 쓰던 
   assert.deepEqual(startLangs({ history: [{ side: 'me', from: 'ko', to: 'tr' }] }, ['tr']), { me: 'ko', partner: 'tr' }, '기록만 있어도 쓰던 사람');
   assert.deepEqual(startLangs({ settings: { theme: 'dark' } }, ['en']), { me: 'ko', partner: 'tr' }, '언어 설정이 없으면 한국어');
   assert.deepEqual(startLangs({ settings: { me: 'tr', partner: 'ko' } }, ['ko']), { me: 'tr', partner: 'ko' }, '골라 둔 언어 그대로');
-  assert.deepEqual(startLangs({ settings: { me: 'zh', partner: 'zh' } }, ['tr']), { me: 'ko', partner: 'tr' }, '잘못된 값은 고친다');
+  assert.deepEqual(startLangs({ settings: { me: 'xx', partner: 'xx' } }, ['tr']), { me: 'ko', partner: 'tr' }, '잘못된 값은 고친다');
   assert.deepEqual(startLangs({ settings: { me: 'en', partner: 'en' } }, []), { me: 'en', partner: 'ko' }, '나와 상대가 같으면 고친다');
 });
 
@@ -147,7 +147,7 @@ test('언어 바꾸기: 상대 언어가 새 내 언어와 같아지면 서로 �
   assert.deepEqual(pickLanguage({ me: 'ko', partner: 'tr' }, 'en'), { me: 'en', partner: 'tr' });
   assert.deepEqual(pickLanguage({ me: 'ja', partner: 'ko' }, 'ko'), { me: 'ko', partner: 'ja' });
   assert.deepEqual(pickLanguage({ me: 'ko', partner: 'tr' }, 'ko'), { me: 'ko', partner: 'tr' }, '같은 언어');
-  assert.deepEqual(pickLanguage({ me: 'ko', partner: 'tr' }, 'zh'), { me: 'ko', partner: 'tr' }, '모르는 언어');
+  assert.deepEqual(pickLanguage({ me: 'ko', partner: 'tr' }, 'xx'), { me: 'ko', partner: 'tr' }, '모르는 언어');
   for (const me of CODES) for (const partner of CODES.filter((c) => c !== me)) for (const c of CODES) {
     const r = pickLanguage({ me, partner }, c);
     assert.notEqual(r.me, r.partner, `${me}/${partner} → ${c}`);

@@ -27,6 +27,11 @@ button, input, select, textarea { font: inherit; color: inherit; }
   font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo, "Noto Sans JP", "Noto Sans CJK JP", var(--font);
   word-break: normal; line-break: strict;
 }
+/* 중국어(간체)는 중국어 글꼴로 — 일본어·한국어 글꼴로 그리면 한자 모양이 달라진다 */
+:lang(zh) {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans SC", "Noto Sans CJK SC", "Source Han Sans SC", var(--font);
+  word-break: normal; line-break: strict;
+}
 /* 한국어는 낱말 가운데서 줄을 바꾸지 않게 (받아쓰기 → 받 / 아쓰기 X) */
 :lang(ko) { word-break: keep-all; overflow-wrap: break-word; }
 button { cursor: pointer; }

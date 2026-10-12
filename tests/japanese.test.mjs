@@ -11,8 +11,8 @@ import { PHRASES, phrasesFor } from '../public/js/phrases.js';
 
 beforeEach(() => _resetBuckets());
 
-test('네 언어 모두 서로 통역 (지시문에 일본어 말투 규칙)', () => {
-  assert.deepEqual(CODES, ['ko', 'tr', 'en', 'ja']);
+test('모든 언어끼리 서로 통역 (지시문에 일본어 말투 규칙)', () => {
+  assert.deepEqual(CODES, ['ko', 'tr', 'en', 'ja', 'zh']);
   const [sys] = buildMessages({ text: '안녕', from: 'ko', to: 'ja' });
   assert.match(sys.content, /from Korean into Japanese/);
   assert.match(sys.content, /です・ます/);
@@ -65,7 +65,7 @@ test('일본어 읽기 → 한글 발음 (첫머리 예사소리 · っ ㅅ받�
 
 test('일본어 알아보기 · 언어 정보 · 상대 안내', () => {
   assert.equal(detectLang('トイレはどこですか？'), 'ja');
-  assert.equal(detectLang('駅'), 'ja', '한자만 있어도 (중국어는 지원 안 함)');
+  assert.equal(detectLang('駅'), 'ja', '한자만 있어도 일본 글자체(駅)면 일본어');
   assert.equal(detectLang('안녕하세요'), 'ko');
   assert.equal(detectLang('Merhaba'), 'tr');
   assert.equal(LANGS.ja.bcp47, 'ja-JP');

@@ -7,7 +7,7 @@ import {
 test('요청 검사: 글·언어·길이·맥락', () => {
   assert.ok(validateTranslate({ text: '안녕', from: 'ko', to: 'tr' }).value);
   assert.match(validateTranslate({ text: '  ', from: 'ko', to: 'tr' }).error, /비어/);
-  assert.match(validateTranslate({ text: 'x', from: 'ko', to: 'zh' }).error, /지원하지/);
+  assert.match(validateTranslate({ text: 'x', from: 'ko', to: 'de' }).error, /지원하지/);
   assert.ok(validateTranslate({ text: 'こんにちは', from: 'ja', to: 'tr' }).value, '일본어 지원');
   assert.match(validateTranslate({ text: 'x'.repeat(MAX_TEXT + 1), from: 'ko', to: 'en' }).error, /1000자/);
   assert.match(validateTranslate(null).error, /형식/);

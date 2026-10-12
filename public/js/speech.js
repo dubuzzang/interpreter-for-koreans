@@ -155,14 +155,21 @@ if (synth) { refreshVoices(); synth.addEventListener?.('voiceschanged', refreshV
 
 export const canSpeak = () => Boolean(synth);
 
-const GOOD = /(natural|neural|online|premium|enhanced|google|siri|yelda|yuna|samantha|ava|jenny|aria|sunhi|seoyeon|emel|ahmet|kyoko|otoya|nanami|keita|haruka|ayumi|sayaka)/i;
+const GOOD = /(natural|neural|online|premium|enhanced|google|siri|yelda|yuna|samantha|ava|jenny|aria|sunhi|seoyeon|emel|ahmet|kyoko|otoya|nanami|keita|haruka|ayumi|sayaka|xiaoxiao|yunxi|xiaoyi|yunyang|tingting|lili|huihui|yaoyao|kangkang)/i;
+const tagOf = (v) => v.lang.toLowerCase().replace(/_/g, '-');
+// 중국어(보통화): 중국 본토 목소리 → 대만 목소리 순. 홍콩·광둥어(zh-HK · yue) 목소리는 같은 글도 광둥어로 읽어서 뺀다
+const MANDARIN = (tag) => (/^(zh|cmn)(-hans)?(-cn|-sg)?$/.test(tag) ? 2 : /^(zh|cmn)(-hant)?-tw$/.test(tag) ? 1 : 0);
 /** 언어별 목소리 후보 (좋은 것부터) */
 export function voicesFor(lang) {
   const tag = LANGS[lang].bcp47.toLowerCase();
   const base = lang.toLowerCase();
+  if (lang === 'zh') {
+    return voices.filter((v) => v.lang && MANDARIN(tagOf(v)))
+      .sort((a, b) => (MANDARIN(tagOf(b)) - MANDARIN(tagOf(a))) || (GOOD.test(b.name) - GOOD.test(a.name)));
+  }
   return voices
-    .filter((v) => v.lang && (v.lang.toLowerCase().replace('_', '-') === tag || v.lang.toLowerCase().startsWith(`${base}-`) || v.lang.toLowerCase() === base))
-    .sort((a, b) => (GOOD.test(b.name) - GOOD.test(a.name)) || (b.lang.toLowerCase().replace('_', '-') === tag) - (a.lang.toLowerCase().replace('_', '-') === tag));
+    .filter((v) => v.lang && (tagOf(v) === tag || v.lang.toLowerCase().startsWith(`${base}-`) || v.lang.toLowerCase() === base))
+    .sort((a, b) => (GOOD.test(b.name) - GOOD.test(a.name)) || (tagOf(b) === tag) - (tagOf(a) === tag));
 }
 export const hasVoice = (lang) => voicesFor(lang).length > 0;
 

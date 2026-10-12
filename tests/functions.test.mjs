@@ -85,7 +85,7 @@ test('음성 인식: 언어·크기 검사, Whisper에 base64로 넘기고 지�
   assert.equal(AI.calls[0].input.language, 'tr');
   res = await stt({ request: req('/api/stt?lang=ko', audio, { type: 'audio/webm' }), env: { AI } });
   assert.deepEqual(await res.json(), { text: '' }, '지어낸 자막 끝인사');
-  assert.equal((await stt({ request: req('/api/stt?lang=zh', audio, { type: 'audio/webm' }), env: { AI } })).status, 400);
+  assert.equal((await stt({ request: req('/api/stt?lang=de', audio, { type: 'audio/webm' }), env: { AI } })).status, 400);
   assert.deepEqual(await (await stt({ request: req('/api/stt?lang=ko', new Uint8Array(10), { type: 'audio/webm' }), env: { AI } })).json(), { text: '' }, '너무 짧은 녹음');
   assert.equal((await stt({ request: req('/api/stt?lang=ko', audio, { origin: 'https://evil.example', type: 'audio/webm' }), env: { AI } })).status, 403);
 });

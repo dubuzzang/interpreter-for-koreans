@@ -18,16 +18,16 @@ test('언어 알아보기', () => {
   assert.equal(detectLang('İstanbul havalimanı'), 'tr');
 });
 
-test('언어 정보 · 상대 쪽 문구가 네 언어 모두 있다', () => {
-  assert.deepEqual(CODES, ['ko', 'tr', 'en', 'ja']);
+test('언어 정보 · 상대 쪽 문구가 모든 언어에 있다', () => {
+  assert.deepEqual(CODES, ['ko', 'tr', 'en', 'ja', 'zh']);
   for (const c of CODES) {
     assert.match(LANGS[c].bcp47, /^[a-z]{2}-[A-Z]{2}$/);
     for (const k of Object.keys(MESSAGES.ko)) assert.ok(MESSAGES[c][k], `${c}.${k}`);
   }
-  assert.deepEqual(otherLangs('ko'), ['tr', 'en', 'ja']);
+  assert.deepEqual(otherLangs('ko'), ['tr', 'en', 'ja', 'zh']);
 });
 
-test('표현집: 네 언어가 다 있고, 글자 체계가 맞고, 겹치지 않는다', () => {
+test('표현집: 모든 언어가 다 있고, 글자 체계가 맞고, 겹치지 않는다', () => {
   const cats = new Set(PHRASE_CATS.map((c) => c.id));
   const seen = new Set();
   assert.ok(PHRASES.length >= 60);

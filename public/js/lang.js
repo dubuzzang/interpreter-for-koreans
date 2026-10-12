@@ -5,6 +5,7 @@ export const LANGS = {
   tr: { code: 'tr', native: 'Türkçe', flag: '🇹🇷', bcp47: 'tr-TR', short: 'TR' },
   en: { code: 'en', native: 'English', flag: '🇺🇸', bcp47: 'en-US', short: 'EN' },
   ja: { code: 'ja', native: '日本語', flag: '🇯🇵', bcp47: 'ja-JP', short: 'JA' },
+  zh: { code: 'zh', native: '中文', flag: '🇨🇳', bcp47: 'zh-CN', short: 'ZH' }, // 간체 중국어 (중국 본토)
 };
 export const CODES = Object.keys(LANGS);
 
@@ -33,7 +34,7 @@ export function detectLang(text, fallback = 'en') {
   return tr > en ? 'tr' : 'en';
 }
 
-/** 대화 상대 언어 선택지: 내 언어가 아닌 세 언어 */
+/** 대화 상대 언어 선택지: 내 언어가 아닌 나머지 언어 */
 export const otherLangs = (me) => CODES.filter((c) => c !== me);
 
 /**

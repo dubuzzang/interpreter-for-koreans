@@ -1,10 +1,10 @@
-// 화면 문구 사전 (한국어 · 튀르키예어 · 영어 · 일본어) · 고른 언어 · 처음 쓰는 사람의 기본 언어
+// 화면 문구 사전 (한국어 · 튀르키예어 · 영어 · 일본어 · 중국어 간체) · 고른 언어 · 처음 쓰는 사람의 기본 언어
 // 고른 언어 = '나'의 언어: 화면 문구, 내 말 받아쓰기·읽어 주기, 번역 방향이 모두 이것을 따른다.
-// 문구는 짧은 현지 표현으로 (튀르키예어는 siz 말투, 일본어는 です·ます). {이름}은 채워 넣는 자리, *굵게* 는 굵은 글씨.
+// 문구는 짧은 현지 표현으로 (튀르키예어는 siz 말투, 일본어는 です·ます, 중국어는 你). {이름}은 채워 넣는 자리, *굵게* 는 굵은 글씨.
 import { CODES, LANGS } from './lang.js';
 
 const ko = {
-  'app.title': 'Tercüman · 한국어 튀르키예어 영어 일본어 통역',
+  'app.title': 'Tercüman · 한국어 튀르키예어 영어 일본어 중국어 통역',
   'app.home': 'Tercüman 처음 화면',
   'app.settings': '설정',
   'app.menu': '메뉴',
@@ -20,6 +20,7 @@ const ko = {
   'lang.tr': '튀르키예어',
   'lang.en': '영어',
   'lang.ja': '일본어',
+  'lang.zh': '중국어',
 
   // 말하는 사람 쪽 문구 (대화 화면의 마이크 버튼 등 — 그 버튼을 누르는 사람의 언어로 보인다)
   'mic.speak': '말하기',
@@ -79,6 +80,7 @@ const ko = {
   'cat.talk': '소통',
   'cat.food': '식당',
   'cat.shop': '쇼핑',
+  'cat.order': '주문·배송',
   'cat.move': '길·교통',
   'cat.stay': '숙소',
   'cat.help': '긴급',
@@ -97,7 +99,7 @@ const ko = {
   'set.tone': '말투',
   'set.formal': '존댓말',
   'set.casual': '반말',
-  'set.toneHint': '번역되는 언어에 맞춰요: 한국어 존댓말/반말, 일본어 です·ます/반말, 튀르키예어 siz/sen. 영어는 그대로예요.',
+  'set.toneHint': '번역되는 언어에 맞춰요: 한국어 존댓말/반말, 일본어 です·ます/반말, 튀르키예어 siz/sen, 중국어 您/你. 영어는 그대로예요.',
   'set.autoSpeak': '번역을 바로 읽어 주기',
   'set.autoSpeakHint': '대화에서 번역이 나오면 바로 소리 내어 읽어요',
   'set.rate': '읽는 속도',
@@ -138,7 +140,7 @@ const ko = {
   'set.updating': 'v{v}로 바꾸는 중…',
   'set.offline': '인터넷에 연결되어 있지 않아요',
   'set.latest': '최신 버전이에요 (v{v})',
-  'set.about': '{date} · 한국어 · 튀르키예어 · 영어 · 일본어 통역',
+  'set.about': '{date} · 한국어 · 튀르키예어 · 영어 · 일본어 · 중국어 통역',
   'set.privacy': '번역: Cloudflare Workers AI (Gemma 4) · 음성 인식: 브라우저 / Whisper large-v3 turbo · 읽어 주기: 기기 목소리. 말한 내용은 번역을 위해 서버로 보내지고 저장되지 않아요. 기록은 이 기기에만 남아요.',
   'set.install': '홈 화면에 추가하면 앱처럼 쓸 수 있어요 (아이폰: Safari 공유 → 홈 화면에 추가 · 안드로이드: Chrome 메뉴 → 앱 설치).',
 
@@ -168,6 +170,7 @@ const ko = {
   'err.too_long': '한 번에 {max}자까지 번역할 수 있어요.',
   'err.unsupported_lang': '지원하지 않는 언어예요.',
   'err.not_japanese': '일본어 글이 아니에요.',
+  'err.not_chinese': '중국어 글이 아니에요.',
   'err.audio_too_long': '녹음이 너무 길어요. 1분 안으로 말해 주세요.',
   'err.no_engine': 'AI 엔진이 연결되지 않았어요.',
   'err.quota': '오늘 무료 사용 한도를 다 썼어요. 내일 다시 써 주세요.',
@@ -180,7 +183,7 @@ const ko = {
 };
 
 const tr = {
-  'app.title': 'Tercüman · Korece, Türkçe, İngilizce ve Japonca tercüman',
+  'app.title': 'Tercüman · Korece, Türkçe, İngilizce, Japonca ve Çince tercüman',
   'app.home': 'Tercüman ana sayfa',
   'app.settings': 'Ayarlar',
   'app.menu': 'Menü',
@@ -196,6 +199,7 @@ const tr = {
   'lang.tr': 'Türkçe',
   'lang.en': 'İngilizce',
   'lang.ja': 'Japonca',
+  'lang.zh': 'Çince',
 
   'mic.speak': 'Konuşun',
   'mic.listening': 'Dinliyorum…',
@@ -254,6 +258,7 @@ const tr = {
   'cat.talk': 'İletişim',
   'cat.food': 'Restoran',
   'cat.shop': 'Alışveriş',
+  'cat.order': 'Sipariş ve kargo',
   'cat.move': 'Yol ve ulaşım',
   'cat.stay': 'Konaklama',
   'cat.help': 'Acil durum',
@@ -272,7 +277,7 @@ const tr = {
   'set.tone': 'Hitap',
   'set.formal': 'Kibar (siz)',
   'set.casual': 'Samimi (sen)',
-  'set.toneHint': 'Çevrilen dile uygulanır: Korece ve Japoncada kibar/samimi dil, Türkçede siz/sen. İngilizceyi etkilemez.',
+  'set.toneHint': 'Çevrilen dile uygulanır: Korece ve Japoncada kibar/samimi dil, Türkçede siz/sen, Çincede 您/你. İngilizceyi etkilemez.',
   'set.autoSpeak': 'Çeviriyi hemen sesli oku',
   'set.autoSpeakHint': 'Sohbette çeviri çıkınca hemen sesli okunur',
   'set.rate': 'Okuma hızı',
@@ -313,7 +318,7 @@ const tr = {
   'set.updating': 'v{v} sürümüne geçiliyor…',
   'set.offline': 'İnternet bağlantısı yok',
   'set.latest': 'En güncel sürümü kullanıyorsunuz (v{v})',
-  'set.about': '{date} · Korece · Türkçe · İngilizce · Japonca tercüman',
+  'set.about': '{date} · Korece · Türkçe · İngilizce · Japonca · Çince tercüman',
   'set.privacy': 'Çeviri: Cloudflare Workers AI (Gemma 4) · Ses tanıma: tarayıcı / Whisper large-v3 turbo · Sesli okuma: cihaz sesleri. Söyledikleriniz çeviri için sunucuya gönderilir ve saklanmaz. Geçmiş yalnızca bu cihazda kalır.',
   'set.install': 'Ana ekrana eklerseniz uygulama gibi kullanabilirsiniz (iPhone: Safari Paylaş → Ana Ekrana Ekle · Android: Chrome menüsü → Uygulamayı yükle).',
 
@@ -342,6 +347,7 @@ const tr = {
   'err.too_long': 'Tek seferde en fazla {max} karakter çevrilebilir.',
   'err.unsupported_lang': 'Bu dil desteklenmiyor.',
   'err.not_japanese': 'Bu metin Japonca değil.',
+  'err.not_chinese': 'Bu metin Çince değil.',
   'err.audio_too_long': 'Kayıt çok uzun. Lütfen bir dakikadan kısa konuşun.',
   'err.no_engine': 'Yapay zekâ motoru bağlı değil.',
   'err.quota': 'Bugünkü ücretsiz kullanım sınırı doldu. Lütfen yarın tekrar deneyin.',
@@ -354,7 +360,7 @@ const tr = {
 };
 
 const en = {
-  'app.title': 'Tercüman · Korean, Turkish, English & Japanese interpreter',
+  'app.title': 'Tercüman · Korean, Turkish, English, Japanese & Chinese interpreter',
   'app.home': 'Tercüman home',
   'app.settings': 'Settings',
   'app.menu': 'Menu',
@@ -370,6 +376,7 @@ const en = {
   'lang.tr': 'Turkish',
   'lang.en': 'English',
   'lang.ja': 'Japanese',
+  'lang.zh': 'Chinese',
 
   'mic.speak': 'Speak',
   'mic.listening': 'Listening…',
@@ -428,6 +435,7 @@ const en = {
   'cat.talk': 'Basics',
   'cat.food': 'Restaurant',
   'cat.shop': 'Shopping',
+  'cat.order': 'Orders & shipping',
   'cat.move': 'Getting around',
   'cat.stay': 'Hotel',
   'cat.help': 'Emergency',
@@ -446,7 +454,7 @@ const en = {
   'set.tone': 'Tone',
   'set.formal': 'Polite',
   'set.casual': 'Casual',
-  'set.toneHint': 'Applies to the language being translated into: polite or casual Korean and Japanese, siz/sen in Turkish. No effect on English.',
+  'set.toneHint': 'Applies to the language being translated into: polite or casual Korean and Japanese, siz/sen in Turkish, 您/你 in Chinese. No effect on English.',
   'set.autoSpeak': 'Read translations aloud',
   'set.autoSpeakHint': 'In Talk, each translation is read aloud right away',
   'set.rate': 'Speech rate',
@@ -487,7 +495,7 @@ const en = {
   'set.updating': 'Updating to v{v}…',
   'set.offline': "You're offline",
   'set.latest': "You're on the latest version (v{v})",
-  'set.about': '{date} · Korean · Turkish · English · Japanese interpreter',
+  'set.about': '{date} · Korean · Turkish · English · Japanese · Chinese interpreter',
   'set.privacy': 'Translation: Cloudflare Workers AI (Gemma 4) · Speech recognition: browser / Whisper large-v3 turbo · Read-aloud: device voices. What you say is sent to the server for translation and is not stored. History stays on this device only.',
   'set.install': 'Add it to your home screen to use it like an app (iPhone: Safari Share → Add to Home Screen · Android: Chrome menu → Install app).',
 
@@ -516,6 +524,7 @@ const en = {
   'err.too_long': 'You can translate up to {max} characters at a time.',
   'err.unsupported_lang': "This language isn't supported.",
   'err.not_japanese': "This isn't Japanese text.",
+  'err.not_chinese': "This isn't Chinese text.",
   'err.audio_too_long': 'The recording is too long. Please keep it under a minute.',
   'err.no_engine': 'The AI engine is not connected.',
   'err.quota': "Today's free usage limit has been reached. Please try again tomorrow.",
@@ -528,7 +537,7 @@ const en = {
 };
 
 const ja = {
-  'app.title': 'Tercüman · 韓国語・トルコ語・英語・日本語の通訳',
+  'app.title': 'Tercüman · 韓国語・トルコ語・英語・日本語・中国語の通訳',
   'app.home': 'Tercüman ホーム',
   'app.settings': '設定',
   'app.menu': 'メニュー',
@@ -544,6 +553,7 @@ const ja = {
   'lang.tr': 'トルコ語',
   'lang.en': '英語',
   'lang.ja': '日本語',
+  'lang.zh': '中国語',
 
   'mic.speak': '話す',
   'mic.listening': '聞いています…',
@@ -602,6 +612,7 @@ const ja = {
   'cat.talk': 'やりとり',
   'cat.food': '飲食店',
   'cat.shop': '買い物',
+  'cat.order': '注文・配送',
   'cat.move': '道・交通',
   'cat.stay': '宿泊',
   'cat.help': '緊急',
@@ -620,7 +631,7 @@ const ja = {
   'set.tone': '話し方',
   'set.formal': '丁寧',
   'set.casual': 'カジュアル',
-  'set.toneHint': '翻訳先の言語に合わせます：韓国語・日本語は丁寧／くだけた言い方、トルコ語は siz／sen。英語には影響しません。',
+  'set.toneHint': '翻訳先の言語に合わせます：韓国語・日本語は丁寧／くだけた言い方、トルコ語は siz／sen、中国語は 您／你。英語には影響しません。',
   'set.autoSpeak': '翻訳をすぐ読み上げる',
   'set.autoSpeakHint': '会話で翻訳が出たら、すぐに読み上げます',
   'set.rate': '読み上げの速さ',
@@ -661,7 +672,7 @@ const ja = {
   'set.updating': 'v{v} に更新中…',
   'set.offline': 'インターネットに接続されていません',
   'set.latest': '最新バージョンです（v{v}）',
-  'set.about': '{date} · 韓国語・トルコ語・英語・日本語の通訳',
+  'set.about': '{date} · 韓国語・トルコ語・英語・日本語・中国語の通訳',
   'set.privacy': '翻訳：Cloudflare Workers AI（Gemma 4）・音声認識：ブラウザ / Whisper large-v3 turbo・読み上げ：端末の音声。話した内容は翻訳のためにサーバーへ送られますが、保存はされません。履歴はこの端末にだけ残ります。',
   'set.install': 'ホーム画面に追加すると、アプリのように使えます（iPhone：Safari の共有 →「ホーム画面に追加」・Android：Chrome のメニュー →「アプリをインストール」）。',
 
@@ -690,6 +701,7 @@ const ja = {
   'err.too_long': '一度に翻訳できるのは{max}文字までです。',
   'err.unsupported_lang': '対応していない言語です。',
   'err.not_japanese': '日本語の文ではありません。',
+  'err.not_chinese': '中国語の文ではありません。',
   'err.audio_too_long': '録音が長すぎます。1分以内で話してください。',
   'err.no_engine': 'AIエンジンに接続されていません。',
   'err.quota': '本日の無料利用枠を使い切りました。明日またお使いください。',
@@ -701,7 +713,185 @@ const ja = {
   'err.rate_limited': 'リクエストが多すぎます。{retry}秒後にもう一度お試しください。',
 };
 
-export const MESSAGES = { ko, tr, en, ja };
+// 간체 중국어 (중국 본토). 사용자는 你로 부른다
+const zh = {
+  'app.title': 'Tercüman · 韩语、土耳其语、英语、日语、中文翻译',
+  'app.home': 'Tercüman 首页',
+  'app.settings': '设置',
+  'app.menu': '菜单',
+  'app.language': '语言 / Language',
+  'app.pair': '更改翻译语言：我 {me}，对方 {partner}',
+
+  'tab.talk': '对话',
+  'tab.text': '翻译',
+  'tab.phrases': '常用语',
+  'tab.history': '记录',
+
+  'lang.ko': '韩语',
+  'lang.tr': '土耳其语',
+  'lang.en': '英语',
+  'lang.ja': '日语',
+  'lang.zh': '中文',
+
+  'mic.speak': '说话',
+  'mic.listening': '正在听…',
+  'mic.stop': '点击停止',
+  'mic.thinking': '正在翻译…',
+  'mic.tapToSpeak': '点击后说话',
+  'mic.typeHere': '在这里输入',
+  'mic.noSpeech': '没有听到声音',
+  'mic.partnerHint': '请点右边的按钮，然后说中文。',
+
+  'common.listen': '播放',
+  'common.copy': '复制',
+  'common.showBig': '全屏显示',
+  'common.speak': '朗读',
+  'common.close': '关闭',
+  'common.cancel': '取消',
+  'common.retry': '重试',
+  'common.ok': '确定',
+
+  'talk.ariaSpeak': '用{lang}说话',
+  'talk.ariaType': '用{lang}输入',
+  'talk.noVoice': '此设备没有{lang}语音。请把屏幕给对方看（设置 → 语音）。',
+  'talk.editHeard': '修改识别内容',
+  'talk.retranslate': '重新翻译',
+  'talk.edited': '已修改',
+  'talk.replay': '再听一遍',
+  'talk.whoTypes': '切换输入的人',
+  'talk.me': '我',
+  'talk.partner': '对方',
+  'talk.send': '发送',
+  'talk.emptyHow': '*{me} 左边*的按钮是你的，*{partner} 右边*的按钮给对方用。点击后说话。',
+  'talk.emptyAuto': '说完后会自动翻译并朗读。要打字，请点中间的 ⌨ 按钮。',
+  'talk.noMic': '此浏览器无法使用麦克风。请用 ⌨ 按钮输入文字。',
+  'talk.newConfirm': '要从屏幕上清除这段对话吗？（记录里仍会保留）',
+  'talk.faceToFace': '面对面',
+  'talk.faceToFaceOff': '退出面对面',
+  'talk.new': '新对话',
+  'talk.partnerHalf': '对方一侧（倒置）',
+  'talk.myHalf': '我这一侧',
+  'talk.typeToggle': '文字输入',
+
+  'text.from': '源语言',
+  'text.auto': '🔎 自动检测',
+  'text.to': '目标语言',
+  'text.placeholder': '输入要翻译的内容，或点 🎤 说话',
+  'text.area': '要翻译的文字',
+  'text.go': '翻译',
+  'text.going': '正在翻译…',
+  'text.dictate': '语音输入',
+  'text.clear': '清除',
+  'text.swap': '交换语言',
+  'text.big': '放大',
+
+  'phrases.note': '{me} → {partner} 点一下就用{lang}朗读。没有网络也能用。',
+  'cat.greet': '问候',
+  'cat.talk': '沟通',
+  'cat.food': '餐厅',
+  'cat.shop': '购物',
+  'cat.order': '订单·发货',
+  'cat.move': '问路·交通',
+  'cat.stay': '住宿',
+  'cat.help': '紧急',
+
+  'hist.text': '文字翻译',
+  'hist.empty': '还没有记录。',
+  'hist.emptyHint': '对话和文字翻译会保存在这里。记录只保存在这台设备上。',
+  'hist.off': '设置中的"保存记录"已关闭。',
+  'hist.count': '{n} 条 · 仅保存在此设备',
+  'hist.clearConfirm': '要删除全部记录吗？',
+  'hist.cleared': '记录已删除',
+  'hist.clearAll': '全部删除',
+
+  'set.title': '设置',
+  'set.languageHint': '你选择的语言就是"我"的语言：界面文字、我的语音识别和朗读、翻译方向都会跟着变。',
+  'set.tone': '语气',
+  'set.formal': '礼貌',
+  'set.casual': '随意',
+  'set.toneHint': '按翻译成的语言调整：韩语和日语的敬语/非敬语，土耳其语的 siz/sen，中文的 您/你。对英语没有影响。',
+  'set.autoSpeak': '翻译后立即朗读',
+  'set.autoSpeakHint': '在对话中，翻译一出来就朗读',
+  'set.rate': '朗读速度',
+  'set.rateValue': '{x}倍',
+  'set.reading': '显示读音',
+  'set.readingHint': '在韩语和日语下方用拉丁字母显示读音（안녕하세요 → Annyeonghaseyo · こんにちは → Konnichiwa）',
+  'set.voices': '语音',
+  'set.voicesHint': '使用设备上安装的语音朗读。某种语言没有语音时，可以在手机设置的"文字转语音"里添加。',
+  'set.voiceOf': '{lang}语音',
+  'set.voiceTry': '试听{lang}',
+  'set.voiceSample': '你好，很高兴认识你。',
+  'set.noVoice': '此设备没有语音',
+  'set.online': '（在线）',
+  'set.stt': '语音识别方式',
+  'set.sttAuto': '自动',
+  'set.sttBrowser': '浏览器',
+  'set.sttServer': '服务器（Whisper）',
+  'set.sttHint': '自动：使用浏览器的语音识别（说话时就能看到文字）；不支持的浏览器会录音后发送到服务器识别。',
+  'set.device': '此设备：{list}',
+  'set.sttYes': '支持浏览器语音识别',
+  'set.sttNo': '不支持浏览器语音识别',
+  'set.recYes': '可以录音（服务器识别）',
+  'set.recNo': '无法录音',
+  'set.ttsYes': '支持朗读',
+  'set.ttsNo': '不支持朗读',
+  'set.saveHistory': '保存记录',
+  'set.saveHistoryHint': '翻译内容只保存在这台设备上',
+  'set.clearHistory': '删除全部记录',
+  'set.theme': '外观',
+  'set.themeAuto': '跟随系统',
+  'set.themeLight': '浅色',
+  'set.themeDark': '深色',
+  'set.update': '更新',
+  'set.version': '当前版本 v{v}（{date}）',
+  'set.updateHint': '有新版本时，屏幕上方会自动出现"更新"按钮。也可以在这里检查。',
+  'set.checkUpdate': '检查更新',
+  'set.checking': '正在检查…',
+  'set.updating': '正在更新到 v{v}…',
+  'set.offline': '没有连接网络',
+  'set.latest': '已是最新版本（v{v}）',
+  'set.about': '{date} · 韩语 · 土耳其语 · 英语 · 日语 · 中文翻译',
+  'set.privacy': '翻译：Cloudflare Workers AI（Gemma 4）· 语音识别：浏览器 / Whisper large-v3 turbo · 朗读：设备语音。你说的话会发送到服务器进行翻译，不会被保存。记录只保留在这台设备上。',
+  'set.install': '添加到主屏幕后可以像应用一样使用（iPhone：Safari 分享 → 添加到主屏幕 · Android：Chrome 菜单 → 安装应用）。',
+
+  'pair.title': '翻译语言',
+  'pair.dialog': '选择语言',
+  'pair.partner': '对方的语言',
+  'pair.me': '我的语言（界面语言）',
+  'pair.meHint': '更改我的语言后，界面文字也会换成该语言。',
+  'pair.swap': '互换',
+
+  'ui.copied': '已复制',
+  'ui.copyFailed': '复制失败',
+  'ui.bigView': '全屏',
+
+  'err.noMic': '此浏览器无法使用麦克风。请用文字输入。',
+  'err.micPermission': '需要麦克风权限。请点地址栏旁边的锁形图标，允许使用麦克风。',
+  'err.micMissing': '找不到麦克风。',
+  'err.stt': '语音识别出错（{code}）',
+  'err.sttStart': '无法启动语音识别。',
+  'err.server': '服务器错误（{status}）',
+  'err.slow': '响应超时。请检查网络连接后重试。',
+  'err.offline': '没有连接网络。翻译需要网络（常用语离线也能用）。',
+  'err.network': '无法连接服务器。请稍后再试。',
+  'err.bad_request': '请求格式不正确。',
+  'err.empty': '要翻译的内容是空的。',
+  'err.too_long': '一次最多可以翻译 {max} 个字。',
+  'err.unsupported_lang': '不支持这种语言。',
+  'err.not_japanese': '这不是日语。',
+  'err.not_chinese': '这不是中文。',
+  'err.audio_too_long': '录音太长了。请在一分钟内说完。',
+  'err.no_engine': '没有连接 AI 引擎。',
+  'err.quota': '今天的免费使用额度已用完。请明天再用。',
+  'err.timeout': '服务器响应太慢。请稍后再试。',
+  'err.busy': '服务器繁忙。请稍后再试。',
+  'err.failed': '翻译失败。请稍后再试。',
+  'err.stt_failed': '无法识别语音。请稍后再试。',
+  'err.forbidden': '只能在本应用的页面中使用。',
+  'err.rate_limited': '请求太频繁。请 {retry} 秒后再试。',
+};
+
+export const MESSAGES = { ko, tr, en, ja, zh };
 
 let current = 'ko';
 /** 지금 화면 언어 (= 나의 언어) */
@@ -723,7 +913,7 @@ export const langName = (code) => t(`lang.${code}`);
 /** 날짜·시각 표시용 지역 설정 */
 export const locale = () => LANGS[current].bcp47;
 
-/** 처음 쓰는 사람의 언어: 브라우저 언어(navigator.languages) 중 앞에서부터 네 언어에 드는 것, 없으면 영어 */
+/** 처음 쓰는 사람의 언어: 브라우저 언어(navigator.languages) 중 앞에서부터 지원하는 언어에 드는 것(zh-TW 등도 중국어로), 없으면 영어 */
 export function defaultLang(languages = []) {
   for (const tag of languages || []) {
     const base = String(tag || '').toLowerCase().split(/[-_]/)[0];
