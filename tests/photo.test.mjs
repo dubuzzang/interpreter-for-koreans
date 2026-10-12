@@ -418,9 +418,11 @@ test('⭐ 내 표현에 넣기: 원문(사진 언어) + 내 언어 번역 + 읽�
   assert.deepEqual(item.sound, { zh: 'Quànhòu 89' });
   assert.equal(myText(item, 'ko'), '쿠폰 적용가 ¥89');
   assert.equal(sayText(item, 'zh'), '券后 ¥89');
-  const other = fromPhotoLine({ text: 'Bánh mì 25.000đ', lang: 'vi', tr: '반미 25.000동' }, 'ko');
-  assert.equal(other.orig, 'ko', '다섯 언어가 아니면 번역을 처음 글로');
-  assert.deepEqual(other.texts, { ko: '반미 25.000동' });
+  const other = fromPhotoLine({ text: 'Apfelstrudel 6,50 €', lang: 'de', tr: '사과 슈트루델 6,50 €' }, 'ko');
+  assert.equal(other.orig, 'ko', '앱의 언어가 아니면 번역을 처음 글로');
+  assert.deepEqual(other.texts, { ko: '사과 슈트루델 6,50 €' });
+  const vi = fromPhotoLine({ text: 'Bánh mì 25.000đ', lang: 'vi', tr: '반미 25.000동' }, 'ko');
+  assert.equal(vi.orig, 'vi', '베트남어는 v1.6.0부터 앱의 언어');
   let list = togglePhotoLine([], line, 'ko');
   assert.ok(hasPhotoLine(list, line));
   list = togglePhotoLine(list, line, 'ko');

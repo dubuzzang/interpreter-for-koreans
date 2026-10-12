@@ -30,7 +30,7 @@ function languageCard() {
   return h('section', { class: 'card' },
     h('div', { class: 'set-row col' },
       h('div', { class: 'set-label' }, t('app.language')),
-      h('div', { class: 'seg', role: 'radiogroup', 'aria-label': t('app.language') }, CODES.map((c) => h('button', {
+      h('div', { class: 'seg langs', role: 'radiogroup', 'aria-label': t('app.language') }, CODES.map((c) => h('button', {
         type: 'button', lang: c, role: 'radio', class: state.settings.me === c ? 'on' : '', 'aria-checked': String(state.settings.me === c),
         onclick: () => setMyLang(c),
       }, LANGS[c].native))),

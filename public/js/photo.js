@@ -94,8 +94,10 @@ export function mergeParts(parts) {
 
 /** 가격 · 숫자만 있는 줄 (메뉴에서 가격을 따로 읽은 줄) — 화면에서 작게 보인다 */
 // 화폐 이름 (0xc6d0 · 0xc5d4 = 한국어로 쓴 원 · 엔 — 화면 코드에는 한글을 직접 쓰지 않는다)
-const CURRENCY = new RegExp(['円', '元', '块', '塊', String.fromCharCode(0xc6d0), String.fromCharCode(0xc5d4), 'lira', 'tl', 'usd', 'eur', 'yuan', 'rmb', 'krw', 'jpy', 'try', 'cny'].join('|'), 'gi');
-export const isPriceOnly = (text) => /\d/.test(text) && !/\p{L}{2,}/u.test(String(text).replace(CURRENCY, ''));
+// v1.6.0: 베트남 동 · 태국 바트 · 러시아 루블 · 아랍권 리얄 · 디르함 · 파운드 · 대만 · 홍콩 달러, 숫자는 타이 숫자 · 아랍 숫자도
+const CURRENCY = new RegExp(['円', '元', '块', '塊', String.fromCharCode(0xc6d0), String.fromCharCode(0xc5d4), 'lira', 'tl', 'usd', 'eur', 'yuan', 'rmb', 'krw', 'jpy', 'try', 'cny',
+  'đồng', 'vnđ', 'vnd', 'บาท', 'thb', 'руб', 'rub', 'ريال', 'درهم', 'جنيه', 'sar', 'aed', 'egp', 'twd', 'ntd', 'hkd'].join('|'), 'gi');
+export const isPriceOnly = (text) => /[0-9๐-๙٠-٩۰-۹]/.test(text) && !/\p{L}{2,}/u.test(String(text).replace(CURRENCY, ''));
 
 /** 공유 · 복사용 글 */
 export const lineText = (line) => (line.tr ? `${line.text}\n${line.tr}` : line.text);

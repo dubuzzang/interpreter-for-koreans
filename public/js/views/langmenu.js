@@ -17,9 +17,11 @@ export function openLangMenu(anchor, current, onPick) {
     onclick: () => { close(false); if (c !== current) onPick(c); anchor.focus(); },
   }, h('span', null, LANGS[c].native), c === current ? h('span', { class: 'lm-check', 'aria-hidden': 'true' }, '✓') : null));
   const r = anchor.getBoundingClientRect();
+  // 버튼 끝에 맞춰 연다 (아랍어 화면은 위 막대가 뒤집혀 버튼이 왼쪽 끝에 있다). 언어가 많아 길면 메뉴 안에서 스크롤
+  const side = document.documentElement.dir === 'rtl' ? { left: `${Math.max(8, Math.round(r.left))}px` } : { right: `${Math.max(8, Math.round(innerWidth - r.right))}px` };
   const menu = h('div', {
     class: 'lang-menu', role: 'menu', 'aria-label': t('app.language'),
-    style: { top: `${Math.round(r.bottom + 6)}px`, right: `${Math.max(8, Math.round(innerWidth - r.right))}px` },
+    style: { top: `${Math.round(r.bottom + 6)}px`, maxHeight: `${Math.max(160, Math.round(innerHeight - r.bottom - 16))}px`, ...side },
   }, items);
   const wrap = h('div', { class: 'menu-wrap', onclick: (e) => { if (e.target === wrap) close(); } }, menu);
   const onKey = (e) => {

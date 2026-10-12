@@ -1,8 +1,13 @@
-// 읽는 법 표시 — 보는 사람이 읽을 수 있는 글자로:
-// 한국어 사용자에게 튀르키예어·일본어·중국어 → 한글 발음 (중국어는 병음도), 다른 언어 사용자에게 한국어 → 로마자,
-// 일본어 → 로마자, 중국어 → 병음. 라틴 문자 언어끼리는 적지 않는다.
+// 읽는 법 표시 — 보는 사람이 읽을 수 있는 글자로 (v1.6.0부터 언어마다 같은 길: READERS):
+// 한국어 사용자에게는 한글 발음 (중국어는 병음도), 그 밖의 사용자에게는 로마자 (중국어는 병음). 라틴 문자 언어는 로마자를 따로 적지 않는다.
 // 튀르키예어 규칙은 Merhaba(한국인을 위한 튀르키예어) 앱의 변환기와 같다. 중국어 병음 → 한글은 pinyin.js.
+// 새 언어의 변환기는 read/<code>.js — { sound, hangul(text, sound), roman(text, sound) }
 import { pinyinToHangul, pinyinText } from './pinyin.js';
+import { isChinese } from './lang.js';
+import vi from './read/vi.js';
+import th from './read/th.js';
+import ru from './read/ru.js';
+import ar from './read/ar.js';
 
 const trLower = (s) => String(s ?? '').normalize('NFC').toLocaleLowerCase('tr-TR').replace(/̇/g, '');
 
@@ -265,31 +270,52 @@ export function jaKanaToRomaji(kana) {
   return res.replace(/(^|[.!?]\s+)([a-zāīūēō])/g, (_, a, b) => a + b.toUpperCase());
 }
 
+// ---------- 언어마다 읽는 법 ----------
+// sound: true면 서버(/api/sound)에서 받은 소리 표기(일본어 히라가나 · 중국어 병음 …)로 만든다 — 아직 없으면 비운다.
+// hangul: 한국어 사용자에게 · roman: 그 밖의 사용자에게. 없으면 그 사람에게는 적지 않는다.
+const PINYIN = {
+  sound: true,
+  hangul: (text, sound) => `${pinyinToHangul(sound)}\n${pinyinText(sound)}`, // 한글 발음 + 병음 (두 줄)
+  roman: (text, sound) => pinyinText(sound),
+};
+export const READERS = {
+  ko: { roman: (text) => koToRoman(text) },
+  tr: { hangul: (text) => trToHangul(text) },
+  en: {},
+  // 일본어 사용자에게 튀르키예어·영어(가타카나 표기)는 정확하게 만들기 어려워서 적지 않는다
+  ja: { sound: true, hangul: (text, sound) => jaKanaToHangul(sound), roman: (text, sound) => jaKanaToRomaji(sound) },
+  zh: PINYIN,
+  'zh-TW': PINYIN,
+  vi,
+  th,
+  ru,
+  ar,
+};
+
+/** 서로 글자를 읽을 수 있는 사이라 읽는 법이 필요 없나 (같은 언어 · 간체↔번체) */
+const sameReader = (lang, viewer) => lang === viewer || (isChinese(lang) && isChinese(viewer));
+const converter = (lang, viewer) => {
+  const r = READERS[lang];
+  return r && !sameReader(lang, viewer) ? (viewer === 'ko' ? r.hangul : r.roman) || null : null;
+};
+
 /**
  * 화면에 같이 보일 읽는 법 — 그 글을 보는 사람(viewer)이 읽을 수 있는 글자로, 필요할 때만.
- * sound: 서버에서 받아 둔 소리 표기 (일본어 → 히라가나 읽기, 중국어 → 병음). 아직 없으면 그 언어는 비운다.
- * - 한국어 사용자: 튀르키예어 → 한글 발음, 일본어 → 한글 발음, 중국어 → 한글 발음 + 병음 (두 줄)
- * - 튀르키예어·영어 사용자: 한국어 → 로마자, 일본어 → 로마자, 중국어 → 병음. 튀르키예어↔영어는 적지 않음
- * - 일본어 사용자: 한국어 → 로마자, 중국어 → 병음. 튀르키예어·영어는 적지 않음 (가타카나 표기는 정확하게 만들기 어려워서)
- * - 중국어 사용자: 한국어 → 로마자, 일본어 → 로마자. 튀르키예어·영어는 적지 않음
+ * sound: 서버에서 받아 둔 소리 표기 (일본어 → 히라가나 읽기, 중국어 → 병음 …). 아직 없으면 그 언어는 비운다.
+ * - 한국어 사용자: 한글 발음 (튀르키예어 · 일본어 · 중국어는 + 병음 두 줄 · 새 언어들), 영어는 적지 않음
+ * - 그 밖의 사용자: 한국어 · 일본어 · 라틴 문자가 아닌 언어 → 로마자, 중국어 → 병음. 라틴 문자 언어는 적지 않음
+ * - 간체 ↔ 번체 중국어 사용자끼리는 적지 않음
  */
 export function readingFor(text, lang, viewer = 'ko', sound = '') {
-  if (lang === viewer) return '';
-  if (lang === 'zh') {
-    if (!sound) return '';
-    return viewer === 'ko' ? `${pinyinToHangul(sound)}\n${pinyinText(sound)}` : pinyinText(sound);
-  }
-  if (viewer === 'ko') {
-    if (lang === 'tr') return trToHangul(text);
-    if (lang === 'ja') return sound ? jaKanaToHangul(sound) : '';
-    return '';
-  }
-  if (lang === 'ko') return koToRoman(text);
-  if (lang === 'ja') return sound ? jaKanaToRomaji(sound) : '';
-  return '';
+  const fn = converter(lang, viewer);
+  if (!fn || !text) return '';
+  if (READERS[lang].sound && !sound) return '';
+  return fn(text, sound) || '';
 }
 
+/** 이 언어의 읽는 법은 서버의 소리 표기가 있어야 만들 수 있나 (일본어 · 중국어 …) — 내 표현 · 사진 줄에 같이 저장한다 */
+export const hasSound = (lang) => Boolean(READERS[lang]?.sound);
 /** 이 사람에게 일본어 읽는 법을 보이려면 서버에서 히라가나 읽기를 받아야 하나 */
 export const needsKana = (lang, viewer) => lang === 'ja' && viewer !== 'ja';
-/** 이 사람에게 읽는 법을 보이려면 서버에서 소리 표기를 받아야 하나 (일본어 → 히라가나 · 중국어 → 병음) */
-export const needsSound = (lang, viewer) => (lang === 'ja' || lang === 'zh') && lang !== viewer;
+/** 이 사람에게 읽는 법을 보이려면 서버에서 소리 표기를 받아야 하나 (일본어 → 히라가나 · 중국어 → 병음 …) */
+export const needsSound = (lang, viewer) => hasSound(lang) && Boolean(converter(lang, viewer));

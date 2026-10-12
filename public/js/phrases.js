@@ -1,7 +1,13 @@
-// 표현집 (인터넷 없이도 됨) — 한국어 · 튀르키예어 · 영어 · 일본어 · 중국어(간체). 분류 이름은 i18n.js의 cat.<id>
+// 표현집 (인터넷 없이도 됨) — 한국어 · 튀르키예어 · 영어 · 일본어 · 중국어(간체)는 여기, v1.6.0에 더한 언어는 phrases/<code>.js.
+// 분류 이름은 i18n/의 cat.<id>
 // jaKana: 일본어 읽기(히라가나, 조사는 소리대로 わ·え·お, 낱말 띄어 쓰기) → 화면에서 한글 발음 · 로마자로
 // zhPinyin: 중국어 병음(성조 부호, 낱말 띄어 쓰기, 一·不는 바뀐 성조로) → 화면에서 한글 발음 · 병음으로. 한자 한 글자 = 한 음절
-// only: 그 상대 언어일 때만 보이는 문장 · me: 그 언어 사용자에게만 보이는 문장 ("저는 한국 사람이에요" 같은 것)
+// only: 그 상대 언어일 때만 보이는 문장 · me: 그 언어 사용자에게만 보이는 문장 ("저는 한국 사람이에요" 같은 것) — 둘 다 언어 하나 또는 목록
+import zhTW from './phrases/zh-TW.js';
+import vi from './phrases/vi.js';
+import th from './phrases/th.js';
+import ru from './phrases/ru.js';
+import ar from './phrases/ar.js';
 export const PHRASE_CATS = [
   { id: 'greet', icon: '👋' },
   { id: 'talk', icon: '💬' },
@@ -31,11 +37,21 @@ export const PHRASES = [
   { cat: 'talk', me: 'tr', ko: '저는 튀르키예 사람이에요.', tr: 'Ben Türküm.', en: "I'm Turkish.", ja: '私はトルコ人です。', jaKana: 'わたしわ とるこじん です', zh: '我是土耳其人。', zhPinyin: "wǒ shì Tǔ'ěrqírén." },
   { cat: 'talk', me: 'ja', ko: '저는 일본 사람이에요.', tr: 'Ben Japonum.', en: "I'm Japanese.", ja: '私は日本人です。', jaKana: 'わたしわ にほんじん です', zh: '我是日本人。', zhPinyin: 'wǒ shì Rìběnrén.' },
   { cat: 'talk', me: 'zh', ko: '저는 중국 사람이에요.', tr: 'Ben Çinliyim.', en: "I'm Chinese.", ja: '私は中国人です。', jaKana: 'わたしわ ちゅうごくじん です', zh: '我是中国人。', zhPinyin: 'wǒ shì Zhōngguórén.' },
+  { cat: 'talk', me: 'zh-TW', ko: '저는 대만 사람이에요.', tr: 'Ben Tayvanlıyım.', en: "I'm Taiwanese.", ja: '私は台湾人です。', jaKana: 'わたしわ たいわんじん です', zh: '我是台湾人。', zhPinyin: 'wǒ shì Táiwānrén.' },
+  { cat: 'talk', me: 'vi', ko: '저는 베트남 사람이에요.', tr: 'Ben Vietnamlıyım.', en: "I'm Vietnamese.", ja: '私はベトナム人です。', jaKana: 'わたしわ べとなむじん です', zh: '我是越南人。', zhPinyin: 'wǒ shì Yuènánrén.' },
+  { cat: 'talk', me: 'th', ko: '저는 태국 사람이에요.', tr: 'Ben Taylandlıyım.', en: "I'm Thai.", ja: '私はタイ人です。', jaKana: 'わたしわ たいじん です', zh: '我是泰国人。', zhPinyin: 'wǒ shì Tàiguórén.' },
+  // 러시아어 · 아랍어 사용자는 여러 나라 사람이라 나라 대신 쓰는 말로
+  { cat: 'talk', me: 'ru', ko: '저는 러시아어를 해요.', tr: 'Rusça konuşuyorum.', en: 'I speak Russian.', ja: '私はロシア語を話します。', jaKana: 'わたしわ ろしあごお はなします', zh: '我说俄语。', zhPinyin: 'wǒ shuō Éyǔ.' },
+  { cat: 'talk', me: 'ar', ko: '저는 아랍어를 해요.', tr: 'Arapça konuşuyorum.', en: 'I speak Arabic.', ja: '私はアラビア語を話します。', jaKana: 'わたしわ あらびあごお はなします', zh: '我说阿拉伯语。', zhPinyin: 'wǒ shuō Ālābóyǔ.' },
   { cat: 'talk', ko: '한국어를 잘 못해요.', tr: 'Koreceyi iyi konuşamıyorum.', en: "I don't speak Korean well.", ja: '韓国語はあまり話せません。', jaKana: 'かんこくごわ あまり はなせません', zh: '我韩语说得不太好。', zhPinyin: 'wǒ Hányǔ shuō de bú tài hǎo.', only: 'ko' },
   { cat: 'talk', ko: '튀르키예어를 잘 못해요.', tr: 'Türkçeyi iyi konuşamıyorum.', en: "I don't speak Turkish well.", ja: 'トルコ語はあまり話せません。', jaKana: 'とるこごわ あまり はなせません', zh: '我土耳其语说得不太好。', zhPinyin: "wǒ Tǔ'ěrqíyǔ shuō de bú tài hǎo.", only: 'tr' },
   { cat: 'talk', ko: '영어를 잘 못해요.', tr: 'İngilizceyi iyi konuşamıyorum.', en: "I don't speak English well.", ja: '英語はあまり話せません。', jaKana: 'えいごわ あまり はなせません', zh: '我英语说得不太好。', zhPinyin: 'wǒ Yīngyǔ shuō de bú tài hǎo.', only: 'en' },
   { cat: 'talk', ko: '일본어를 잘 못해요.', tr: 'Japoncayı iyi konuşamıyorum.', en: "I don't speak Japanese well.", ja: '日本語はあまり話せません。', jaKana: 'にほんごわ あまり はなせません', zh: '我日语说得不太好。', zhPinyin: 'wǒ Rìyǔ shuō de bú tài hǎo.', only: 'ja' },
-  { cat: 'talk', ko: '중국어를 잘 못해요.', tr: 'Çinceyi iyi konuşamıyorum.', en: "I don't speak Chinese well.", ja: '中国語はあまり話せません。', jaKana: 'ちゅうごくごわ あまり はなせません', zh: '我中文说得不太好。', zhPinyin: 'wǒ Zhōngwén shuō de bú tài hǎo.', only: 'zh' },
+  { cat: 'talk', ko: '중국어를 잘 못해요.', tr: 'Çinceyi iyi konuşamıyorum.', en: "I don't speak Chinese well.", ja: '中国語はあまり話せません。', jaKana: 'ちゅうごくごわ あまり はなせません', zh: '我中文说得不太好。', zhPinyin: 'wǒ Zhōngwén shuō de bú tài hǎo.', only: ['zh', 'zh-TW'] },
+  { cat: 'talk', ko: '베트남어를 잘 못해요.', tr: 'Vietnamcayı iyi konuşamıyorum.', en: "I don't speak Vietnamese well.", ja: 'ベトナム語はあまり話せません。', jaKana: 'べとなむごわ あまり はなせません', zh: '我越南语说得不太好。', zhPinyin: 'wǒ Yuènányǔ shuō de bú tài hǎo.', only: 'vi' },
+  { cat: 'talk', ko: '태국어를 잘 못해요.', tr: 'Taycayı iyi konuşamıyorum.', en: "I don't speak Thai well.", ja: 'タイ語はあまり話せません。', jaKana: 'たいごわ あまり はなせません', zh: '我泰语说得不太好。', zhPinyin: 'wǒ Tàiyǔ shuō de bú tài hǎo.', only: 'th' },
+  { cat: 'talk', ko: '러시아어를 잘 못해요.', tr: 'Rusçayı iyi konuşamıyorum.', en: "I don't speak Russian well.", ja: 'ロシア語はあまり話せません。', jaKana: 'ろしあごわ あまり はなせません', zh: '我俄语说得不太好。', zhPinyin: 'wǒ Éyǔ shuō de bú tài hǎo.', only: 'ru' },
+  { cat: 'talk', ko: '아랍어를 잘 못해요.', tr: 'Arapçayı iyi konuşamıyorum.', en: "I don't speak Arabic well.", ja: 'アラビア語はあまり話せません。', jaKana: 'あらびあごわ あまり はなせません', zh: '我阿拉伯语说得不太好。', zhPinyin: 'wǒ Ālābóyǔ shuō de bú tài hǎo.', only: 'ar' },
   { cat: 'talk', ko: '천천히 말해 주세요.', tr: 'Lütfen yavaş konuşun.', en: 'Please speak slowly.', ja: 'ゆっくり話してください。', jaKana: 'ゆっくり はなして ください', zh: '请说慢一点。', zhPinyin: 'qǐng shuō màn yìdiǎn.' },
   { cat: 'talk', ko: '다시 한번 말해 주시겠어요?', tr: 'Tekrar söyler misiniz?', en: 'Could you say that again?', ja: 'もう一度言っていただけますか？', jaKana: 'もう いちど いって いただけますか', zh: '能再说一遍吗？', zhPinyin: 'néng zài shuō yí biàn ma?' },
   { cat: 'talk', ko: '이해했어요.', tr: 'Anladım.', en: 'I understand.', ja: 'わかりました。', jaKana: 'わかりました', zh: '我明白了。', zhPinyin: 'wǒ míngbai le.' },
@@ -118,11 +134,28 @@ export const PHRASES = [
   { cat: 'help', me: 'tr', ko: '튀르키예 대사관에 연락해 주세요.', tr: "Lütfen Türkiye Büyükelçiliği'ni arayın.", en: 'Please contact the Turkish Embassy.', ja: 'トルコ大使館に連絡してください。', jaKana: 'とるこ たいしかんに れんらく して ください', zh: '请联系土耳其大使馆。', zhPinyin: "qǐng liánxì Tǔ'ěrqí dàshǐguǎn." },
   { cat: 'help', me: 'ja', ko: '일본 대사관에 연락해 주세요.', tr: "Lütfen Japonya Büyükelçiliği'ni arayın.", en: 'Please contact the Japanese Embassy.', ja: '日本大使館に連絡してください。', jaKana: 'にほん たいしかんに れんらく して ください', zh: '请联系日本大使馆。', zhPinyin: 'qǐng liánxì Rìběn dàshǐguǎn.' },
   { cat: 'help', me: 'zh', ko: '중국 대사관에 연락해 주세요.', tr: "Lütfen Çin Büyükelçiliği'ni arayın.", en: 'Please contact the Chinese Embassy.', ja: '中国大使館に連絡してください。', jaKana: 'ちゅうごく たいしかんに れんらく して ください', zh: '请联系中国大使馆。', zhPinyin: 'qǐng liánxì Zhōngguó dàshǐguǎn.' },
-  { cat: 'help', me: 'en', ko: '저희 나라 대사관에 연락해 주세요.', tr: 'Lütfen ülkemin büyükelçiliğini arayın.', en: 'Please contact my embassy.', ja: '私の国の大使館に連絡してください。', jaKana: 'わたしの くにの たいしかんに れんらく して ください', zh: '请联系我们国家的大使馆。', zhPinyin: 'qǐng liánxì wǒmen guójiā de dàshǐguǎn.' },
+  { cat: 'help', me: 'vi', ko: '베트남 대사관에 연락해 주세요.', tr: "Lütfen Vietnam Büyükelçiliği'ni arayın.", en: 'Please contact the Vietnamese Embassy.', ja: 'ベトナム大使館に連絡してください。', jaKana: 'べとなむ たいしかんに れんらく して ください', zh: '请联系越南大使馆。', zhPinyin: 'qǐng liánxì Yuènán dàshǐguǎn.' },
+  { cat: 'help', me: 'th', ko: '태국 대사관에 연락해 주세요.', tr: "Lütfen Tayland Büyükelçiliği'ni arayın.", en: 'Please contact the Thai Embassy.', ja: 'タイ大使館に連絡してください。', jaKana: 'たい たいしかんに れんらく して ください', zh: '请联系泰国大使馆。', zhPinyin: 'qǐng liánxì Tàiguó dàshǐguǎn.' },
+  { cat: 'help', me: ['en', 'zh-TW', 'ru', 'ar'], ko: '저희 나라 대사관에 연락해 주세요.', tr: 'Lütfen ülkemin büyükelçiliğini arayın.', en: 'Please contact my embassy.', ja: '私の国の大使館に連絡してください。', jaKana: 'わたしの くにの たいしかんに れんらく して ください', zh: '请联系我们国家的大使馆。', zhPinyin: 'qǐng liánxì wǒmen guójiā de dàshǐguǎn.' },
 ];
 
-/** 표현에 붙여 둔 소리 표기 (일본어 → 히라가나 읽기, 중국어 → 병음) — 읽는 법을 인터넷 없이 보여 준다 */
-export const phraseSound = (p, lang) => ({ ja: p.jaKana, zh: p.zhPinyin })[lang] || '';
+// v1.6.0에 더한 언어: phrases/<code>.js — 열쇠는 표현집 문장 열쇠(분류|한국어, mine.js phraseRef와 같음),
+// 값은 글 하나 또는 [글, 소리 표기(병음 · 로마자 …)]. 여기서 각 문장에 p[code] · p.sound[code]로 붙인다
+export const EXTRA_PHRASES = { 'zh-TW': zhTW, vi, th, ru, ar };
+for (const p of PHRASES) {
+  const ref = `${p.cat}|${p.ko}`;
+  for (const [code, pack] of Object.entries(EXTRA_PHRASES)) {
+    const v = pack[ref];
+    if (v == null) continue;
+    const [text, sound] = Array.isArray(v) ? v : [v];
+    p[code] = text;
+    if (sound) (p.sound ??= {})[code] = sound;
+  }
+}
 
+/** 표현에 붙여 둔 소리 표기 (일본어 → 히라가나 읽기, 중국어 → 병음 …) — 읽는 법을 인터넷 없이 보여 준다 */
+export const phraseSound = (p, lang) => p.sound?.[lang] || ({ ja: p.jaKana, zh: p.zhPinyin })[lang] || '';
+
+const fits = (list, code) => !list || [].concat(list).includes(code);
 /** 상대 언어 · 내 언어에 맞는 표현 */
-export const phrasesFor = (cat, partner, me = 'ko') => PHRASES.filter((p) => p.cat === cat && (!p.only || p.only === partner) && (!p.me || p.me === me));
+export const phrasesFor = (cat, partner, me = 'ko') => PHRASES.filter((p) => p.cat === cat && fits(p.only, partner) && fits(p.me, me));

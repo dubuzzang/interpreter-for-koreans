@@ -1,9 +1,11 @@
 // 내 표현(v1.4.0): 자주 쓰는 문장 — 표현집에서 ☆ 한 것 · 직접 쓴 것. 이 기기에만 저장 (인터넷 없이도 보이고 읽어 준다)
 // 설정·기록(tercuman.v1)과 따로 저장해서 예전 데이터는 건드리지 않는다.
 // 항목: { id, ref?: 표현집 문장 열쇠(분류|한국어), orig: 처음 쓴 언어, label: 이름(내 배송 주소 등),
-//        texts: { 언어: 글 }, sound: { ja: 히라가나 읽기, zh: 병음 }, manual: { 언어: 직접 고친 번역 }, at }
+//        texts: { 언어: 글 }, sound: { ja: 히라가나 읽기, zh: 병음 … }, manual: { 언어: 직접 고친 번역 }, at }
 // 다른 언어 글은 필요할 때(상대 언어 · 내 언어가 바뀌었을 때) orig 글에서 번역해 채운다 — 화면(views/phrases.js)이 한다.
 import { CODES } from './lang.js';
+import { phraseSound } from './phrases.js';
+import { hasSound } from './reading.js';
 
 export const MINE_KEY = 'tercuman.mine.v1';
 export const MAX_MINE = 200;
@@ -32,13 +34,12 @@ export function saveMine(list, storage = globalThis.localStorage) {
   try { storage?.setItem(MINE_KEY, JSON.stringify(list.slice(0, MAX_MINE))); return true; } catch { return false; }
 }
 
-/** 표현집 문장 → 내 표현 (다섯 언어 글과 읽기를 그대로 가져와서 번역이 필요 없다) */
+/** 표현집 문장 → 내 표현 (모든 언어 글과 읽기를 그대로 가져와서 번역이 필요 없다) */
 export function fromPhrase(p) {
   const texts = {};
   for (const c of CODES) if (p[c]) texts[c] = p[c];
   const sound = {};
-  if (p.jaKana) sound.ja = p.jaKana;
-  if (p.zhPinyin) sound.zh = p.zhPinyin;
+  for (const c of CODES) if (phraseSound(p, c)) sound[c] = phraseSound(p, c);
   return { id: newId(), ref: phraseRef(p), orig: 'ko', label: '', texts, sound, manual: {}, at: Date.now() };
 }
 export const isStarred = (list, p) => list.some((x) => x.ref === phraseRef(p));
@@ -55,7 +56,7 @@ export function fromPhotoLine(line, me) {
   const orig = known ? line.lang : me;
   const texts = known ? { [line.lang]: clean(line.text, MAX_MINE_TEXT) } : { [me]: clean(line.tr || line.text, MAX_MINE_TEXT) };
   if (known && line.tr && line.lang !== me) texts[me] = clean(line.tr, MAX_MINE_TEXT);
-  const sound = known && line.read && (line.lang === 'ja' || line.lang === 'zh') ? { [line.lang]: line.read } : {};
+  const sound = known && line.read && hasSound(line.lang) ? { [line.lang]: line.read } : {};
   return { id: newId(), ref: photoRef(line), orig, label: '', texts, sound, manual: {}, at: Date.now() };
 }
 export const hasPhotoLine = (list, line) => list.some((x) => x.ref === photoRef(line));

@@ -1,4 +1,4 @@
-// 통역할 언어 고르기: 상대 언어(내 언어가 아닌 세 언어 중) · 내 언어(= 화면 언어) · 서로 바꾸기
+// 통역할 언어 고르기: 상대 언어(내 언어가 아닌 언어 중) · 내 언어(= 화면 언어) · 서로 바꾸기 — 10개 언어라 격자로(.seg.langs)
 import { h, icon } from '../ui.js';
 import { LANGS, CODES, otherLangs } from '../lang.js';
 import { state, setSetting } from '../store.js';
@@ -16,10 +16,10 @@ export function openLangPicker({ onMyLang, onDone } = {}) {
       h('div', { class: 'sheet-head' }, h('b', null, t('pair.title')), h('button', { class: 'icon-btn', type: 'button', 'aria-label': t('common.close'), onclick: close }, icon('close'))),
       h('div', { class: 'pick-row' },
         h('div', { class: 'pick-label' }, t('pair.partner')),
-        h('div', { class: 'seg' }, otherLangs(me).map((c) => choice(c, c === partner, () => { setSetting('partner', c); draw(); })))),
+        h('div', { class: 'seg langs' }, otherLangs(me).map((c) => choice(c, c === partner, () => { setSetting('partner', c); draw(); })))),
       h('div', { class: 'pick-row' },
         h('div', { class: 'pick-label' }, t('pair.me')),
-        h('div', { class: 'seg' }, CODES.map((c) => choice(c, c === me, () => { onMyLang?.(c); draw(); }, true))),
+        h('div', { class: 'seg langs' }, CODES.map((c) => choice(c, c === me, () => { onMyLang?.(c); draw(); }, true))),
         h('p', { class: 'muted small' }, t('pair.meHint'))),
       h('button', { class: 'btn ghost block mt', type: 'button', onclick: () => { onMyLang?.(partner); draw(); } }, icon('swap', 18), ' ', t('pair.swap')),
       h('button', { class: 'btn primary block mt', type: 'button', onclick: close }, t('common.ok'))));

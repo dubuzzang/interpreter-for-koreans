@@ -1,8 +1,14 @@
 // 화면 도우미: 요소 만들기 · 아이콘 · 알림 · 큰 글씨 보여 주기
 import { t, locale } from './i18n.js';
+import { LANGS, dirOf } from './lang.js';
 
+/**
+ * 요소 만들기. lang 속성(앱의 언어 코드)을 주면 글 방향 dir도 같이 단다 (v1.6.0, 아랍어 rtl) —
+ * 아랍어 화면에서는 한국어 말풍선이 ltr로, 다른 화면에서는 아랍어 말풍선만 rtl로 보인다. dir을 직접 주면 그것을 쓴다
+ */
 export function h(tag, attrs, ...children) {
   const el = document.createElement(tag);
+  if (attrs?.lang && LANGS[attrs.lang] && attrs.dir == null) attrs = { ...attrs, dir: dirOf(attrs.lang) };
   for (const [k, v] of Object.entries(attrs || {})) {
     if (v == null || v === false) continue;
     if (k === 'class') el.className = v;
@@ -52,7 +58,7 @@ const PATHS = {
   image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/>',
 };
 export const icon = (name, size = 22) => h('span', {
-  class: 'ic', 'aria-hidden': 'true',
+  class: `ic ic-${name}`, 'aria-hidden': 'true',
   html: `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${PATHS[name] || ''}</svg>`,
 });
 

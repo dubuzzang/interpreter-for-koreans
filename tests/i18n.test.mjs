@@ -21,7 +21,7 @@ const vars = (s) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join('
 const stripComments = (src) => src.replace(/\/\*[\s\S]*?\*\//g, '').split('\n').map((l) => l.replace(/(^|\s)\/\/.*$/, '')).join('\n');
 
 test('문구 사전: 다섯 언어의 키가 모두 같고, 빈 문구가 없고, 채울 자리·굵게 표시가 같다', () => {
-  assert.deepEqual(Object.keys(MESSAGES), ['ko', 'tr', 'en', 'ja', 'zh']);
+  assert.deepEqual(Object.keys(MESSAGES), CODES);
   const keys = Object.keys(MESSAGES.ko).sort();
   assert.ok(keys.length > 150, `문구 ${keys.length}개`);
   for (const c of CODES) {
@@ -68,7 +68,8 @@ test('고른 언어로 문구를 고르고, {자리}를 채운다', () => {
 
 test('화면 코드가 쓰는 문구 키는 모두 사전에 있고, 화면 코드에 한국어 문장을 직접 쓰지 않는다', () => {
   const KEY = /'((?:app|tab|lang|mic|common|talk|text|phrases|cat|hist|set|pair|ui|err|suggest|mine|share|install|photo)\.[A-Za-z0-9_]+)'/g;
-  const ui = files('public/js').filter((f) => !/[\\/](i18n|reading|phrases|lang)\.js$/.test(f));
+  // 언어 자료(사전 i18n/ · 표현집 phrases/ · 읽는 법 read/)는 빼고 본다
+  const ui = files('public/js').filter((f) => !/[\\/](i18n|reading|phrases|lang)\.js$/.test(f) && !/[\\/](i18n|phrases|read)[\\/]/.test(f));
   assert.ok(ui.length >= 12);
   let used = 0;
   for (const f of ui) {
@@ -222,7 +223,7 @@ test('표현집: 내 언어에 맞는 문장 ("저는 ○○ 사람이에요"·�
     assert.ok(list.length >= 5, `${me}→${partner} ${c.id}`);
     for (const p of list) assert.ok(p[me] && p[partner]);
   }
-  for (const p of PHRASES) assert.ok(!p.me || CODES.includes(p.me));
+  for (const p of PHRASES) assert.ok([].concat(p.me ?? []).every((c) => CODES.includes(c)));
 });
 
 test('말투는 번역되는 쪽 언어에만 (영어는 영향 없음)', () => {
@@ -247,7 +248,7 @@ test('index.html: 언어 버튼은 오른쪽 끝(설정 뒤)에 숨겨 두고, �
   assert.match(header, /<button id="lang" class="lang-btn"[^>]* hidden><\/button>/, '예전 앱 코드에서는 숨은 채로');
   const block = html.match(/var TEXT = \{([\s\S]*?)\};/)[1];
   for (const c of CODES) {
-    const row = block.match(new RegExp(`${c}: \\[([^\\]]+)\\]`));
+    const row = block.match(new RegExp(`'?${c}'?: \\[([^\\]]+)\\]`));
     assert.ok(row, `업데이트 알림 ${c}`);
     assert.equal(row[1].split("', '").length, 5, `${c} 문구 5개`);
   }
@@ -255,7 +256,7 @@ test('index.html: 언어 버튼은 오른쪽 끝(설정 뒤)에 숨겨 두고, �
   assert.match(html, /navigator\.languages/);
   assert.match(html, /return 'en';/, '네 언어가 아니면 영어');
   // 알림의 "업데이트" 버튼 이름과 설정 화면 안내가 같은 말
-  for (const c of CODES) assert.ok(MESSAGES[c]['set.updateHint'].includes(block.match(new RegExp(`${c}: \\[[^\\]]*?'[^']*', '[^']*', '([^']*)'`))[1]), `${c} 업데이트 버튼 이름`);
+  for (const c of CODES) assert.ok(MESSAGES[c]['set.updateHint'].includes(block.match(new RegExp(`'?${c}'?: \\[[^\\]]*?'[^']*', '[^']*', '([^']*)'`))[1]), `${c} 업데이트 버튼 이름`);
 });
 
 test('CSS: 좁은 화면에서도 위 막대가 넘치지 않게 (앱 이름 글자 숨김 · 언어 짝 버튼 줄어듦)', () => {

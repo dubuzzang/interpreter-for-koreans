@@ -18,15 +18,18 @@ beforeEach(() => _resetBuckets());
 const ORIGIN = 'https://interpreter-for-koreans.pages.dev';
 
 test('중국어 언어 정보: 간체(zh-CN) · 모든 언어와 짝', () => {
-  assert.deepEqual(LANGS.zh, { code: 'zh', native: '中文', flag: '🇨🇳', bcp47: 'zh-CN', short: 'ZH' });
+  const { code, native, flag, bcp47, short, script } = LANGS.zh;
+  assert.deepEqual({ code, native, flag, bcp47, short, script }, { code: 'zh', native: '简体中文', flag: '🇨🇳', bcp47: 'zh-CN', short: 'ZH', script: 'Hans' });
   assert.deepEqual(SERVER_CODES, CODES);
-  assert.deepEqual(otherLangs('zh'), ['ko', 'tr', 'en', 'ja']);
+  assert.deepEqual(otherLangs('zh'), CODES.filter((c) => c !== 'zh'));
   for (const c of CODES.filter((x) => x !== 'zh')) {
     assert.ok(validateTranslate({ text: '你好', from: 'zh', to: c }).value, `zh → ${c}`);
     assert.ok(validateTranslate({ text: 'x', from: c, to: 'zh' }).value, `${c} → zh`);
   }
   assert.equal(defaultLang(['zh-CN', 'en']), 'zh');
-  assert.equal(defaultLang(['zh-TW']), 'zh', '번체 브라우저도 중국어로 (간체 화면)');
+  assert.equal(defaultLang(['zh-TW']), 'zh-TW', '번체 브라우저는 번체 중국어 화면 (v1.6.0)');
+  assert.equal(defaultLang(['zh-Hans-HK']), 'zh-TW', '홍콩도 번체');
+  assert.equal(defaultLang(['zh-SG']), 'zh');
   assert.equal(defaultPartner('zh'), 'ko');
   assert.deepEqual(startLangs({}, ['zh-CN']), { me: 'zh', partner: 'ko' });
   assert.deepEqual(startLangs({ settings: { me: 'ko', partner: 'tr' } }, ['zh-CN']), { me: 'ko', partner: 'tr' }, '이미 쓰던 사람은 그대로');
@@ -41,7 +44,7 @@ test('번역 지시문: 간체 · 말투(您/你) · 병음을 덧붙이지 않�
   assert.match(sys('ko', 'zh', false), /你, not 您/);
   assert.match(sys('zh', 'ko'), /from Simplified Chinese into Korean/);
   assert.match(sys('zh', 'ko'), /존댓말/);
-  assert.match(sys('ko', 'zh'), /between Korean, Turkish, English, Japanese and Chinese speakers/);
+  assert.match(sys('ko', 'zh'), /between Korean, Turkish, English, Japanese, Chinese, Vietnamese, Thai, Russian and Arabic speakers/);
   assert.match(sys('ko', 'zh'), /No quotes, labels, notes, explanations, alternatives, romanization or pinyin/);
   assert.equal(sys('zh', 'en', true), sys('zh', 'en', false), '영어로 옮길 때는 말투 상관없음');
   const ctx = buildMessages({ text: 'x', from: 'ko', to: 'zh', context: [{ lang: 'zh', text: '你好' }] })[0].content;
@@ -221,14 +224,16 @@ test('화면 문구(중국어): 간체 한자로, 상대 안내 · 언어 이름
   for (const [k, s] of Object.entries(MESSAGES.zh)) if (!/^[A-Za-z0-9\s.()/:·→✕×{}-]+$/.test(s)) assert.match(s, /[一-鿿]/, `zh.${k}`);
   assert.doesNotMatch(Object.values(MESSAGES.zh).join(''), /[們這說嗎麼錢買賣時東車門問謝對見還個為發貨價樣質換運輸單網訂給請語話讀設錄]/, '번체 글자 없음');
   assert.match(tl('zh', 'mic.partnerHint'), /中文/);
-  assert.equal(tl('ko', 'lang.zh'), '중국어');
-  assert.equal(tl('tr', 'lang.zh'), 'Çince');
-  assert.equal(tl('en', 'lang.zh'), 'Chinese');
-  assert.equal(tl('ja', 'lang.zh'), '中国語');
+  // v1.6.0: 번체 중국어가 생겨서 다른 언어 화면에서는 간체라고 적는다 (중국어 화면에서는 그대로 中文)
+  assert.equal(tl('ko', 'lang.zh'), '중국어(간체)');
+  assert.equal(tl('tr', 'lang.zh'), 'Çince (Basitleştirilmiş)');
+  assert.equal(tl('en', 'lang.zh'), 'Chinese (Simplified)');
+  assert.equal(tl('ja', 'lang.zh'), '中国語（簡体字）');
+  assert.equal(tl('zh', 'lang.zh'), '中文');
   assert.equal(tl('zh', 'lang.ko'), '韩语');
   for (const c of CODES) {
     assert.match(tl(c, 'set.toneHint'), /您/, `${c} 말투 안내에 중국어`);
-    assert.match(tl(c, 'set.about'), /중국어|Çince|Chinese|中国語|中文/, `${c} 앱 정보에 중국어`);
+    assert.match(tl(c, 'set.about'), /중국어|Çince|Chinese|中国語|中文|Trung|จีน|итай|الصين/, `${c} 앱 정보에 중국어`);
   }
   assert.match(tl('ko', 'set.readingHint'), /중국어/);
   assert.equal(tl('zh', 'talk.ariaSpeak', { lang: tl('zh', 'lang.zh') }), '用中文说话');

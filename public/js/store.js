@@ -1,5 +1,6 @@
 // 이 기기에만 저장: 설정 · 통역 기록
 import { startLangs } from './i18n.js';
+import { CODES } from './lang.js';
 
 const KEY = 'tercuman.v1';
 const MAX_HISTORY = 500;
@@ -13,7 +14,7 @@ export const DEFAULTS = {
   reading: true,       // 읽는 법(한글 발음 · 로마자) 같이 보이기
   suggest: true,       // 답장 추천: 상대 말이 통역되면 내가 할 만한 답 2~3개 (v1.4.0, AI를 한 번 더 부름)
   stt: 'auto',         // 음성 인식: auto(브라우저 → 안 되면 서버) · browser · server
-  voices: { ko: '', tr: '', en: '', ja: '', zh: '' },
+  voices: Object.fromEntries(CODES.map((c) => [c, ''])), // 언어마다 고른 목소리 (빈 값 = 가장 좋은 것)
   saveHistory: true,
   theme: 'auto',       // auto · light · dark
   faceToFace: false,   // 마주 보기(상대 쪽 화면을 뒤집어 보여 줌)

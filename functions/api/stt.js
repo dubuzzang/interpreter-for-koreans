@@ -1,6 +1,6 @@
-// POST /api/stt?lang=ko  본문: 녹음 파일(webm·mp4·ogg·wav·mp3) → { text }  (lang: ko · tr · en · ja · zh)
+// POST /api/stt?lang=ko  본문: 녹음 파일(webm·mp4·ogg·wav·mp3) → { text }  (lang: 앱의 언어 코드 — 번체 중국어 zh-TW는 Whisper에 zh로)
 // 브라우저 음성 인식이 없는 곳(일부 앱 안 브라우저·파이어폭스)에서 쓰는 대신 경로 — Whisper large-v3 turbo
-import { CODES, STT_MODEL, STT_PROMPT, MAX_AUDIO, aiError, cleanTranscript, toBase64, withTimeout } from '../../lib/translate-core.mjs';
+import { CODES, STT_MODEL, STT_PROMPT, MAX_AUDIO, aiError, cleanTranscript, sttLanguage, toBase64, withTimeout } from '../../lib/translate-core.mjs';
 import { checkOrigin, rateLimit, json } from '../../lib/guard.mjs';
 
 export async function onRequestPost({ request, env }) {
@@ -15,7 +15,7 @@ export async function onRequestPost({ request, env }) {
   if (audio.byteLength > MAX_AUDIO) return json({ error: '녹음이 너무 길어요. 1분 안으로 말해 주세요.', code: 'audio_too_long' }, 413);
   if (!env.AI) return json({ error: '음성 인식 엔진이 연결되지 않았어요.', code: 'no_engine' }, 500);
   try {
-    const input = { audio: toBase64(audio), language: lang, task: 'transcribe', vad_filter: true };
+    const input = { audio: toBase64(audio), language: sttLanguage(lang), task: 'transcribe', vad_filter: true };
     if (STT_PROMPT[lang]) input.initial_prompt = STT_PROMPT[lang];
     const r = await withTimeout(env.AI.run(STT_MODEL, input), 25_000);
     return json({ text: cleanTranscript(r?.text) });

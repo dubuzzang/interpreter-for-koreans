@@ -1,6 +1,6 @@
-// Tercüman — 한국어 · 튀르키예어 · 영어 · 일본어 통역 (화면 뼈대 · 화면 전환 · 화면 언어)
+// Tercüman — 10개 언어 통역 (화면 뼈대 · 화면 전환 · 화면 언어)
 import { h, icon } from './ui.js';
-import { LANGS } from './lang.js';
+import { LANGS, dirOf } from './lang.js';
 import { state, setSetting } from './store.js';
 import { t, setUiLang, langName, pickLanguage } from './i18n.js';
 import { unlockSpeech } from './speech.js';
@@ -54,6 +54,7 @@ export function renderPair() {
 function applyLang() {
   const me = setUiLang(state.settings.me);
   document.documentElement.lang = me;
+  document.documentElement.dir = dirOf(me); // 아랍어 화면은 오른쪽에서 왼쪽으로 (v1.6.0)
   document.title = t('app.title');
   document.querySelector('.brand')?.setAttribute('aria-label', t('app.home'));
   gearBtn.setAttribute('aria-label', t('app.settings'));

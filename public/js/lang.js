@@ -1,17 +1,56 @@
-// 언어 정보 · 글로 언어 알아보기 · 기록 항목이 누구 쪽인지 (화면 문구는 i18n.js)
+// 언어 정보 · 글로 언어 알아보기 · 기록 항목이 누구 쪽인지 (화면 문구는 i18n/ · 표현집은 phrases.js · 읽는 법은 reading.js)
+// 언어를 더할 때: 여기 LANGS 한 줄 → i18n/<code>.js(화면 글자) · phrases/<code>.js(표현집) · read/<code>.js(읽는 법) · lib/langs/<code>.mjs(서버)
+//
+// name: 번역 지시문에 쓰는 영어 이름 · script: 글자 체계(ISO 15924) · dir: 글 방향(아랍어만 rtl)
+// voices: 읽어 주기 목소리 고르기 — 받는 목소리 언어 태그(소문자, _는 -로)를 앞에서부터 순서대로 (이 목록에 없는 목소리는 안 씀)
 
 export const LANGS = {
-  ko: { code: 'ko', native: '한국어', flag: '🇰🇷', bcp47: 'ko-KR', short: 'KO' },
-  tr: { code: 'tr', native: 'Türkçe', flag: '🇹🇷', bcp47: 'tr-TR', short: 'TR' },
-  en: { code: 'en', native: 'English', flag: '🇺🇸', bcp47: 'en-US', short: 'EN' },
-  ja: { code: 'ja', native: '日本語', flag: '🇯🇵', bcp47: 'ja-JP', short: 'JA' },
-  zh: { code: 'zh', native: '中文', flag: '🇨🇳', bcp47: 'zh-CN', short: 'ZH' }, // 간체 중국어 (중국 본토)
+  ko: { code: 'ko', native: '한국어', flag: '🇰🇷', bcp47: 'ko-KR', short: 'KO', name: 'Korean', script: 'Hang' },
+  tr: { code: 'tr', native: 'Türkçe', flag: '🇹🇷', bcp47: 'tr-TR', short: 'TR', name: 'Turkish', script: 'Latn' },
+  en: { code: 'en', native: 'English', flag: '🇺🇸', bcp47: 'en-US', short: 'EN', name: 'English', script: 'Latn' },
+  ja: { code: 'ja', native: '日本語', flag: '🇯🇵', bcp47: 'ja-JP', short: 'JA', name: 'Japanese', script: 'Jpan' },
+  // 간체 중국어 (중국 본토 보통화). 홍콩·광둥어(zh-HK · yue) 목소리는 같은 글을 광둥어로 읽어서 뺀다
+  zh: {
+    code: 'zh', native: '简体中文', flag: '🇨🇳', bcp47: 'zh-CN', short: 'ZH', name: 'Simplified Chinese', script: 'Hans',
+    voices: [/^(zh|cmn)(-hans)?(-cn|-sg)?$/, /^(zh|cmn)(-hant)?-tw$/],
+  },
+  // 번체 중국어 (대만 · 홍콩 글자, 소리는 대만 보통화) — 엔진은 간체와 같고 글자체 · 목소리만 다르다 (v1.6.0)
+  'zh-TW': {
+    code: 'zh-TW', native: '繁體中文', flag: '🇹🇼', bcp47: 'zh-TW', short: 'TW', name: 'Traditional Chinese', script: 'Hant',
+    voices: [/^(zh|cmn)(-hant)?-tw$/, /^(zh|cmn)(-hans)?(-cn|-sg)?$/],
+  },
+  vi: { code: 'vi', native: 'Tiếng Việt', flag: '🇻🇳', bcp47: 'vi-VN', short: 'VI', name: 'Vietnamese', script: 'Latn' },
+  th: { code: 'th', native: 'ภาษาไทย', flag: '🇹🇭', bcp47: 'th-TH', short: 'TH', name: 'Thai', script: 'Thai' },
+  ru: { code: 'ru', native: 'Русский', flag: '🇷🇺', bcp47: 'ru-RU', short: 'RU', name: 'Russian', script: 'Cyrl' },
+  ar: { code: 'ar', native: 'العربية', flag: '🇸🇦', bcp47: 'ar-SA', short: 'AR', name: 'Arabic', script: 'Arab', dir: 'rtl' },
 };
 export const CODES = Object.keys(LANGS);
 
+/** 오른쪽에서 왼쪽으로 쓰는 언어인가 (아랍어) */
+export const isRtl = (code) => LANGS[code]?.dir === 'rtl';
+/** 글 방향: 'rtl' · 'ltr' (모르는 언어는 ltr) */
+export const dirOf = (code) => (isRtl(code) ? 'rtl' : 'ltr');
+/** 한자로 쓰는 중국어 (간체 · 번체) */
+export const isChinese = (code) => code === 'zh' || code === 'zh-TW';
+
+/**
+ * 브라우저 언어 태그(zh-TW · zh_Hant_HK · vi-VN · ar-EG …) → 이 앱의 언어 코드, 없으면 null.
+ * 대만 · 홍콩 · 마카오 · 번체(Hant)는 번체 중국어, 그 밖의 중국어는 간체
+ */
+export function codeOfTag(tag) {
+  const s = String(tag || '').toLowerCase().replace(/_/g, '-');
+  const base = s.split('-')[0];
+  if (base === 'zh') return /-(hant|tw|hk|mo)(-|$)/.test(s) ? 'zh-TW' : 'zh';
+  return CODES.includes(base) ? base : null;
+}
+
+// ---------- 글로 언어 알아보기 (글 번역 탭의 🔎 자동 감지 · 사진 줄 언어) ----------
 const TR_LETTERS = /[çğıöşüİĞŞ]/i;
 const TR_WORDS = new Set('ve bir bu da de ne ben sen o biz siz onlar var yok mı mi mu mü için çok ama evet hayır merhaba teşekkür ederim lütfen nasıl nerede kaç ne zaman tamam iyi güzel değil şey gibi daha en ile bunu şu benim senin sizin burada orada istiyorum ister misiniz musunuz miyim yapabilir olur oldu olsun kadar sonra önce şimdi bugün yarın dün otel otobüs tren bilet su çay kahve hesap fiyat lira'.split(' '));
 const EN_WORDS = new Set('the a an and is are was were be been to of in on at for with from this that these those it i you he she we they my your our me him her them do does did not no yes please thank thanks hello hi how what where when why who which can could would should will shall have has had there here go going want need like much many some any just very really okay ok sorry excuse'.split(' '));
+// 베트남어: 베트남어에만 쓰는 글자 (ă đ ơ ư와 아래 점 · 갈고리 · 겹친 성조 부호가 붙은 모음).
+// â · ê · ô · à · é 같은 것은 튀르키예어(kâğıt) · 프랑스어에도 나와서 뺀다
+const VI_LETTERS = /[ăđơưạảấầẩẫậắằẳẵặẹẻẽếềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹ]/i;
 
 // 한자만 있는 글이 중국어인지 일본어인지 가를 글자들.
 // 중국어: 간체로만 쓰는 글자 · 중국어에만 쓰는 낱말 글자(你·吗·呢…) · 번체로만 쓰는 글자(們·這·說…, 일본에서 안 쓰는 모양)
@@ -31,19 +70,27 @@ function hanOnlyLang(s, fallback) {
   return fallback === 'ja' ? 'ja' : 'zh';
 }
 
+/** 글자 체계마다 글자 수 (글자만 센다) */
+const count = (s, re) => (s.match(re) || []).length;
+
 /**
  * 글이 어느 언어인지: 한글 → ko, 가나가 있으면 ja, 한자만 있으면 zh 쪽으로(일본 글자체면 ja),
+ * 타이 문자 → th, 키릴 문자 → ru, 아랍 문자 → ar, 베트남어 글자 → vi,
  * 튀르키예어 글자·흔한 낱말 → tr, 영어 낱말 → en. 모르겠으면 fallback
  */
 export function detectLang(text, fallback = 'en') {
   const s = String(text || '');
   const letters = s.replace(/[^\p{L}]/gu, '');
   if (!letters) return fallback;
-  const hangul = (s.match(/[가-힣ㄱ-ㅎㅏ-ㅣ]/g) || []).length;
-  if (hangul / letters.length >= 0.3) return 'ko';
-  const kana = (s.match(KANA) || []).length;
-  const han = (s.match(HAN) || []).length;
-  if ((kana + han) / letters.length >= 0.3) return kana ? 'ja' : hanOnlyLang(s, fallback);
+  const n = letters.length;
+  if (count(s, /[가-힣ㄱ-ㅎㅏ-ㅣ]/g) / n >= 0.3) return 'ko';
+  const kana = count(s, KANA);
+  const han = count(s, HAN);
+  if ((kana + han) / n >= 0.3) return kana ? 'ja' : hanOnlyLang(s, fallback);
+  if (count(s, /[฀-๿]/g) / n >= 0.3) return 'th';
+  if (count(s, /[Ѐ-ӿ]/g) / n >= 0.3) return 'ru';
+  if (count(s, /[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]/g) / n >= 0.3) return 'ar';
+  if (VI_LETTERS.test(s)) return 'vi';
   if (TR_LETTERS.test(s)) return 'tr';
   const words = s.toLowerCase().match(/[a-zçğıöşü']+/g) || []; // tr-TR 소문자는 영어 I를 ı로 바꿔 버린다
   let tr = 0, en = 0;

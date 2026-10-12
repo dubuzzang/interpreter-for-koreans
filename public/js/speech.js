@@ -155,21 +155,28 @@ if (synth) { refreshVoices(); synth.addEventListener?.('voiceschanged', refreshV
 
 export const canSpeak = () => Boolean(synth);
 
-const GOOD = /(natural|neural|online|premium|enhanced|google|siri|yelda|yuna|samantha|ava|jenny|aria|sunhi|seoyeon|emel|ahmet|kyoko|otoya|nanami|keita|haruka|ayumi|sayaka|xiaoxiao|yunxi|xiaoyi|yunyang|tingting|lili|huihui|yaoyao|kangkang)/i;
+// 이름으로 본 좋은 목소리 (언어마다 잘 알려진 기기 · 온라인 목소리 이름)
+const GOOD = /(natural|neural|online|premium|enhanced|google|siri|yelda|yuna|samantha|ava|jenny|aria|sunhi|seoyeon|emel|ahmet|kyoko|otoya|nanami|keita|haruka|ayumi|sayaka|xiaoxiao|yunxi|xiaoyi|yunyang|tingting|lili|huihui|yaoyao|kangkang|meijia|hanhan|hsiaochen|yating|zhiwei|hoaimy|namminh|premwadee|niwat|kanya|pattara|svetlana|dmitry|milena|irina|pavel|zariyah|hamed|maged|laila|salma|shakir)/i;
 const tagOf = (v) => v.lang.toLowerCase().replace(/_/g, '-');
-// 중국어(보통화): 중국 본토 목소리 → 대만 목소리 순. 홍콩·광둥어(zh-HK · yue) 목소리는 같은 글도 광둥어로 읽어서 뺀다
-const MANDARIN = (tag) => (/^(zh|cmn)(-hans)?(-cn|-sg)?$/.test(tag) ? 2 : /^(zh|cmn)(-hant)?-tw$/.test(tag) ? 1 : 0);
-/** 언어별 목소리 후보 (좋은 것부터) */
+/**
+ * 그 언어 목소리의 순위 (0 = 쓰지 않음). LANGS[lang].voices가 있으면 그 목록의 앞쪽일수록 높게
+ * (중국어: 본토 → 대만, 번체 중국어: 대만 → 본토, 홍콩·광둥어 zh-HK · yue는 같은 글을 광둥어로 읽어서 뺀다),
+ * 없으면 bcp47과 같은 태그 2 · 같은 언어의 다른 지역 1
+ */
+function voiceRank(lang, tag) {
+  const order = LANGS[lang].voices;
+  if (order) { const i = order.findIndex((re) => re.test(tag)); return i < 0 ? 0 : order.length - i; }
+  const want = LANGS[lang].bcp47.toLowerCase();
+  if (tag === want) return 2;
+  return tag === lang || tag.startsWith(`${lang}-`) ? 1 : 0;
+}
+/** 언어별 목소리 후보 (좋은 것부터): 순서 목록이 있는 언어(중국어)는 지역 순서 먼저, 그 밖은 좋은 목소리 먼저 */
 export function voicesFor(lang) {
-  const tag = LANGS[lang].bcp47.toLowerCase();
-  const base = lang.toLowerCase();
-  if (lang === 'zh') {
-    return voices.filter((v) => v.lang && MANDARIN(tagOf(v)))
-      .sort((a, b) => (MANDARIN(tagOf(b)) - MANDARIN(tagOf(a))) || (GOOD.test(b.name) - GOOD.test(a.name)));
-  }
-  return voices
-    .filter((v) => v.lang && (tagOf(v) === tag || v.lang.toLowerCase().startsWith(`${base}-`) || v.lang.toLowerCase() === base))
-    .sort((a, b) => (GOOD.test(b.name) - GOOD.test(a.name)) || (tagOf(b) === tag) - (tagOf(a) === tag));
+  const rank = (v) => voiceRank(lang, tagOf(v));
+  const good = (v) => Number(GOOD.test(v.name));
+  const byRegion = Boolean(LANGS[lang].voices);
+  return voices.filter((v) => v.lang && rank(v))
+    .sort((a, b) => (byRegion ? (rank(b) - rank(a)) || (good(b) - good(a)) : (good(b) - good(a)) || (rank(b) - rank(a))));
 }
 export const hasVoice = (lang) => voicesFor(lang).length > 0;
 

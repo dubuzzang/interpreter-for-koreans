@@ -1,5 +1,6 @@
 // 서버 API: 번역 · 음성 인식 · 읽는 법 · 답장 추천 · 합의 내용 요약 · 사진 번역 (Cloudflare Workers AI)
 import { t, uiLang, MESSAGES } from './i18n.js';
+import { hasSound } from './reading.js';
 
 const cache = new Map();
 
@@ -47,21 +48,19 @@ export async function translate(text, from, to, { context = [], formal = true } 
 }
 
 /**
- * 읽는 법을 만들 소리 표기: 일본어 → 히라가나 읽기(/api/kana), 중국어 → 병음(/api/pinyin).
+ * 읽는 법을 만들 소리 표기 (/api/sound, v1.6.0): 일본어 → 히라가나 읽기, 중국어 → 병음, 그 밖에 서버를 거치는 언어(reading.js hasSound).
  * 화면에서 한글 발음 · 로마자 · 병음으로 바꿔 보여 준다. 실패해도 번역은 그대로라 빈 값
  */
-const SOUND_API = { ja: 'kana', zh: 'pinyin' };
 const soundCache = new Map();
 export async function sound(text, lang) {
-  const kind = SOUND_API[lang];
   const t = String(text).trim();
-  if (!kind || !t) return '';
+  if (!hasSound(lang) || !t) return '';
   const key = `${lang}|${t}`;
   if (soundCache.has(key)) return soundCache.get(key);
   try {
-    const data = await call(`/api/${kind}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: t }) }, 20000);
-    soundCache.set(key, data[kind] || '');
-    return data[kind] || '';
+    const data = await call('/api/sound', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: t, lang }) }, 20000);
+    soundCache.set(key, data.sound || '');
+    return data.sound || '';
   } catch { return ''; }
 }
 
