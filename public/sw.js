@@ -1,5 +1,5 @@
 /* Tercüman 서비스 워커 — scripts/gen-sw.mjs가 만든 파일 (직접 고치지 마세요) */
-const VERSION = '1.4.1';
+const VERSION = '1.5.0';
 const CACHE = `tercuman-${VERSION}`;
 const ASSETS = [
   "/",
@@ -16,6 +16,7 @@ const ASSETS = [
   "/js/install.js",
   "/js/lang.js",
   "/js/mine.js",
+  "/js/photo.js",
   "/js/phrases.js",
   "/js/pinyin.js",
   "/js/reading.js",
@@ -28,6 +29,7 @@ const ASSETS = [
   "/js/views/install.js",
   "/js/views/langmenu.js",
   "/js/views/langpicker.js",
+  "/js/views/photo.js",
   "/js/views/phrases.js",
   "/js/views/settings.js",
   "/js/views/share.js",

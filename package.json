@@ -1,6 +1,6 @@
 {
   "name": "interpreter-for-koreans",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "private": true,
   "type": "module",
   "description": "Tercüman — 한국어 · 튀르키예어 · 영어 · 일본어 · 중국어 통역 웹앱 (Cloudflare Pages + Workers AI)",

@@ -45,6 +45,23 @@ export const isStarred = (list, p) => list.some((x) => x.ref === phraseRef(p));
 /** 별표: 있으면 빼고, 없으면 맨 뒤에 */
 export const toggleStar = (list, p) => (isStarred(list, p) ? list.filter((x) => x.ref !== phraseRef(p)) : [...list, fromPhrase(p)]);
 
+/**
+ * 사진 번역(v1.5.0)에서 읽은 줄 → 내 표현. 원문(사진 언어)이 처음 글이고, 내 언어 번역 · 읽기(병음 · 히라가나)를 같이 넣는다.
+ * 사진 언어가 다섯 언어가 아니면 번역(내 언어)을 처음 글로.
+ */
+export const photoRef = (line) => `photo|${line.lang}|${line.text}`;
+export function fromPhotoLine(line, me) {
+  const known = CODES.includes(line.lang);
+  const orig = known ? line.lang : me;
+  const texts = known ? { [line.lang]: clean(line.text, MAX_MINE_TEXT) } : { [me]: clean(line.tr || line.text, MAX_MINE_TEXT) };
+  if (known && line.tr && line.lang !== me) texts[me] = clean(line.tr, MAX_MINE_TEXT);
+  const sound = known && line.read && (line.lang === 'ja' || line.lang === 'zh') ? { [line.lang]: line.read } : {};
+  return { id: newId(), ref: photoRef(line), orig, label: '', texts, sound, manual: {}, at: Date.now() };
+}
+export const hasPhotoLine = (list, line) => list.some((x) => x.ref === photoRef(line));
+/** 사진 줄 별표: 있으면 빼고, 없으면 맨 앞에 (직접 쓴 문장처럼 새것이 위로) */
+export const togglePhotoLine = (list, line, me) => (hasPhotoLine(list, line) ? list.filter((x) => x.ref !== photoRef(line)) : [fromPhotoLine(line, me), ...list]);
+
 /** 직접 쓴 문장 (lang = 쓴 언어 = 그때 내 언어) */
 export function createItem({ text, lang, label = '' }) {
   return { id: newId(), orig: lang, label: clean(label, MAX_LABEL), texts: { [lang]: clean(text, MAX_MINE_TEXT) }, sound: {}, manual: {}, at: Date.now() };

@@ -67,7 +67,7 @@ test('고른 언어로 문구를 고르고, {자리}를 채운다', () => {
 });
 
 test('화면 코드가 쓰는 문구 키는 모두 사전에 있고, 화면 코드에 한국어 문장을 직접 쓰지 않는다', () => {
-  const KEY = /'((?:app|tab|lang|mic|common|talk|text|phrases|cat|hist|set|pair|ui|err|suggest|mine|share|install)\.[A-Za-z0-9_]+)'/g;
+  const KEY = /'((?:app|tab|lang|mic|common|talk|text|phrases|cat|hist|set|pair|ui|err|suggest|mine|share|install|photo)\.[A-Za-z0-9_]+)'/g;
   const ui = files('public/js').filter((f) => !/[\\/](i18n|reading|phrases|lang)\.js$/.test(f));
   assert.ok(ui.length >= 12);
   let used = 0;

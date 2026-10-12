@@ -10,11 +10,14 @@ import phrases from './views/phrases.js';
 import history from './views/history.js';
 import settings from './views/settings.js';
 import install from './views/install.js';
+import photo from './views/photo.js';
 import { openLangPicker } from './views/langpicker.js';
 import { openLangMenu } from './views/langmenu.js';
 import { VERSION } from './version.js';
 
-const VIEWS = { talk, text, phrases, history, settings, install }; // install: 설정 → 앱 설치 (#/install, 아래 탭에는 없음)
+// install: 설정 → 앱 설치 (#/install) · photo: 번역 탭의 📷 사진 → 사진 번역 결과 (#/photo) — 아래 탭에는 없음
+const VIEWS = { talk, text, phrases, history, settings, install, photo };
+const TAB_OF = { photo: 'text' }; // 아래 탭에서 어느 것을 켜 둘지
 const TABS = [
   ['talk', 'tab.talk', 'chat'],
   ['text', 'tab.text', 'text'],
@@ -85,7 +88,7 @@ export function render() {
   cleanup = null;
   document.body.dataset.view = name;
   main.replaceChildren();
-  for (const b of tabbar.querySelectorAll('a')) b.setAttribute('aria-current', b.dataset.tab === name ? 'page' : 'false');
+  for (const b of tabbar.querySelectorAll('a')) b.setAttribute('aria-current', b.dataset.tab === (TAB_OF[name] || name) ? 'page' : 'false');
   cleanup = VIEWS[name].render(main) || null;
   main.focus({ preventScroll: true });
 }

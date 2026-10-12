@@ -48,6 +48,8 @@ const PATHS = {
   back: '<path d="M15 6l-6 6 6 6"/>',
   check: '<path d="m5 12 5 5 9-10"/>',
   download: '<path d="M12 4v11m0 0-4-4m4 4 4-4"/><path d="M5 20h14"/>',
+  camera: '<path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.5" r="3.5"/>',
+  image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/>',
 };
 export const icon = (name, size = 22) => h('span', {
   class: 'ic', 'aria-hidden': 'true',

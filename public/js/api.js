@@ -1,4 +1,4 @@
-// 서버 API: 번역 · 음성 인식 · 읽는 법 · 답장 추천 · 합의 내용 요약 (Cloudflare Workers AI)
+// 서버 API: 번역 · 음성 인식 · 읽는 법 · 답장 추천 · 합의 내용 요약 · 사진 번역 (Cloudflare Workers AI)
 import { t, uiLang, MESSAGES } from './i18n.js';
 
 const cache = new Map();
@@ -8,7 +8,7 @@ const cache = new Map();
  * 코드를 모르면 한국어 화면에서는 서버 문장, 다른 언어에서는 "서버 오류 (상태)"
  */
 export function serverError(data, status, kind = 'translate') {
-  const code = data?.code === 'failed' && kind === 'stt' ? 'stt_failed' : data?.code;
+  const code = data?.code === 'failed' && (kind === 'stt' || kind === 'photo') ? `${kind}_failed` : data?.code;
   if (code && MESSAGES.ko[`err.${code}`]) return t(`err.${code}`, { retry: data.retry ?? '', max: data.max ?? 1000 });
   return (uiLang() === 'ko' && data?.error) || t('err.server', { status });
 }
@@ -19,7 +19,7 @@ async function call(url, init, timeoutMs, kind) {
   try {
     const res = await fetch(url, { ...init, signal: ctrl.signal });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(serverError(data, res.status, kind));
+    if (!res.ok) throw Object.assign(new Error(serverError(data, res.status, kind)), { code: data?.code, retry: data?.retry, status: res.status });
     return data;
   } catch (e) {
     if (e.name === 'AbortError') throw new Error(t('err.slow'));
@@ -89,6 +89,27 @@ export async function summarize({ me, partner, turns }) {
     body: JSON.stringify({ me, partner, turns: turns.slice(-40).map(turnBody) }),
   }, 30000);
   return data.fields || {};
+}
+
+/**
+ * 사진 번역 (v1.5.0): 그림 한 장(긴 그림은 그 조각) → { lines: [{ text, lang, tr, read, check? }], summary, notes }.
+ * 그림은 서버에서 읽기만 하고 저장하지 않는다. 서버는 기본 모델이 안 되면 예비 모델까지 부르므로 넉넉히 기다린다
+ */
+export async function readPhoto(blob, { me, part = 1, parts = 1 }) {
+  const q = new URLSearchParams({ me, ...(parts > 1 ? { part, parts } : {}) });
+  return call(`/api/photo?${q}`, { method: 'POST', headers: { 'content-type': blob.type || 'image/jpeg' }, body: blob }, 95000, 'photo');
+}
+
+/** 긴 그림을 조각으로 읽어 합친 뒤 전체 요약 한 줄 (실패하면 빈 글) */
+export async function photoSummary({ me, lines }) {
+  try {
+    const data = await call('/api/photo-summary', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ me, lines: lines.slice(0, 120).map((l) => ({ text: l.text, tr: l.tr || '' })) }),
+    }, 30000);
+    return data.summary || '';
+  } catch { return ''; }
 }
 
 /** 녹음 → 글 (브라우저 음성 인식이 없을 때) */

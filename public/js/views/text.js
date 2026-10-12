@@ -1,6 +1,7 @@
-// 글 번역: 언어 고르기(자동 감지) · 받아쓰기 · 결과 읽어 주기 · 복사 · 크게 보기
+// 글 번역: 언어 고르기(자동 감지) · 받아쓰기 · 결과 읽어 주기 · 복사 · 크게 보기 · 📷 사진 번역(v1.5.0, views/photo.js)
 // 기본 방향: (자동 감지, 모르면 내 언어) → 상대 언어
 import { h, icon, toast, copyText, showBig } from '../ui.js';
+import { openPhotoPicker } from './photo.js';
 import { LANGS, CODES, detectLang } from '../lang.js';
 import { t, tl, langName } from '../i18n.js';
 import { state, addHistory } from '../store.js';
@@ -113,7 +114,8 @@ export default {
           h('div', { class: 'row gap' }, micBtn,
             h('button', { class: 'icon-btn', type: 'button', 'aria-label': t('text.clear'), onclick: () => { area.value = ''; memo.text = ''; memo.result = null; showResult(null); count.textContent = '0/1000'; area.focus(); } }, icon('trash', 20))),
           count),
-        goBtn),
+        h('div', { class: 'row gap text-go' }, goBtn,
+          h('button', { class: 'btn soft photo-btn', type: 'button', onclick: openPhotoPicker }, t('photo.button')))),
       result);
     showResult(memo.result);
     return () => listening?.stop();
