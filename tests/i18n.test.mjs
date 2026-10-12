@@ -120,7 +120,8 @@ test('처음 쓰는 사람의 기본 언어: 브라우저 언어 중 네 언어�
   assert.equal(defaultLang(['EN-gb']), 'en');
   assert.equal(defaultLang(['de-DE', 'ja-JP', 'en']), 'ja', '앞에서부터 처음 맞는 것');
   assert.equal(defaultLang(['zh_CN', 'ko']), 'zh', '중국어 (v1.3.0)');
-  assert.equal(defaultLang(['de-DE', 'fr']), 'en', '네 언어가 아니면 영어');
+  assert.equal(defaultLang(['de-DE', 'it']), 'en', '앱의 언어가 아니면 영어');
+  assert.equal(defaultLang(['de-DE', 'fr']), 'fr', '프랑스어 (v1.6.0, 추가지시 2)');
   assert.equal(defaultLang([]), 'en');
   assert.equal(defaultLang(undefined), 'en');
   assert.equal(defaultPartner('ko'), 'tr');
@@ -131,7 +132,8 @@ test('앱을 열 때의 언어: 처음이면 브라우저 언어, 이미 쓰던 
   assert.deepEqual(startLangs({}, ['tr-TR']), { me: 'tr', partner: 'ko' });
   assert.deepEqual(startLangs({}, ['ja-JP']), { me: 'ja', partner: 'ko' });
   assert.deepEqual(startLangs({}, ['ko-KR']), { me: 'ko', partner: 'tr' });
-  assert.deepEqual(startLangs({}, ['fr-FR']), { me: 'en', partner: 'ko' });
+  assert.deepEqual(startLangs({}, ['it-IT']), { me: 'en', partner: 'ko' });
+  assert.deepEqual(startLangs({}, ['fr-FR']), { me: 'fr', partner: 'ko' });
   assert.deepEqual(startLangs({ history: [] }, ['en-US']), { me: 'en', partner: 'ko' }, '빈 기록은 처음과 같다');
   // 이미 쓰던 사람: 브라우저가 다른 언어여도 저장된 그대로 (예전 버전 저장값은 me: ko)
   assert.deepEqual(startLangs({ settings: { me: 'ko', partner: 'en' } }, ['ja-JP']), { me: 'ko', partner: 'en' });

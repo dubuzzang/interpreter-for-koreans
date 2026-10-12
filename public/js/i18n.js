@@ -12,8 +12,9 @@ import vi from './i18n/vi.js';
 import th from './i18n/th.js';
 import ru from './i18n/ru.js';
 import ar from './i18n/ar.js';
+import fr from './i18n/fr.js';
 
-export const MESSAGES = { ko, tr, en, ja, zh, 'zh-TW': zhTW, vi, th, ru, ar };
+export const MESSAGES = { ko, tr, en, ja, zh, 'zh-TW': zhTW, vi, th, ru, ar, fr };
 
 let current = 'ko';
 /** 지금 화면 언어 (= 나의 언어) */

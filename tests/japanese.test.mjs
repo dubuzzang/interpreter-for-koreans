@@ -12,7 +12,7 @@ import { PHRASES, phrasesFor } from '../public/js/phrases.js';
 beforeEach(() => _resetBuckets());
 
 test('모든 언어끼리 서로 통역 (지시문에 일본어 말투 규칙)', () => {
-  assert.deepEqual(CODES, ['ko', 'tr', 'en', 'ja', 'zh', 'zh-TW', 'vi', 'th', 'ru', 'ar']);
+  assert.deepEqual(CODES, ['ko', 'tr', 'en', 'ja', 'zh', 'zh-TW', 'vi', 'th', 'ru', 'ar', 'fr']);
   const [sys] = buildMessages({ text: '안녕', from: 'ko', to: 'ja' });
   assert.match(sys.content, /from Korean into Japanese/);
   assert.match(sys.content, /です・ます/);

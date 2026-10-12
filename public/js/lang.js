@@ -23,6 +23,7 @@ export const LANGS = {
   th: { code: 'th', native: 'ภาษาไทย', flag: '🇹🇭', bcp47: 'th-TH', short: 'TH', name: 'Thai', script: 'Thai' },
   ru: { code: 'ru', native: 'Русский', flag: '🇷🇺', bcp47: 'ru-RU', short: 'RU', name: 'Russian', script: 'Cyrl' },
   ar: { code: 'ar', native: 'العربية', flag: '🇸🇦', bcp47: 'ar-SA', short: 'AR', name: 'Arabic', script: 'Arab', dir: 'rtl' },
+  fr: { code: 'fr', native: 'Français', flag: '🇫🇷', bcp47: 'fr-FR', short: 'FR', name: 'French', script: 'Latn' }, // 추가지시 2
 };
 export const CODES = Object.keys(LANGS);
 
@@ -51,6 +52,9 @@ const EN_WORDS = new Set('the a an and is are was were be been to of in on at fo
 // 베트남어: 베트남어에만 쓰는 글자 (ă đ ơ ư와 아래 점 · 갈고리 · 겹친 성조 부호가 붙은 모음).
 // â · ê · ô · à · é 같은 것은 튀르키예어(kâğıt) · 프랑스어에도 나와서 뺀다
 const VI_LETTERS = /[ăđơưạảấầẩẫậắằẳẵặẹẻẽếềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹ]/i;
+// 프랑스어: 튀르키예어 · 영어에 없는 글자(é è à ù œ ë ï — ç는 튀르키예어에도 있어서 뺀다)와 흔한 낱말
+const FR_LETTERS = /[éèàùœëïÿ]/i;
+const FR_WORDS = new Set("le la les un une des du de et est je tu il elle nous vous ils elles sont pas ne que qui où quoi combien merci bonjour bonsoir salut oui non avec pour dans sur ce cette ces c'est je voudrais voudrais s'il plaît madame monsieur au aux mon ma mes votre vos très bien aussi encore l'addition prix euros ça".split(' '));
 
 // 한자만 있는 글이 중국어인지 일본어인지 가를 글자들.
 // 중국어: 간체로만 쓰는 글자 · 중국어에만 쓰는 낱말 글자(你·吗·呢…) · 번체로만 쓰는 글자(們·這·說…, 일본에서 안 쓰는 모양)
@@ -75,8 +79,8 @@ const count = (s, re) => (s.match(re) || []).length;
 
 /**
  * 글이 어느 언어인지: 한글 → ko, 가나가 있으면 ja, 한자만 있으면 zh 쪽으로(일본 글자체면 ja),
- * 타이 문자 → th, 키릴 문자 → ru, 아랍 문자 → ar, 베트남어 글자 → vi,
- * 튀르키예어 글자·흔한 낱말 → tr, 영어 낱말 → en. 모르겠으면 fallback
+ * 타이 문자 → th, 키릴 문자 → ru, 아랍 문자 → ar, 베트남어 글자 → vi, 프랑스어 글자(é · à …) → fr,
+ * 튀르키예어 글자·흔한 낱말 → tr, 영어 · 프랑스어 낱말 → en · fr. 모르겠으면 fallback
  */
 export function detectLang(text, fallback = 'en') {
   const s = String(text || '');
@@ -91,16 +95,19 @@ export function detectLang(text, fallback = 'en') {
   if (count(s, /[Ѐ-ӿ]/g) / n >= 0.3) return 'ru';
   if (count(s, /[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]/g) / n >= 0.3) return 'ar';
   if (VI_LETTERS.test(s)) return 'vi';
-  if (TR_LETTERS.test(s)) return 'tr';
-  const words = s.toLowerCase().match(/[a-zçğıöşü']+/g) || []; // tr-TR 소문자는 영어 I를 ı로 바꿔 버린다
-  let tr = 0, en = 0;
+  if (FR_LETTERS.test(s) && !/[ğışİ]/i.test(s)) return 'fr';
+  if (TR_LETTERS.test(s) && !/[ç]/i.test(s.replace(/[ğıöşüİĞŞ]/g, ''))) return 'tr';
+  const words = s.toLowerCase().match(/[a-zçğıöşüâêîôûéèàùœëï']+/g) || []; // tr-TR 소문자는 영어 I를 ı로 바꿔 버린다
+  let tr = TR_LETTERS.test(s) ? 1 : 0, en = 0, fr = 0;
   for (const w of words) {
     if (TR_WORDS.has(w)) tr++;
     if (EN_WORDS.has(w.replace(/'.*$/, ''))) en++;
+    if (FR_WORDS.has(w) || FR_WORDS.has(w.replace(/^[ldjmnstc]'/, ''))) fr++;
     if (/(yor|iyor|ıyor|uyor|üyor|ler|lar|mak|mek|sınız|siniz|ım|im|um|üm)$/.test(w) && w.length > 4) tr += 0.5;
   }
-  if (tr === en) return fallback;
-  return tr > en ? 'tr' : 'en';
+  const best = Math.max(tr, en, fr);
+  if (!best || [tr, en, fr].filter((x) => x === best).length > 1) return fallback;
+  return best === tr ? 'tr' : best === en ? 'en' : 'fr';
 }
 
 /** 대화 상대 언어 선택지: 내 언어가 아닌 나머지 언어 */

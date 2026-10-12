@@ -1,6 +1,6 @@
 // 튀르키예어 화면 문구 (siz 말투)
 export default {
-  'app.title': 'Tercüman · Korece, Türkçe, İngilizce, Japonca, Çince, Vietnamca, Tayca, Rusça ve Arapça tercüman',
+  'app.title': 'Tercüman · Korece, Türkçe, İngilizce, Japonca, Çince, Vietnamca, Tayca, Rusça, Arapça ve Fransızca tercüman',
   'app.home': 'Tercüman ana sayfa',
   'app.settings': 'Ayarlar',
   'app.menu': 'Menü',
@@ -22,6 +22,7 @@ export default {
   'lang.th': 'Tayca',
   'lang.ru': 'Rusça',
   'lang.ar': 'Arapça',
+  'lang.fr': 'Fransızca',
 
   'mic.speak': 'Konuşun',
   'mic.listening': 'Dinliyorum…',
@@ -203,7 +204,7 @@ export default {
   'set.tone': 'Hitap',
   'set.formal': 'Kibar (siz)',
   'set.casual': 'Samimi (sen)',
-  'set.toneHint': 'Çevrilen dile uygulanır: Korece ve Japoncada kibar/samimi dil, Türkçede siz/sen, Rusçada вы/ты, Çincede 您/你; Vietnamca, Tayca ve Arapçada kibar/samimi ifade. İngilizceyi etkilemez.',
+  'set.toneHint': 'Çevrilen dile uygulanır: Korece ve Japoncada kibar/samimi dil, Türkçede siz/sen, Rusçada вы/ты, Fransızcada vous/tu, Çincede 您/你; Vietnamca, Tayca ve Arapçada kibar/samimi ifade. İngilizceyi etkilemez.',
   'set.autoSpeak': 'Çeviriyi hemen sesli oku',
   'set.autoSpeakHint': 'Sohbette çeviri çıkınca hemen sesli okunur',
   'set.rate': 'Okuma hızı',
@@ -246,7 +247,7 @@ export default {
   'set.updating': 'v{v} sürümüne geçiliyor…',
   'set.offline': 'İnternet bağlantısı yok',
   'set.latest': 'En güncel sürümü kullanıyorsunuz (v{v})',
-  'set.about': '{date} · 10 dilde tercüman: Korece · Türkçe · İngilizce · Japonca · Çince (Basitleştirilmiş · Geleneksel) · Vietnamca · Tayca · Rusça · Arapça',
+  'set.about': '{date} · 11 dilde tercüman: Korece · Türkçe · İngilizce · Japonca · Çince (Basitleştirilmiş · Geleneksel) · Vietnamca · Tayca · Rusça · Arapça · Fransızca',
   'set.privacy': 'Çeviri: Cloudflare Workers AI (Gemma 4) · Ses tanıma: tarayıcı / Whisper large-v3 turbo · Sesli okuma: cihaz sesleri. Söyledikleriniz çeviri, yanıt önerileri ve özet için sunucuya gönderilir ve saklanmaz. Fotoğraf çevirisindeki fotoğraflar da sunucuda yalnızca okunur, saklanmaz. Geçmiş ve İfadelerim yalnızca bu cihazda kalır.',
 
   'install.title': 'Uygulamayı yükle',

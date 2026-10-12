@@ -1,4 +1,4 @@
-// 통역할 언어 고르기: 상대 언어(내 언어가 아닌 언어 중) · 내 언어(= 화면 언어) · 서로 바꾸기 — 10개 언어라 격자로(.seg.langs)
+// 통역할 언어 고르기: 상대 언어(내 언어가 아닌 언어 중) · 내 언어(= 화면 언어) · 서로 바꾸기 — 11개 언어라 격자로(.seg.langs)
 import { h, icon } from '../ui.js';
 import { LANGS, CODES, otherLangs } from '../lang.js';
 import { state, setSetting } from '../store.js';

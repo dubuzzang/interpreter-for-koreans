@@ -44,7 +44,7 @@ test('번역 지시문: 간체 · 말투(您/你) · 병음을 덧붙이지 않�
   assert.match(sys('ko', 'zh', false), /你, not 您/);
   assert.match(sys('zh', 'ko'), /from Simplified Chinese into Korean/);
   assert.match(sys('zh', 'ko'), /존댓말/);
-  assert.match(sys('ko', 'zh'), /between Korean, Turkish, English, Japanese, Chinese, Vietnamese, Thai, Russian and Arabic speakers/);
+  assert.match(sys('ko', 'zh'), /between Korean, Turkish, English, Japanese, Chinese, Vietnamese, Thai, Russian, Arabic and French speakers/);
   assert.match(sys('ko', 'zh'), /No quotes, labels, notes, explanations, alternatives, romanization or pinyin/);
   assert.equal(sys('zh', 'en', true), sys('zh', 'en', false), '영어로 옮길 때는 말투 상관없음');
   const ctx = buildMessages({ text: 'x', from: 'ko', to: 'zh', context: [{ lang: 'zh', text: '你好' }] })[0].content;
@@ -233,7 +233,7 @@ test('화면 문구(중국어): 간체 한자로, 상대 안내 · 언어 이름
   assert.equal(tl('zh', 'lang.ko'), '韩语');
   for (const c of CODES) {
     assert.match(tl(c, 'set.toneHint'), /您/, `${c} 말투 안내에 중국어`);
-    assert.match(tl(c, 'set.about'), /중국어|Çince|Chinese|中国語|中文|Trung|จีน|итай|الصين/, `${c} 앱 정보에 중국어`);
+    assert.match(tl(c, 'set.about'), /중국어|Çince|Chinese|中国語|中文|Trung|จีน|итай|الصين|chinois/, `${c} 앱 정보에 중국어`);
   }
   assert.match(tl('ko', 'set.readingHint'), /중국어/);
   assert.equal(tl('zh', 'talk.ariaSpeak', { lang: tl('zh', 'lang.zh') }), '用中文说话');

@@ -1,4 +1,4 @@
-// Tercüman — 10개 언어 통역 (화면 뼈대 · 화면 전환 · 화면 언어)
+// Tercüman — 11개 언어 통역 (화면 뼈대 · 화면 전환 · 화면 언어)
 import { h, icon } from './ui.js';
 import { LANGS, dirOf } from './lang.js';
 import { state, setSetting } from './store.js';

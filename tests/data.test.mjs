@@ -19,7 +19,7 @@ test('언어 알아보기', () => {
 });
 
 test('언어 정보 · 상대 쪽 문구가 모든 언어에 있다', () => {
-  assert.deepEqual(CODES, ['ko', 'tr', 'en', 'ja', 'zh', 'zh-TW', 'vi', 'th', 'ru', 'ar']);
+  assert.deepEqual(CODES, ['ko', 'tr', 'en', 'ja', 'zh', 'zh-TW', 'vi', 'th', 'ru', 'ar', 'fr']);
   for (const c of CODES) {
     assert.match(LANGS[c].bcp47, /^[a-z]{2}-[A-Z]{2}$/);
     for (const k of Object.keys(MESSAGES.ko)) assert.ok(MESSAGES[c][k], `${c}.${k}`);

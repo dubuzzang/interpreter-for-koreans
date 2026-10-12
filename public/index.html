@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-  <title>Tercüman · 한국어 · 튀르키예어 · 영어 · 일본어 · 중국어 · 베트남어 · 태국어 · 러시아어 · 아랍어 통역</title>
-  <meta name="description" content="말하면 바로 통역 — 한국어 · 튀르키예어 · 영어 · 일본어 · 중국어(간체 · 번체) · 베트남어 · 태국어 · 러시아어 · 아랍어. 마주 보기 대화, 답장 추천, 글 번역, 사진 번역(메뉴판·상품 포장·상세 이미지), 여행·거래 표현집과 내 표현, 대화 기록 공유, 한글 발음.">
+  <title>Tercüman · 한국어 · 튀르키예어 · 영어 · 일본어 · 중국어 · 베트남어 · 태국어 · 러시아어 · 아랍어 · 프랑스어 통역</title>
+  <meta name="description" content="말하면 바로 통역 — 한국어 · 튀르키예어 · 영어 · 일본어 · 중국어(간체 · 번체) · 베트남어 · 태국어 · 러시아어 · 아랍어 · 프랑스어. 마주 보기 대화, 답장 추천, 글 번역, 사진 번역(메뉴판·상품 포장·상세 이미지), 여행·거래 표현집과 내 표현, 대화 기록 공유, 한글 발음.">
   <meta name="theme-color" content="#f4f5fb">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/icons/favicon-32.png" sizes="32x32">
@@ -14,7 +14,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Tercüman">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta property="og:title" content="Tercüman · 10개 언어 통역 (한국어 · 튀르키예어 · 영어 · 일본어 · 중국어 · 베트남어 · 태국어 · 러시아어 · 아랍어)">
+  <meta property="og:title" content="Tercüman · 11개 언어 통역 (한국어 · 튀르키예어 · 영어 · 일본어 · 중국어 · 베트남어 · 태국어 · 러시아어 · 아랍어 · 프랑스어)">
   <meta property="og:description" content="말하면 바로 통역해서 읽어 줘요. 마주 보기 대화 · 글 번역 · 여행 표현집">
   <meta property="og:image" content="/icons/icon-512.png">
   <link rel="stylesheet" href="/css/app.css">
@@ -29,7 +29,7 @@
   </header>
   <main id="main" tabindex="-1"></main>
   <nav id="tabbar" class="tabbar" aria-label="메뉴"></nav>
-  <noscript><p style="padding:24px">이 앱은 자바스크립트가 필요해요. · Bu uygulama JavaScript gerektirir. · This app needs JavaScript. · このアプリには JavaScript が必要です。 · 此应用需要 JavaScript。 · Ứng dụng này cần JavaScript. · แอปนี้ต้องใช้ JavaScript · Для работы приложения нужен JavaScript. · <span dir="rtl" lang="ar">يحتاج هذا التطبيق إلى JavaScript.</span></p></noscript>
+  <noscript><p style="padding:24px">이 앱은 자바스크립트가 필요해요. · Bu uygulama JavaScript gerektirir. · This app needs JavaScript. · このアプリには JavaScript が必要です。 · 此应用需要 JavaScript。 · Ứng dụng này cần JavaScript. · แอปนี้ต้องใช้ JavaScript · Для работы приложения нужен JavaScript. · <span dir="rtl" lang="ar">يحتاج هذا التطبيق إلى JavaScript.</span> · Cette application nécessite JavaScript.</p></noscript>
   <script>
   // 새 버전 알림 · 업데이트 버튼 (문구는 저장된 언어로 — 앱 코드의 i18n.js를 못 쓰는 예전 버전에서도 뜨므로 여기에 따로 둔다).
   // 이 HTML은 열 때마다 서버에서 새로 받아서(서비스 워커도 페이지는 네트워크 먼저), 예전 버전 앱 코드가 돌고 있어도
@@ -48,6 +48,7 @@
       th: ['✨ มีเวอร์ชันใหม่แล้ว', 'ประวัติของคุณยังอยู่ครบ', 'อัปเดต', 'กำลังอัปเดต…', 'ไว้ทีหลัง'],
       ru: ['✨ Доступна новая версия', 'История сохранится', 'Обновить', 'Обновление…', 'Позже'],
       ar: ['✨ يتوفر إصدار جديد', 'سيبقى سجلك كما هو', 'تحديث', 'جارٍ التحديث…', 'لاحقًا'],
+      fr: ['✨ Une nouvelle version est disponible', 'Votre historique est conservé', 'Mettre à jour', 'Mise à jour…', 'Plus tard'],
     };
     var FONT = {
       ja: '"Hiragino Sans","Yu Gothic UI",Meiryo,', zh: '"PingFang SC","Microsoft YaHei","Noto Sans SC",', 'zh-TW': '"PingFang TC","Microsoft JhengHei","Noto Sans TC",',

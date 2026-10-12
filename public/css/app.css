@@ -133,7 +133,7 @@ body[data-view="talk"] main { display: flex; flex-direction: column; overflow: h
 .seg { display: flex; gap: 4px; background: var(--bg); padding: 4px; border-radius: 12px; flex-wrap: wrap; }
 .seg button { flex: 1; border: 0; background: transparent; padding: 8px 10px; border-radius: 9px; font-weight: 600; font-size: 14px; color: var(--muted); white-space: nowrap; }
 .seg button.on { background: var(--card); color: var(--text); box-shadow: var(--shadow); }
-/* 언어 고르기 (10개 언어, v1.6.0): 한 줄에 들어가는 만큼 고르게, 이름이 길면 버튼 안에서 줄바꿈 */
+/* 언어 고르기 (11개 언어, v1.6.0): 한 줄에 들어가는 만큼 고르게, 이름이 길면 버튼 안에서 줄바꿈 */
 .seg.langs { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
 .seg.langs button { white-space: normal; line-height: 1.25; padding: 8px 6px; min-height: 40px; }
 .empty { text-align: center; padding: 32px 20px; color: var(--text); }

@@ -8,6 +8,7 @@ import vi from './read/vi.js';
 import th from './read/th.js';
 import ru from './read/ru.js';
 import ar from './read/ar.js';
+import fr from './read/fr.js';
 
 const trLower = (s) => String(s ?? '').normalize('NFC').toLocaleLowerCase('tr-TR').replace(/̇/g, '');
 
@@ -290,6 +291,7 @@ export const READERS = {
   th,
   ru,
   ar,
+  fr,
 };
 
 /** 서로 글자를 읽을 수 있는 사이라 읽는 법이 필요 없나 (같은 언어 · 간체↔번체) */

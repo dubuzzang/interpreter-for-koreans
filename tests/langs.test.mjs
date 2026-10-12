@@ -1,4 +1,4 @@
-// v1.6.0 언어 10개 공통 틀: 언어마다 같은 자리(화면 글자 · 표현집 · 읽는 법 · 서버 정보)가 다 있고, 글 방향 · 언어 고르기가 맞다
+// v1.6.0 언어 11개 공통 틀 (추가지시 2로 프랑스어까지): 언어마다 같은 자리(화면 글자 · 표현집 · 읽는 법 · 서버 정보)가 다 있고, 글 방향 · 언어 고르기가 맞다
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -14,10 +14,10 @@ import { lineLang, inMyScript } from '../lib/photo-core.mjs';
 import { onRequestPost as soundApi } from '../functions/api/sound.js';
 import { _resetBuckets } from '../lib/guard.mjs';
 
-const NEW = ['zh-TW', 'vi', 'th', 'ru', 'ar'];
+const NEW = ['zh-TW', 'vi', 'th', 'ru', 'ar', 'fr'];
 
-test('언어 10개: 정보가 다 있고, 코드 · 이름 · 글자 체계 · 글 방향', () => {
-  assert.deepEqual(CODES, ['ko', 'tr', 'en', 'ja', 'zh', 'zh-TW', 'vi', 'th', 'ru', 'ar']);
+test('언어 11개: 정보가 다 있고, 코드 · 이름 · 글자 체계 · 글 방향', () => {
+  assert.deepEqual(CODES, ['ko', 'tr', 'en', 'ja', 'zh', 'zh-TW', 'vi', 'th', 'ru', 'ar', 'fr']);
   for (const c of CODES) {
     const L = LANGS[c];
     assert.equal(L.code, c);
@@ -36,14 +36,14 @@ test('브라우저 언어 → 앱 언어: 번체(대만 · 홍콩 · Hant)는 zh
   const cases = {
     'zh-TW': 'zh-TW', zh_TW: 'zh-TW', 'zh-HK': 'zh-TW', 'zh-Hant': 'zh-TW', 'zh-Hant-TW': 'zh-TW', 'zh-MO': 'zh-TW',
     'zh-CN': 'zh', zh: 'zh', 'zh-Hans': 'zh', 'zh-SG': 'zh',
-    'vi-VN': 'vi', vi: 'vi', 'th-TH': 'th', 'ru-RU': 'ru', 'ru-KZ': 'ru', 'ar-EG': 'ar', 'ar-SA': 'ar', ar: 'ar', 'de-DE': null, '': null,
+    'vi-VN': 'vi', vi: 'vi', 'th-TH': 'th', 'ru-RU': 'ru', 'ru-KZ': 'ru', 'ar-EG': 'ar', 'ar-SA': 'ar', ar: 'ar', 'fr-FR': 'fr', 'fr-CA': 'fr', 'de-DE': null, '': null,
   };
   for (const [tag, want] of Object.entries(cases)) assert.equal(codeOfTag(tag), want, tag);
   assert.equal(defaultLang(['de', 'ar-EG', 'en']), 'ar');
   assert.equal(defaultLang(['th-TH']), 'th');
 });
 
-test('화면 글자: 언어마다 사전 파일이 있고, 언어 이름 10개 · 쉬는 안내(err.paused)가 다 있다', () => {
+test('화면 글자: 언어마다 사전 파일이 있고, 언어 이름 11개 · 쉬는 안내(err.paused)가 다 있다', () => {
   for (const c of CODES) {
     assert.ok(existsSync(`public/js/i18n/${c}.js`), `i18n/${c}.js`);
     for (const l of CODES) assert.ok(MESSAGES[c][`lang.${l}`], `${c} 사전의 lang.${l}`);
@@ -152,6 +152,8 @@ test('사진: 줄 언어를 글자 체계로 (타이 · 키릴 · 아랍 · 번�
   assert.equal(lineLang('牛肉面', 'zh'), 'zh');
   assert.equal(lineLang('Phở bò tái 65.000đ', 'vi'), 'vi');
   assert.equal(lineLang('Phở bò tái', ''), 'vi', '베트남어 글자로');
+  assert.equal(lineLang('Crème brûlée 8,50 €', 'fr'), 'fr');
+  assert.equal(lineLang('Café crème', ''), 'fr', '프랑스어 글자로');
   assert.ok(inMyScript('Phở bò', 'vi') && inMyScript('ข้าวผัด', 'th') && inMyScript('Борщ', 'ru') && inMyScript('شاورما', 'ar'));
   assert.ok(!inMyScript('Shawarma', 'ar'), '아랍어 사용자에게 라틴 문자 번역');
   assert.ok(!inMyScript('Борщ メイク', 'ru', 'Borscht'), '원문에 없는 가나');
@@ -164,7 +166,7 @@ test('서버 언어 정보 파일: 새 언어마다 있고, translate-core 등�
     assert.doesNotMatch(src, /from '\.\.\/(translate|assist|photo|sound)-core\.mjs'/, `${c}: 고리`);
     assert.ok(existsSync(`public/js/phrases/${c}.js`), `phrases/${c}.js`);
   }
-  for (const c of ['vi', 'th', 'ru', 'ar']) assert.ok(existsSync(`public/js/read/${c}.js`), `read/${c}.js`);
+  for (const c of ['vi', 'th', 'ru', 'ar', 'fr']) assert.ok(existsSync(`public/js/read/${c}.js`), `read/${c}.js`);
 });
 
 test('글 방향(RTL): CSS는 논리 속성(왼쪽 · 오른쪽 대신 시작 · 끝)으로, 아랍어 글꼴 · 번체 글꼴 · 태국어 줄바꿈', () => {
@@ -183,4 +185,9 @@ test('글 방향(RTL): CSS는 논리 속성(왼쪽 · 오른쪽 대신 시작 ·
   assert.equal(detectLang('สวัสดีครับ ราคาเท่าไหร่'), 'th');
   assert.equal(detectLang('Xin chào, cái này bao nhiêu tiền?'), 'vi');
   assert.equal(detectLang('Hünkâr Beğendi'), 'tr', 'â는 튀르키예어에도 있어서 베트남어로 보지 않는다');
+  assert.equal(detectLang("Bonjour, c'est combien ?"), 'fr');
+  assert.equal(detectLang('Ça coûte combien ?'), 'fr', 'ç는 튀르키예어에도 있지만 프랑스어 낱말로');
+  assert.equal(detectLang('Je voudrais l’addition, s’il vous plaît.'), 'fr');
+  assert.equal(detectLang('Çay lütfen'), 'tr');
+  assert.equal(detectLang('Where is the hotel?'), 'en');
 });

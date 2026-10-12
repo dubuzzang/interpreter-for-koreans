@@ -22,6 +22,7 @@ export default {
   'lang.th': 'Thai',
   'lang.ru': 'Russian',
   'lang.ar': 'Arabic',
+  'lang.fr': 'ภาษาฝรั่งเศส',
 
   'mic.speak': 'Speak',
   'mic.listening': 'Listening…',

@@ -1,6 +1,6 @@
 // 영어 화면 문구
 export default {
-  'app.title': 'Tercüman · Korean, Turkish, English, Japanese, Chinese, Vietnamese, Thai, Russian & Arabic interpreter',
+  'app.title': 'Tercüman · Korean, Turkish, English, Japanese, Chinese, Vietnamese, Thai, Russian, Arabic & French interpreter',
   'app.home': 'Tercüman home',
   'app.settings': 'Settings',
   'app.menu': 'Menu',
@@ -22,6 +22,7 @@ export default {
   'lang.th': 'Thai',
   'lang.ru': 'Russian',
   'lang.ar': 'Arabic',
+  'lang.fr': 'French',
 
   'mic.speak': 'Speak',
   'mic.listening': 'Listening…',
@@ -203,7 +204,7 @@ export default {
   'set.tone': 'Tone',
   'set.formal': 'Polite',
   'set.casual': 'Casual',
-  'set.toneHint': 'Applies to the language being translated into: polite or casual Korean and Japanese, siz/sen in Turkish, вы/ты in Russian, 您/你 in Chinese, polite or casual Vietnamese, Thai and Arabic. No effect on English.',
+  'set.toneHint': 'Applies to the language being translated into: polite or casual Korean and Japanese, siz/sen in Turkish, вы/ты in Russian, vous/tu in French, 您/你 in Chinese, polite or casual Vietnamese, Thai and Arabic. No effect on English.',
   'set.autoSpeak': 'Read translations aloud',
   'set.autoSpeakHint': 'In Talk, each translation is read aloud right away',
   'set.rate': 'Speech rate',
@@ -246,7 +247,7 @@ export default {
   'set.updating': 'Updating to v{v}…',
   'set.offline': "You're offline",
   'set.latest': "You're on the latest version (v{v})",
-  'set.about': '{date} · Interpreter for 10 languages: Korean · Turkish · English · Japanese · Chinese (Simplified · Traditional) · Vietnamese · Thai · Russian · Arabic',
+  'set.about': '{date} · Interpreter for 11 languages: Korean · Turkish · English · Japanese · Chinese (Simplified · Traditional) · Vietnamese · Thai · Russian · Arabic · French',
   'set.privacy': 'Translation: Cloudflare Workers AI (Gemma 4) · Speech recognition: browser / Whisper large-v3 turbo · Read-aloud: device voices. What you say is sent to the server for translation, reply suggestions and summaries, and is not stored. Photos for photo translation are also only read on the server and never stored. History and My phrases stay on this device only.',
 
   'install.title': 'Install the app',

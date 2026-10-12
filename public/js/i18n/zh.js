@@ -1,6 +1,6 @@
 // 간체 중국어 화면 문구 (중국 본토). 사용자는 你로 부른다
 export default {
-  'app.title': 'Tercüman · 韩语、土耳其语、英语、日语、中文、越南语、泰语、俄语、阿拉伯语翻译',
+  'app.title': 'Tercüman · 韩语、土耳其语、英语、日语、中文、越南语、泰语、俄语、阿拉伯语、法语翻译',
   'app.home': 'Tercüman 首页',
   'app.settings': '设置',
   'app.menu': '菜单',
@@ -22,6 +22,7 @@ export default {
   'lang.th': '泰语',
   'lang.ru': '俄语',
   'lang.ar': '阿拉伯语',
+  'lang.fr': '法语',
 
   'mic.speak': '说话',
   'mic.listening': '正在听…',
@@ -203,7 +204,7 @@ export default {
   'set.tone': '语气',
   'set.formal': '礼貌',
   'set.casual': '随意',
-  'set.toneHint': '按翻译成的语言调整：韩语和日语的敬语/非敬语，土耳其语的 siz/sen，俄语的 вы/ты，中文的 您/你，越南语、泰语、阿拉伯语的礼貌/随意说法。对英语没有影响。',
+  'set.toneHint': '按翻译成的语言调整：韩语和日语的敬语/非敬语，土耳其语的 siz/sen，俄语的 вы/ты，法语的 vous/tu，中文的 您/你，越南语、泰语、阿拉伯语的礼貌/随意说法。对英语没有影响。',
   'set.autoSpeak': '翻译后立即朗读',
   'set.autoSpeakHint': '在对话中，翻译一出来就朗读',
   'set.rate': '朗读速度',
@@ -246,7 +247,7 @@ export default {
   'set.updating': '正在更新到 v{v}…',
   'set.offline': '没有连接网络',
   'set.latest': '已是最新版本（v{v}）',
-  'set.about': '{date} · 10种语言翻译：韩语 · 土耳其语 · 英语 · 日语 · 中文（简体 · 繁体）· 越南语 · 泰语 · 俄语 · 阿拉伯语',
+  'set.about': '{date} · 11种语言翻译：韩语 · 土耳其语 · 英语 · 日语 · 中文（简体 · 繁体）· 越南语 · 泰语 · 俄语 · 阿拉伯语 · 法语',
   'set.privacy': '翻译：Cloudflare Workers AI（Gemma 4）· 语音识别：浏览器 / Whisper large-v3 turbo · 朗读：设备语音。你说的话会发送到服务器，用于翻译、推荐回复和摘要，不会被保存。拍照翻译的照片也只在服务器上识别，不会保存。记录和我的常用语只保留在这台设备上。',
 
   'install.title': '安装应用',
