@@ -1,5 +1,5 @@
 /* Tercüman 서비스 워커 — scripts/gen-sw.mjs가 만든 파일 (직접 고치지 마세요) */
-const VERSION = '1.6.0';
+const VERSION = '1.6.1';
 const CACHE = `tercuman-${VERSION}`;
 const ASSETS = [
   "/",

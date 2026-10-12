@@ -84,8 +84,8 @@ test('베트남어 → 한글 발음: 국립국어원 「베트남어 자모와 
     // 표기 세칙: nh (냐 · 끝은 ㄴ, a 뒤 '아인') · qu + a → 꽈 · y + 모음 → 한 음절 · 가운데 l → ㄹㄹ (사람 이름 빼고)
     'Thanh Hóa': '타인호아', 'Khánh Hòa': '카인호아', 'Quy Nhơn': '꾸이년', Quang: '꽝', quyên: '꾸옌', Nguyễn: '응우옌', yên: '옌',
     'Đà Lạt': '달랏', 'Hạ Long': '할롱', 'Gia Lai': '잘라이', 'Vĩnh Long': '빈롱', 'Nguyễn Thị Lan': '응우옌티란',
-    // x는 ㅆ, s는 ㅅ (흔히 쓰는 '신짜오'와 다름)
-    'xin chào': '씬 짜오', 'Xin chào, cái này bao nhiêu tiền?': '씬 짜오, 까이 나이 바오 니에우 띠엔?', 'Sài Gòn': '사이곤',
+    // x도 s도 ㅅ (흔히 쓰는 '신 짜오' — v1.6.1에서 대조표의 ㅆ 대신)
+    'xin chào': '신 짜오', 'Xin chào, cái này bao nhiêu tiền?': '신 짜오, 까이 나이 바오 니에우 띠엔?', 'Sài Gòn': '사이곤',
     'bánh mì': '바인 미', 'bún chả': '분 짜', 'cà phê sữa đá': '까 페 스어 다', 'không': '콩', 'người': '응으어이', 'được': '드억', 'tôi': '또이',
     gì: '지', giúp: '줍', 'nhé': '냬', 'nhiều': '니에우', 'Nhật': '녓', 'uống': '우옹', 'Hoàng': '호앙', 'Huỳnh': '후인', 'đẹp': '댑', 'sách': '삭',
     // 숫자 · 외래어 · 구두점은 그대로, 대문자 글도
@@ -93,11 +93,11 @@ test('베트남어 → 한글 발음: 국립국어원 「베트남어 자모와 
   };
   for (const [vi, ko] of Object.entries(cases)) assert.equal(viToHangul(vi), ko, vi);
   assert.equal(viToHangul(''), '');
-  assert.equal(viToHangul('Xin chào'), '씬 짜오', '성조 부호가 따로 붙은 글(NFD)도');
+  assert.equal(viToHangul('Xin chào'), '신 짜오', '성조 부호가 따로 붙은 글(NFD)도');
 });
 
 test('읽는 법: 한국어 사용자에게 베트남어는 한글 발음 (서버 없이), 다른 사용자에게는 적지 않음, 베트남어 사용자에게는 로마자 · 병음', () => {
-  assert.equal(readingFor('Xin chào', 'vi', 'ko'), '씬 짜오');
+  assert.equal(readingFor('Xin chào', 'vi', 'ko'), '신 짜오');
   assert.equal(readingFor('Cảm ơn', 'vi', 'ko', ''), '깜 언', '소리 표기가 필요 없다');
   for (const v of ['tr', 'en', 'ja', 'zh', 'zh-TW', 'th', 'ru', 'ar', 'fr']) assert.equal(readingFor('Xin chào', 'vi', v), '', v);
   assert.equal(readingFor('Xin chào', 'vi', 'vi'), '');

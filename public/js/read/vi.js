@@ -1,7 +1,7 @@
 // 베트남어 읽는 법 — 한국어 사용자에게 한글 발음 (국립국어원 외래어 표기법 「베트남어 자모와 한글 대조표」와 표기 세칙).
 // 라틴 문자라 다른 사용자에게는 로마자를 따로 적지 않고(roman 없음), 글에서 바로 만들어 서버 소리 표기도 필요 없다(sound: false).
 //   Hà Nội → 하노이 · Hồ Chí Minh → 호찌민 · Nha Trang → 냐짱 · Phú Quốc → 푸꾸옥 · phở → 퍼 · cảm ơn → 깜 언
-//   x는 대조표대로 ㅆ (xin chào → 씬 짜오 — 흔히 쓰는 '신짜오'와 다름), s는 ㅅ. 성조는 적지 않는다.
+//   x는 흔히 쓰는 표기대로 ㅅ (xin chào → 신 짜오 — 대조표는 ㅆ '씬'이지만 사용자가 '신 짜오'로 정함, v1.6.1), s도 ㅅ. 성조는 적지 않는다.
 // 표기 세칙: nh는 뒤 모음과 합치고(냐) 끝에서는 ㄴ, a 뒤면 '아인'(Thanh → 타인) · qu + a → 꽈(Quang → 꽝) · y는 뒤 모음과 합침(yên → 옌) ·
 // 낱말 가운데 모음 앞 l은 ㄹㄹ(Đà Lạt → 달랏, 사람 이름은 빼고).
 // 베트남어는 한 낱말이 한 음절이다 — 음절이 여럿인 낱말(iPhone · taxi · Samsung)은 외래어라 그대로 둔다.
@@ -13,7 +13,7 @@ const isVowel = (c) => Boolean(c) && VOWELS.includes(c);
 const ONSETS = ['ngh', 'ng', 'nh', 'ch', 'gh', 'gi', 'kh', 'ph', 'qu', 'th', 'tr', 'b', 'c', 'd', 'đ', 'g', 'h', 'k', 'l', 'm', 'n', 'p', 'r', 's', 't', 'v', 'x'];
 const CODAS = ['ng', 'nh', 'ch', 'c', 'm', 'n', 'p', 't'];
 // 첫소리 → 한글 첫소리 번호 (ㄱ0 ㄲ1 ㄴ2 ㄷ3 ㄸ4 ㄹ5 ㅁ6 ㅂ7 ㅃ8 ㅅ9 ㅆ10 ㅇ11 ㅈ12 ㅉ13 ㅋ15 ㅌ16 ㅍ17 ㅎ18)
-const INI = { b: 7, c: 1, k: 1, ch: 13, d: 12, gi: 12, đ: 3, g: 0, gh: 0, h: 18, kh: 15, l: 5, m: 6, n: 2, p: 8, ph: 17, r: 5, s: 9, t: 4, th: 16, tr: 13, v: 7, x: 10 };
+const INI = { b: 7, c: 1, k: 1, ch: 13, d: 12, gi: 12, đ: 3, g: 0, gh: 0, h: 18, kh: 15, l: 5, m: 6, n: 2, p: 8, ph: 17, r: 5, s: 9, t: 4, th: 16, tr: 13, v: 7, x: 9 };
 // 모음 → 한글 가운뎃소리 번호 (ㅏ0 ㅐ1 ㅓ4 ㅔ5 ㅗ8 ㅜ13 ㅡ18 ㅣ20)
 const VOW = { a: 0, ă: 0, â: 4, e: 1, ê: 5, i: 20, y: 20, o: 8, ô: 8, ơ: 4, u: 13, ư: 18 };
 const Y_GLIDE = { 0: 2, 4: 6, 8: 12, 13: 17, 1: 3, 5: 7, 20: 20 }; // ㅏ→ㅑ ㅓ→ㅕ ㅗ→ㅛ ㅜ→ㅠ ㅐ→ㅒ ㅔ→ㅖ (ㅡ는 없음)
@@ -79,7 +79,7 @@ function word(raw) {
 
 const endsOpen = (s) => { const c = s.charCodeAt(s.length - 1) - 0xac00; return c >= 0 && c < 11172 && c % 28 === 0; };
 
-/** 베트남어 글 → 한글 발음 (구두점 · 숫자 · 외래어는 그대로). 예) Xin chào → 씬 짜오, Hà Nội → 하노이 */
+/** 베트남어 글 → 한글 발음 (구두점 · 숫자 · 외래어는 그대로). 예) Xin chào → 신 짜오, Hà Nội → 하노이 */
 export function viToHangul(text) {
   if (!text) return '';
   const parts = String(text).normalize('NFC').split(/([^\p{L}]+)/u);
