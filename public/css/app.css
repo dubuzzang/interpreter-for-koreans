@@ -232,6 +232,27 @@ body[data-view="talk"] main { display: flex; flex-direction: column; overflow: h
 .phrase-me { font-size: 14px; color: var(--muted); }
 .phrase-say { font-size: 18px; font-weight: 700; color: var(--partner); line-height: 1.35; }
 .phrase-acts { display: flex; flex-direction: column; }
+.icon-btn.star.on { color: #f59e0b; }
+/* 내 표현 */
+.mine-bar { margin: 0 0 10px; }
+.mine-label { font-size: 12.5px; font-weight: 700; color: var(--me); margin-bottom: 1px; }
+.phrase.mine .phrase-say { white-space: pre-line; overflow-wrap: anywhere; }
+.phrase.mine .phrase-me { white-space: pre-line; overflow-wrap: anywhere; }
+.phrase-wait { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--muted); margin-top: 2px; }
+.phrase-wait.bad { color: var(--danger); display: block; font-weight: 500; }
+.phrase-wait .dots { width: 14px; height: 14px; border-width: 2px; }
+.phrase.editing { flex-wrap: wrap; }
+.mine-tools { width: 100%; display: flex; align-items: center; justify-content: flex-end; gap: 6px; border-top: 1px solid var(--line); padding-top: 8px; margin-top: 2px; }
+.mine-tools .icon-btn.dim { opacity: .3; }
+.btn.danger { color: var(--danger); }
+.mine-form { display: flex; flex-direction: column; gap: 10px; }
+.mine-form p { margin: 0; }
+.mine-field { display: flex; flex-direction: column; gap: 4px; }
+.mine-field .type-input { width: 100%; }
+.text-area.mine-text { min-height: 84px; font-size: 16px; }
+.mine-examples { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.row.center { justify-content: center; flex-wrap: wrap; }
+.mine-empty .row { margin: 12px 0; }
 
 /* 기록 */
 .hist-orig { font-size: 14.5px; color: var(--muted); margin-top: 2px; }

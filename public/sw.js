@@ -14,6 +14,7 @@ const ASSETS = [
   "/js/app.js",
   "/js/i18n.js",
   "/js/lang.js",
+  "/js/mine.js",
   "/js/phrases.js",
   "/js/pinyin.js",
   "/js/reading.js",
