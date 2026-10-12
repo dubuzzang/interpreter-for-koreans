@@ -1,8 +1,10 @@
 // POST /api/translate  { text, from, to, context?: [{lang,text}], formal?: true } → { text, model } · 오류는 { error(한국어), code }
 import { validateTranslate, buildMessages, cleanOutput, responseText, looksValid, aiError, withTimeout, maxTokensFor, MODELS } from '../../lib/translate-core.mjs';
 import { checkOrigin, rateLimit, json } from '../../lib/guard.mjs';
+import { runAI } from '../../lib/usage.mjs';
 
-export async function onRequestPost({ request, env }) {
+// 무료 요금제 안전장치(lib/usage.mjs): 번역은 사용량이 많은 날에도 쉬지 않는다 (쓴 뉴런은 센다)
+export async function onRequestPost({ request, env, waitUntil }) {
   const denied = checkOrigin(request) || rateLimit(request, 'translate', 40, 60_000);
   if (denied) return denied;
   let body;
@@ -16,7 +18,7 @@ export async function onRequestPost({ request, env }) {
   let lastError = null;
   for (const model of MODELS) {
     try {
-      const result = await withTimeout(env.AI.run(model.id, { ...input, ...model.extra }), model.timeoutMs);
+      const result = await withTimeout(runAI(env, waitUntil, model.id, { ...input, ...model.extra }), model.timeoutMs);
       const out = cleanOutput(responseText(result), v.text);
       if (looksValid(out, v)) return json({ text: out, model: model.id });
       lastError = new Error(`invalid output from ${model.id}`);

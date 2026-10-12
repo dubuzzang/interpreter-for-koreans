@@ -2,8 +2,10 @@
 // 브라우저 음성 인식이 없는 곳(일부 앱 안 브라우저·파이어폭스)에서 쓰는 대신 경로 — Whisper large-v3 turbo
 import { CODES, STT_MODEL, STT_PROMPT, MAX_AUDIO, aiError, cleanTranscript, sttLanguage, toBase64, withTimeout } from '../../lib/translate-core.mjs';
 import { checkOrigin, rateLimit, json } from '../../lib/guard.mjs';
+import { runAI } from '../../lib/usage.mjs';
 
-export async function onRequestPost({ request, env }) {
+// 받아쓰기는 사용량이 많은 날에도 쉬지 않는다 (오디오 길이로 뉴런을 센다 — lib/usage.mjs)
+export async function onRequestPost({ request, env, waitUntil }) {
   const denied = checkOrigin(request) || rateLimit(request, 'stt', 20, 60_000);
   if (denied) return denied;
   const lang = new URL(request.url).searchParams.get('lang');
@@ -17,7 +19,7 @@ export async function onRequestPost({ request, env }) {
   try {
     const input = { audio: toBase64(audio), language: sttLanguage(lang), task: 'transcribe', vad_filter: true };
     if (STT_PROMPT[lang]) input.initial_prompt = STT_PROMPT[lang];
-    const r = await withTimeout(env.AI.run(STT_MODEL, input), 25_000);
+    const r = await withTimeout(runAI(env, waitUntil, STT_MODEL, input), 25_000);
     return json({ text: cleanTranscript(r?.text) });
   } catch (e) {
     const { status, ...problem } = aiError(e, '음성 인식');

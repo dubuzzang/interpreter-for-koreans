@@ -3,8 +3,10 @@
 import { validateSound, soundInput } from '../../lib/sound-core.mjs';
 import { responseText, aiError, withTimeout, MODELS } from '../../lib/translate-core.mjs';
 import { checkOrigin, rateLimit, json } from '../../lib/guard.mjs';
+import { runAI } from '../../lib/usage.mjs';
 
-export async function onRequestPost({ request, env }) {
+// 읽는 법은 사용량이 많은 날에도 쉬지 않는다 (쓴 뉴런은 센다 — lib/usage.mjs)
+export async function onRequestPost({ request, env, waitUntil }) {
   const denied = checkOrigin(request) || rateLimit(request, 'sound', 40, 60_000);
   if (denied) return denied;
   let body;
@@ -17,7 +19,7 @@ export async function onRequestPost({ request, env }) {
   let rough = null; // 검사(음절 수 등)가 안 맞는 답 — 다음 모델도 안 맞으면 이것이라도
   for (const model of MODELS.slice(0, 2)) {
     try {
-      const sound = v.spec.clean(responseText(await withTimeout(env.AI.run(model.id, { ...input, ...model.extra }), model.timeoutMs)), v.text);
+      const sound = v.spec.clean(responseText(await withTimeout(runAI(env, waitUntil, model.id, { ...input, ...model.extra }), model.timeoutMs)), v.text);
       if (sound && (!v.spec.matches || v.spec.matches(sound, v.text))) return json({ sound, model: model.id });
       if (sound && !rough) rough = { sound, model: model.id };
       lastError = new Error(`invalid sound from ${model.id}`);

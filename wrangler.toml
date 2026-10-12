@@ -5,3 +5,15 @@ compatibility_date = "2026-10-01"
 
 [ai]
 binding = "AI"
+
+# 무료 요금제 안전장치 (v1.6.0, lib/usage.mjs): Workers AI 하루(UTC) 사용량(뉴런)을 하루 한 줄로 센다.
+# 표(ai_usage)는 코드가 처음 쓸 때 만든다. KV는 무료 쓰기가 하루 1,000번이라 쓰지 않는다 (D1은 하루 10만 줄)
+[[d1_databases]]
+binding = "USAGE_DB"
+database_name = "tercuman-usage"
+database_id = "17f6378a-b4dc-45fa-bee1-2a25fdf90fda"
+
+[vars]
+# 오늘(UTC) 센 뉴런이 이 값 이상이면 답장 추천 · 합의 요약 · 사진을 UTC 0시(한국 오전 9시)까지 쉰다 (무료 한도 10,000의 70%).
+# 개발 · 시험도 같은 한도를 쓰지만 이 카운터에는 안 잡혀서 낮게 잡았다. "0"이면 늘 쉼 (실서비스에서 쉬는 응답 확인용)
+USAGE_PAUSE_NEURONS = "7000"
