@@ -499,3 +499,16 @@ test('D1 SQL을 실제 SQLite로: 표 만들기 · 더하기(RETURNING) · 읽�
   assert.equal(await pausedResponse(env), null);
   assert.equal(raw.prepare("SELECT round(neurons, 2) AS n FROM ai_usage WHERE day = date('now')").get().n, 3.75, '센 값은 그대로');
 });
+
+test('운영자가 D1 오늘 값을 고쳐 내리면 (확인용으로 올렸다 되돌림) 30초 메모리가 지난 뒤 풀린다 — 2026-10-12 실서비스에서 찾음', async () => {
+  const now = Date.parse('2026-10-12T14:00:00Z');
+  const db = fakeD1({ rows: { '2026-10-12': 100000 } });
+  const env = { USAGE_DB: db };
+  assert.ok(await pausedResponse(env, now), '올린 값이면 쉼');
+  db.rows.get('2026-10-12').neurons = 4;
+  assert.ok(await pausedResponse(env, now + 1000), '30초 안에는 메모리 값');
+  assert.equal(await pausedResponse(env, now + CACHE_MS + 1000), null, '30초 뒤에는 D1 값 그대로 — 풀림');
+  assert.equal(await usedToday(env, now + CACHE_MS + 2000), 4);
+  await addUsage(env, 2, now + CACHE_MS + 3000);
+  assert.equal(await usedToday(env, now + CACHE_MS + 4000), 6, '더한 뒤에는 D1이 돌려준 합');
+});
