@@ -310,3 +310,20 @@ test('사진: 태국어 줄 — 줄 언어 · 로마자 읽기(한글은 화면�
   assert.deepEqual(page.lines[5], { text: 'ข้าวผัด', lang: 'th', tr: '', read: '' }, '이미 내 언어');
   assert.equal(page.summary, 'หน้าสินค้าจากจีน ราคาเดิม 129 หยวน');
 });
+
+test('성별 말끝 지우기 (2026-10-12 진짜 AI가 지시와 달리 "…ได้ไหมคะ"를 붙임): 번역 · 답장 추천 모두, 낱말 속 글자 · 말끝뿐인 답은 그대로', async () => {
+  const { tidyOutput } = await import('../lib/translate-core.mjs');
+  const { onRequestPost: translateApi } = await import('../functions/api/translate.js');
+  assert.equal(tidyOutput('ช่วยส่งตัวอย่างมาให้ก่อนได้ไหมคะ แล้วการจัดส่งใช้เวลากี่วันคะ', 'th'), 'ช่วยส่งตัวอย่างมาให้ก่อนได้ไหม แล้วการจัดส่งใช้เวลากี่วัน');
+  assert.equal(tidyOutput('ขอบคุณครับ', 'th'), 'ขอบคุณ');
+  assert.equal(tidyOutput('ได้ค่ะ, 200 บาทนะคะ', 'th'), 'ได้, 200 บาทนะ');
+  assert.equal(tidyOutput('คะแนนดีมาก', 'th'), 'คะแนนดีมาก', '낱말 속 คะ는 그대로');
+  assert.equal(tidyOutput('ค่ะ', 'th'), 'ค่ะ', '지우면 아무것도 안 남으면 그대로');
+  assert.equal(tidyOutput('네, 감사합니다.', 'ko'), '네, 감사합니다.', '다른 언어는 그대로');
+  const req = new Request(`${ORIGIN}/api/translate`, { method: 'POST', headers: { 'content-type': 'application/json', origin: ORIGIN, 'cf-connecting-ip': '5.5.5.5' }, body: JSON.stringify({ text: '샘플 먼저 보내 주실 수 있어요?', from: 'ko', to: 'th' }) });
+  const AI = { run: async () => ({ response: 'ช่วยส่งตัวอย่างมาให้ก่อนได้ไหมคะ' }) };
+  assert.equal((await (await translateApi({ request: req, env: { AI } })).json()).text, 'ช่วยส่งตัวอย่างมาให้ก่อนได้ไหม');
+  const turns = [{ side: 'partner', from: 'th', to: 'ko', text: 'ชิ้นละ 250 บาท', translation: '개당 250바트예요.' }];
+  const s = cleanSuggestions(JSON.stringify([{ ko: '좀 생각해 볼게요.', th: 'ขอคิดดูก่อนครับ' }]), { me: 'ko', partner: 'th', turns });
+  assert.equal(s[0]?.partner, 'ขอคิดดูก่อน');
+});

@@ -1,5 +1,5 @@
 // POST /api/translate  { text, from, to, context?: [{lang,text}], formal?: true } → { text, model } · 오류는 { error(한국어), code }
-import { validateTranslate, buildMessages, cleanOutput, responseText, looksValid, aiError, withTimeout, maxTokensFor, MODELS } from '../../lib/translate-core.mjs';
+import { validateTranslate, buildMessages, cleanOutput, tidyOutput, responseText, looksValid, aiError, withTimeout, maxTokensFor, MODELS } from '../../lib/translate-core.mjs';
 import { checkOrigin, rateLimit, json } from '../../lib/guard.mjs';
 import { runAI } from '../../lib/usage.mjs';
 
@@ -19,7 +19,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
   for (const model of MODELS) {
     try {
       const result = await withTimeout(runAI(env, waitUntil, model.id, { ...input, ...model.extra }), model.timeoutMs);
-      const out = cleanOutput(responseText(result), v.text);
+      const out = tidyOutput(cleanOutput(responseText(result), v.text), v.to);
       if (looksValid(out, v)) return json({ text: out, model: model.id });
       lastError = new Error(`invalid output from ${model.id}`);
     } catch (e) {
