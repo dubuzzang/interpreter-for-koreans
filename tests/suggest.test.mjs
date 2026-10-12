@@ -46,6 +46,18 @@ test('숫자 찾기: 아라비아 숫자 · 한자 숫자 · 한국어 · 튀르
   assert.deepEqual(values('yüz elli tane', 'tr'), [150]);
   assert.deepEqual(values('two hundred and fifty pieces, a dozen boxes', 'en'), [250, 12]);
   assert.deepEqual(values('二つください', 'ja'), [2]);
+  // 소수로 읽는 말 (흥정에서 흔함)
+  assert.deepEqual(values('最低十四块五，一百个起订', 'zh'), [14.5, 100], '十四块五 = 14.5');
+  assert.deepEqual(values('两块五一个', 'zh'), [2.5, 1]);
+  assert.deepEqual(values('三块八毛五分', 'zh'), [3.85]);
+  assert.deepEqual(values('三块半', 'zh'), [3.5]);
+  assert.deepEqual(values('十四点五元', 'zh'), [14.5]);
+  assert.deepEqual(values('5元3个', 'zh'), [5, 3], '块/元 뒤 한 자리가 수량이면 소수가 아님');
+  assert.deepEqual(values('三点五十分到', 'zh'), [3, 50], '3시 50분은 소수가 아님');
+  assert.deepEqual(values('能便宜一点吗', 'zh'), [1], '一点 = 조금 → 낱말 1 (추천·요약 쪽에서는 숫자로 치지 않음)');
+  assert.deepEqual(values('tanesi on dört buçuk yuan', 'tr'), [14.5]);
+  assert.deepEqual(values('14 buçuk lira', 'tr'), [14.5]);
+  assert.deepEqual(values('fourteen and a half yuan', 'en'), [14.5]);
   // 숫자가 아닌 흔한 낱말
   for (const [s, lang] of [['十分感谢', 'zh'], ['十分です', 'ja'], ['百货商店', 'zh'], ['千万别忘了', 'zh'], ['一緒に行きましょう', 'ja'],
     ['네 배송은 언제 돼요?', 'ko'], ['네 주문할게요', 'ko'], ['천천히 말해 주세요', 'ko'], ['만일 불량이면요', 'ko'], ['추천해 주십시오', 'ko'], ['I need it on Monday', 'en']]) {
@@ -69,6 +81,12 @@ test('숫자 지어내기 막기: 대화에 나온 숫자(원문·번역 어느 
   assert.equal(inventsNumber('Bir sorum var.', 'tr', allowed), false);
   assert.equal(inventsNumber('Can you do 12 yuan each?', 'en', allowed), true);
   assert.equal(inventsNumber('Can you do fifteen yuan?', 'en', allowed), false);
+  // 상대가 "十四块五"라고만 했고 번역은 낱말(on dört buçuk)로 옮겼어도, 14.5는 대화에 있는 값
+  const haggle = allowedNumbers([{ side: 'partner', from: 'zh', to: 'tr', text: '最低十四块五，一百个起订。', translation: 'En düşük tanesi on dört buçuk yuan, en az yüz tane.' }]);
+  assert.equal(inventsNumber('14,5 yuan, 100 tane', 'tr', haggle), false);
+  assert.equal(inventsNumber('14.5元，100个', 'zh', haggle), false);
+  assert.equal(inventsNumber('14元可以吗？', 'zh', haggle), false, '14도 대화에 그대로 읽은 값으로 있다 (대화 쪽은 넉넉하게)');
+  assert.equal(inventsNumber('13.5元可以吗？', 'zh', haggle), true);
 });
 
 test('빈칸 막기: ○○ · ___ · XX · [가격]', () => {
