@@ -60,7 +60,6 @@ function combine(my) {
   my.lines = mergeParts(ok);
   my.failed = my.results.filter((r) => r?.error).length;
   my.dropped = ok.reduce((n, r) => n + (r.notes ? (r.notes.loops || 0) + (r.notes.wrongLang || 0) + (r.notes.numbers || 0) : 0), 0);
-  my.backup = ok.some((r) => r.backup);
 }
 
 export async function startPhoto(file) {
@@ -195,7 +194,6 @@ export default {
             j.file ? h('button', { class: 'btn primary sm', type: 'button', onclick: () => startPhoto(j.file) }, t('common.retry')) : null,
             h('button', { class: 'btn ghost sm', type: 'button', onclick: openPhotoPicker }, t('photo.again')))) : null,
         lines.length || nothing ? h('p', { class: 'photo-warn' }, '⚠️ ', t('photo.warning')) : null,
-        j.backup && lines.length ? h('p', { class: 'photo-note' }, t('photo.backup')) : null,
         j.truncated && j.status !== 'preparing' ? h('p', { class: 'photo-note' }, t('photo.tooLong', { n: j.parts })) : null,
         j.failed && !busy && j.status !== 'error' ? h('p', { class: 'photo-note' }, t('photo.partFailed', { n: j.failed, total: j.parts })) : null,
         j.summary ? h('div', { class: 'card photo-summary' }, h('div', { class: 'set-label small' }, '📝 ', t('photo.summary')), h('div', { lang: me }, j.summary)) : null,
