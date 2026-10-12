@@ -150,6 +150,24 @@ body[data-view="talk"] main { display: flex; flex-direction: column; overflow: h
 .dots { width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid currentColor; border-right-color: transparent; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* 답장 추천 (상대 말 아래, 내 쪽으로 붙어서) */
+.tips { align-self: flex-end; width: min(88%, 420px); display: flex; flex-direction: column; gap: 6px; }
+.tips.loading { flex-direction: row; align-items: center; gap: 8px; color: var(--muted); font-size: 13.5px; font-weight: 600; width: auto; }
+.tips.loading .dots { width: 14px; height: 14px; border-width: 2px; }
+.tips-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; font-size: 13px; color: var(--me); padding: 0 2px; }
+.tips-head .muted { font-size: 12px; }
+.tip {
+  display: flex; flex-direction: column; gap: 1px; text-align: left; padding: 9px 12px; border-radius: 14px; border: 1.5px dashed var(--me);
+  background: var(--card); color: var(--text); line-height: 1.35; min-width: 0;
+}
+.tip:active { background: var(--me-soft); }
+.tip-say { font-size: 16.5px; font-weight: 700; color: var(--me); overflow-wrap: anywhere; }
+.tip-reading { font-size: 12.5px; color: var(--muted); }
+.tip-me { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.tips.compact { width: 100%; align-self: stretch; }
+.tips.compact .tip { padding: 7px 10px; }
+.tips.compact .tip-say { font-size: 15px; }
+
 .live { margin: 0 12px 8px; padding: 10px 12px; border-radius: 14px; border: 2px dashed var(--line); background: var(--card); }
 .live.me { border-color: var(--me); }
 .live.partner { border-color: var(--partner); }
@@ -189,7 +207,9 @@ body[data-view="talk"] main { display: flex; flex-direction: column; overflow: h
 .f2f-half.partner { background: var(--partner-soft); }
 .f2f-half.me { background: var(--me-soft); }
 .f-panel { flex: 1; display: flex; flex-direction: column; padding: 12px; gap: 10px; min-height: 0; }
-.f-lines { flex: 1; overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; }
+/* 아래로 붙이되(첫 줄 margin-top: auto) 넘치면 위로 스크롤할 수 있게 (justify-content: flex-end는 위쪽이 잘려 안 보인다) */
+.f-lines { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+.f-lines > :first-child { margin-top: auto; }
 .f-line { font-size: 22px; font-weight: 700; line-height: 1.35; word-break: keep-all; overflow-wrap: anywhere; }
 .f-line.own { font-size: 15px; font-weight: 500; color: var(--muted); }
 .f-line.live-line { color: var(--text); }

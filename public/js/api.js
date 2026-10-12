@@ -1,4 +1,4 @@
-// 서버 API: 번역 · 음성 인식 (Cloudflare Workers AI)
+// 서버 API: 번역 · 음성 인식 · 읽는 법 · 답장 추천 · 합의 내용 요약 (Cloudflare Workers AI)
 import { t, uiLang, MESSAGES } from './i18n.js';
 
 const cache = new Map();
@@ -63,6 +63,32 @@ export async function sound(text, lang) {
     soundCache.set(key, data[kind] || '');
     return data[kind] || '';
   } catch { return ''; }
+}
+
+/** 대화 한 줄 → 서버로 보낼 모양 (side는 지금 '나' 기준 me · partner) */
+const turnBody = (t) => ({ side: t.side, from: t.from, to: t.to, text: t.text, translation: t.translation || '' });
+
+/**
+ * 답장 추천: 상대의 마지막 말에 내가 할 만한 답 2~3개 → [{ me: 내 언어, partner: 상대 언어 }].
+ * 통역과 따로 부르고, 실패하면 오류를 던진다 (화면은 조용히 넘어간다)
+ */
+export async function suggestReplies({ me, partner, turns, formal = true }) {
+  const data = await call('/api/suggest', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ me, partner, formal, turns: turns.slice(-4).map(turnBody) }),
+  }, 20000);
+  return Array.isArray(data.suggestions) ? data.suggestions : [];
+}
+
+/** 합의 내용 요약 → { price: { me, partner }, quantity, delivery, other } (대화에 없는 칸은 빈 글) */
+export async function summarize({ me, partner, turns }) {
+  const data = await call('/api/summary', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ me, partner, turns: turns.slice(-40).map(turnBody) }),
+  }, 30000);
+  return data.fields || {};
 }
 
 /** 녹음 → 글 (브라우저 음성 인식이 없을 때) */
