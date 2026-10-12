@@ -12,7 +12,8 @@
   Content-Type: application/vnd.android.package-archive
   Content-Disposition: attachment; filename="tercuman.apk"
   Cache-Control: public, max-age=300
+# camera=(self): 사진 번역의 카메라로 찍기(<input capture>)가 막히지 않게 (v1.5.1)
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: microphone=(self), camera=(), geolocation=()
+  Permissions-Policy: microphone=(self), camera=(self), geolocation=()

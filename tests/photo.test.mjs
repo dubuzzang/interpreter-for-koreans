@@ -444,6 +444,7 @@ test('화면: 번역 탭의 📷 사진 → 카메라로 찍기 / 사진 고르�
   for (const k of ['photo.warning', 'photo.noText', 'photo.summary', 'photo.privacy', 'mine.star']) assert.match(view, new RegExp(`'${k.replace('.', '\\.')}'`), k);
   assert.match(view, /speak\(line\.text, line\.lang\)/, '줄을 누르면 원문을 읽어 준다');
   assert.match(readFileSync('public/js/app.js', 'utf8'), /photo \}/);
+  assert.match(readFileSync('public/_headers', 'utf8'), /Permissions-Policy: [^\n]*camera=\(self\)/, '카메라로 찍기가 막히지 않게');
   for (const l of CODES) {
     for (const k of ['photo.button', 'photo.camera', 'photo.gallery', 'photo.warning', 'photo.noText', 'photo.privacy', 'err.photo_failed', 'err.photo_too_big', 'err.bad_image']) assert.ok(MESSAGES[l][k], `${l}.${k}`);
     assert.match(MESSAGES[l]['photo.button'], /^📷 /);
