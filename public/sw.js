@@ -1,5 +1,5 @@
 /* Tercüman 서비스 워커 — scripts/gen-sw.mjs가 만든 파일 (직접 고치지 마세요) */
-const VERSION = '1.4.0';
+const VERSION = '1.4.1';
 const CACHE = `tercuman-${VERSION}`;
 const ASSETS = [
   "/",
@@ -13,6 +13,7 @@ const ASSETS = [
   "/js/api.js",
   "/js/app.js",
   "/js/i18n.js",
+  "/js/install.js",
   "/js/lang.js",
   "/js/mine.js",
   "/js/phrases.js",
@@ -24,6 +25,7 @@ const ASSETS = [
   "/js/ui.js",
   "/js/version.js",
   "/js/views/history.js",
+  "/js/views/install.js",
   "/js/views/langmenu.js",
   "/js/views/langpicker.js",
   "/js/views/phrases.js",
@@ -54,6 +56,7 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin || url.pathname.startsWith('/api/') || url.pathname === '/version.json') return; // 번역·음성 인식·새 버전 확인은 늘 서버로
+  if (url.pathname.startsWith('/download/') || url.pathname.startsWith('/.well-known/')) return; // 앱 설치 파일(APK)·앱 연결 확인은 저장하지 않고 그대로 받게
   if (req.mode === 'navigate') {
     if (!isAppPage(url.pathname)) return;
     e.respondWith(fetch(req).catch(async () => (await caches.match('/', { cacheName: CACHE })) || Response.error()));

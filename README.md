@@ -1,8 +1,14 @@
 # Tercüman — 한국어 · 튀르키예어 · 영어 · 일본어 · 중국어 통역
 
-말하면 바로 통역해서 상대 언어로 읽어 주는 웹앱입니다. 휴대폰 브라우저에서 바로 쓰고, 홈 화면에 추가하면 앱처럼 열립니다.
+말하면 바로 통역해서 상대 언어로 읽어 주는 웹앱입니다. 휴대폰 브라우저에서 바로 쓰고, 안드로이드 앱(APK)으로 설치하거나 홈 화면에 추가하면 앱처럼 열립니다.
 
 **바로 쓰기 → https://interpreter-for-koreans.pages.dev/**
+
+| 설치 | 방법 (앱 안: 설정 → 앱 설치, [설치 화면](https://interpreter-for-koreans.pages.dev/#/install)) |
+|---|---|
+| 안드로이드 | [Tercüman 앱 내려받기 (APK, 약 1.6MB)](https://interpreter-for-koreans.pages.dev/download/tercuman.apk) → 열어서 설치 (구글 플레이 밖 앱이라 "출처를 알 수 없는 앱" 허용 필요). 주소창 없이 전체 화면으로 열림 |
+| 아이폰·아이패드 | Safari로 열고 공유 버튼 → "홈 화면에 추가" (카카오톡 · 네이버 · 크롬이면 설치 화면의 "Safari로 열기") |
+| PC | Chrome·Edge 주소창의 설치 아이콘(⊕) |
 
 | 화면 | 하는 일 |
 |---|---|
@@ -43,6 +49,7 @@
 | 내 표현 · 공유 | `public/js/mine.js`(기기 저장 `tercuman.mine.v1`) · `public/js/share.js`(공유 글) · `public/js/views/share.js`(고르기 · 요약 확인 · 공유 시트) |
 | 읽어 주기 | 기기 목소리(speechSynthesis). 중국어는 보통화 목소리만(홍콩·광둥어 제외). 아이폰은 첫 터치 때 소리를 풀어 둔다 |
 | 공용 코드 | `lib/translate-core.mjs`(검사·지시문·출력 정리·오류 안내) · `lib/guard.mjs`(이 앱 화면에서 온 요청만 · IP당 요청 제한) |
+| 안드로이드 앱 | Trusted Web Activity(Bubblewrap) — `android/README.md`(빌드 · 서명 지문) · `android/twa-manifest.json`. 사이트 쪽: `public/download/tercuman.apk` · `public/.well-known/assetlinks.json` · `public/_headers`. 설치 안내 `public/js/install.js` · `public/js/views/install.js`. 서비스 워커는 `/download/` · `/.well-known/`을 가로채지도 미리 저장하지도 않음 |
 
 ### 번역 엔진 (2026-10-08 비교)
 

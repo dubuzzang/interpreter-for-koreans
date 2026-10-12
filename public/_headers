@@ -3,6 +3,15 @@
   Cache-Control: no-cache
 /version.json
   Cache-Control: no-cache
+# 안드로이드 앱(TWA)이 주소창 없이 열리려면 이 파일이 JSON으로 와야 한다 (없으면 앱 화면 HTML이 와서 확인 실패)
+/.well-known/assetlinks.json
+  Content-Type: application/json
+  Access-Control-Allow-Origin: *
+# 안드로이드 앱 설치 파일: 이 파일에만 (download 폴더 전체로 넓히면 다른 파일까지 APK 형식이 붙는다)
+/download/tercuman.apk
+  Content-Type: application/vnd.android.package-archive
+  Content-Disposition: attachment; filename="tercuman.apk"
+  Cache-Control: public, max-age=300
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin

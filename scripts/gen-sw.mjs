@@ -10,6 +10,7 @@ const list = (dir) => readdirSync(join(PUB, dir)).flatMap((f) => {
   return statSync(join(PUB, p)).isDirectory() ? list(p) : [p];
 });
 
+/** 미리 저장할 앱 화면 파일 — download/(APK, 크기가 큼) · .well-known 은 넣지 않는다 */
 export function assetList() {
   return ['/', '/manifest.webmanifest', ...list('css').map((p) => `/${p}`), ...list('js').map((p) => `/${p}`), ...list('icons').map((p) => `/${p}`)].sort();
 }
@@ -45,6 +46,7 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin || url.pathname.startsWith('/api/') || url.pathname === '/version.json') return; // 번역·음성 인식·새 버전 확인은 늘 서버로
+  if (url.pathname.startsWith('/download/') || url.pathname.startsWith('/.well-known/')) return; // 앱 설치 파일(APK)·앱 연결 확인은 저장하지 않고 그대로 받게
   if (req.mode === 'navigate') {
     if (!isAppPage(url.pathname)) return;
     e.respondWith(fetch(req).catch(async () => (await caches.match('/', { cacheName: CACHE })) || Response.error()));

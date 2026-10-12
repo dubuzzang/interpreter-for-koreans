@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.dubuzzang.tercuman",
+      "sha256_cert_fingerprints": ["5D:EF:DA:A1:FF:E3:F0:50:2A:F7:B7:33:65:87:62:39:0F:35:82:42:01:6E:0E:DB:05:BC:EC:2F:F3:3E:9D:AF"]
+    }
+  }
+]

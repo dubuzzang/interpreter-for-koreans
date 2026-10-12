@@ -47,6 +47,7 @@ const PATHS = {
   down: '<path d="m6 9 6 6 6-6"/>',
   back: '<path d="M15 6l-6 6 6 6"/>',
   check: '<path d="m5 12 5 5 9-10"/>',
+  download: '<path d="M12 4v11m0 0-4-4m4 4 4-4"/><path d="M5 20h14"/>',
 };
 export const icon = (name, size = 22) => h('span', {
   class: 'ic', 'aria-hidden': 'true',

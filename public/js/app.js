@@ -9,11 +9,12 @@ import text from './views/text.js';
 import phrases from './views/phrases.js';
 import history from './views/history.js';
 import settings from './views/settings.js';
+import install from './views/install.js';
 import { openLangPicker } from './views/langpicker.js';
 import { openLangMenu } from './views/langmenu.js';
 import { VERSION } from './version.js';
 
-const VIEWS = { talk, text, phrases, history, settings };
+const VIEWS = { talk, text, phrases, history, settings, install }; // install: 설정 → 앱 설치 (#/install, 아래 탭에는 없음)
 const TABS = [
   ['talk', 'tab.talk', 'chat'],
   ['text', 'tab.text', 'text'],

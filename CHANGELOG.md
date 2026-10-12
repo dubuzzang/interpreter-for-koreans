@@ -1,5 +1,17 @@
 # 변경 기록
 
+## v1.4.1 — 2026-10-12
+
+- **안드로이드 앱(APK)**: 설치 파일로 받아 설치하면 홈 화면의 Tercüman 아이콘으로 주소창 없이 전체 화면으로 열린다 (Trusted Web Activity, `io.github.dubuzzang.tercuman`, Merhaba · Hello 와 같은 방식)
+  - 내려받기: https://interpreter-for-koreans.pages.dev/download/tercuman.apk (`public/download/tercuman.apk`, 약 1.6MB) — 앱은 이 사이트를 띄우므로 웹을 고치면 앱도 바로 최신
+  - `/.well-known/assetlinks.json`: 앱 서명 지문 등록(주소창 없이 열리게), `_headers`로 JSON 형식
+  - 빌드 방법 · 서명 지문: `android/README.md` · `android/twa-manifest.json`
+- **설정 → 앱 설치** 카드와 설치 화면(`#/install`): 기기에 맞춰 안내 (다섯 언어)
+  - 안드로이드: APK 내려받기 버튼 + "출처를 알 수 없는 앱" 허용 · Play 프로텍트 안내 · Chrome 메뉴로 설치하는 방법
+  - 아이폰 · 아이패드: Safari 공유 → 홈 화면에 추가. Safari가 아니면(카카오톡 · 네이버 · 크롬 등) "Safari로 열기" · 주소 복사
+  - 카카오톡 같은 앱 안 브라우저(안드로이드)는 "Chrome으로 열기"
+- 서비스 워커: `/download/` · `/.well-known/` 은 가로채지도 미리 저장하지도 않는다(APK 크기, 링크로 바로 받기)
+
 ## v1.4.0 — 2026-10-12
 
 - **답장 추천**: 대화에서 상대 말이 통역되면 그 아래에 내가 할 만한 답 2~3개를 상대 언어 + 내 언어로 보여 준다. 누르면 상대 언어로 읽어 주고 내 말로 대화에 들어간다(번역을 다시 부르지 않음). 마주 보기의 내 쪽 절반에도

@@ -1,4 +1,4 @@
-// 설정: 언어 · 말투 · 읽어 주기 · 목소리 · 음성 인식 방식 · 기록 · 화면 · 업데이트 · 앱 정보
+// 설정: 언어 · 말투 · 읽어 주기 · 목소리 · 음성 인식 방식 · 기록 · 화면 · 앱 설치 · 업데이트 · 앱 정보
 import { h, icon, toast } from '../ui.js';
 import { LANGS, CODES } from '../lang.js';
 import { t, tl, langName } from '../i18n.js';
@@ -6,6 +6,7 @@ import { state, setSetting, clearHistory } from '../store.js';
 import { voicesFor, speak, unlockSpeech, hasBrowserSTT, canRecord, canSpeak } from '../speech.js';
 import { applyTheme, setMyLang } from '../app.js';
 import { VERSION, RELEASED } from '../version.js';
+import { installCard } from './install.js';
 
 /** 설정의 "업데이트 확인" — 새 버전이 있으면 바로 바꾼다 (index.html의 업데이트 도우미) */
 function updateCard() {
@@ -101,12 +102,12 @@ export default {
         h('button', { class: 'btn ghost block', type: 'button', onclick: () => { if (confirm(t('hist.clearConfirm'))) { clearHistory(); toast(t('hist.cleared'), 'ok'); } } }, icon('trash', 18), ' ', t('set.clearHistory'))),
       h('section', { class: 'card' },
         seg('theme', t('set.theme'), [['auto', t('set.themeAuto')], ['light', t('set.themeLight')], ['dark', t('set.themeDark')]], applyTheme)),
+      installCard(),
       updateCard(),
       h('section', { class: 'card about' },
         h('div', { class: 'set-label' }, `Tercüman v${VERSION}`),
         h('p', { class: 'muted small' }, t('set.about', { date: RELEASED })),
-        h('p', { class: 'muted small' }, t('set.privacy')),
-        h('p', { class: 'muted small' }, t('set.install'))),
+        h('p', { class: 'muted small' }, t('set.privacy'))),
     );
   },
 };

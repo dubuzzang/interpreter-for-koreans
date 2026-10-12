@@ -8,3 +8,7 @@ node_modules/
 Thumbs.db
 .telegram/
 .claude/
+# 안드로이드 앱 서명 키 · 비밀번호는 저장소 밖(C:\Users\jeong\keys\tercuman\)에만
+*.keystore
+*.jks
+password.txt
