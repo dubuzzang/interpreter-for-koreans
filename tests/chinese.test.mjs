@@ -196,6 +196,27 @@ test('표현집 주문·배송: 도매·인터넷 쇼핑 판매자에게 쓰는 
   assert.equal(readingFor('单价是多少？', 'zh', 'ko', 'dānjià shì duōshao?'), '단자 스 둬사오?\nDānjià shì duōshao?');
 });
 
+test('언어 알아보기: 가나가 있으면 일본어, 한자만 있으면 중국어 쪽 (일본 글자체면 일본어), 일본어 동작은 그대로', async () => {
+  const { detectLang } = await import('../public/js/lang.js');
+  // 중국어 (간체 · 흔한 문장)
+  for (const s of ['这个多少钱？', '你好', '谢谢', '最低起订量是多少？', '什么时候发货？', '可以开发票吗？', '我要两个', 'iPhone 15多少钱？', '有现货吗', '东西有质量问题。'])
+    assert.equal(detectLang(s, 'ko'), 'zh', s);
+  assert.equal(detectLang('這個多少錢？', 'ko'), 'zh', '번체로 써도 중국어');
+  // 일본어 (가나가 있으면 무조건, 한자만이어도 일본 글자체면)
+  for (const s of ['トイレはどこですか？', '駅はどこですか？', 'これはいくらですか', '東京駅', '駅', '円', '大丈夫です', 'お会計をお願いします。', '中国語はあまり話せません。'])
+    assert.equal(detectLang(s, 'ko'), 'ja', s);
+  // 어느 쪽 글자도 없는 한자 낱말: 중국어 쪽, 다만 일본어 대화 중(fallback ja)이면 일본어
+  assert.equal(detectLang('大丈夫', 'ko'), 'zh');
+  assert.equal(detectLang('大丈夫', 'ja'), 'ja');
+  assert.equal(detectLang('多少', 'en'), 'zh');
+  // 다른 언어는 그대로
+  assert.equal(detectLang('안녕하세요', 'zh'), 'ko');
+  assert.equal(detectLang('Merhaba, nasılsınız?', 'zh'), 'tr');
+  assert.equal(detectLang('Where is the hotel?', 'zh'), 'en');
+  assert.equal(detectLang('', 'zh'), 'zh');
+  assert.equal(detectLang('123 !?', 'zh'), 'zh');
+});
+
 test('화면 문구(중국어): 간체 한자로, 상대 안내 · 언어 이름 · 말투 안내', () => {
   for (const [k, s] of Object.entries(MESSAGES.zh)) if (!/^[A-Za-z0-9\s.()/:·→✕×{}-]+$/.test(s)) assert.match(s, /[一-鿿]/, `zh.${k}`);
   assert.doesNotMatch(Object.values(MESSAGES.zh).join(''), /[們這說嗎麼錢買賣時東車門問謝對見還個為發貨價樣質換運輸單網訂給請語話讀設錄]/, '번체 글자 없음');
