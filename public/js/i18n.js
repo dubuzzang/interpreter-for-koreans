@@ -217,7 +217,7 @@ const ko = {
   'set.offline': '인터넷에 연결되어 있지 않아요',
   'set.latest': '최신 버전이에요 (v{v})',
   'set.about': '{date} · 한국어 · 튀르키예어 · 영어 · 일본어 · 중국어 통역',
-  'set.privacy': '번역: Cloudflare Workers AI (Gemma 4) · 음성 인식: 브라우저 / Whisper large-v3 turbo · 읽어 주기: 기기 목소리. 말한 내용은 번역을 위해 서버로 보내지고 저장되지 않아요. 기록은 이 기기에만 남아요.',
+  'set.privacy': '번역: Cloudflare Workers AI (Gemma 4) · 음성 인식: 브라우저 / Whisper large-v3 turbo · 읽어 주기: 기기 목소리. 말한 내용은 번역 · 답장 추천 · 요약을 위해 서버로 보내지고 저장되지 않아요. 기록과 내 표현은 이 기기에만 남아요.',
   'set.install': '홈 화면에 추가하면 앱처럼 쓸 수 있어요 (아이폰: Safari 공유 → 홈 화면에 추가 · 안드로이드: Chrome 메뉴 → 앱 설치).',
 
   'pair.title': '통역할 언어',
@@ -468,7 +468,7 @@ const tr = {
   'set.offline': 'İnternet bağlantısı yok',
   'set.latest': 'En güncel sürümü kullanıyorsunuz (v{v})',
   'set.about': '{date} · Korece · Türkçe · İngilizce · Japonca · Çince tercüman',
-  'set.privacy': 'Çeviri: Cloudflare Workers AI (Gemma 4) · Ses tanıma: tarayıcı / Whisper large-v3 turbo · Sesli okuma: cihaz sesleri. Söyledikleriniz çeviri için sunucuya gönderilir ve saklanmaz. Geçmiş yalnızca bu cihazda kalır.',
+  'set.privacy': 'Çeviri: Cloudflare Workers AI (Gemma 4) · Ses tanıma: tarayıcı / Whisper large-v3 turbo · Sesli okuma: cihaz sesleri. Söyledikleriniz çeviri, yanıt önerileri ve özet için sunucuya gönderilir ve saklanmaz. Geçmiş ve İfadelerim yalnızca bu cihazda kalır.',
   'set.install': 'Ana ekrana eklerseniz uygulama gibi kullanabilirsiniz (iPhone: Safari Paylaş → Ana Ekrana Ekle · Android: Chrome menüsü → Uygulamayı yükle).',
 
   'pair.title': 'Çeviri dilleri',
@@ -718,7 +718,7 @@ const en = {
   'set.offline': "You're offline",
   'set.latest': "You're on the latest version (v{v})",
   'set.about': '{date} · Korean · Turkish · English · Japanese · Chinese interpreter',
-  'set.privacy': 'Translation: Cloudflare Workers AI (Gemma 4) · Speech recognition: browser / Whisper large-v3 turbo · Read-aloud: device voices. What you say is sent to the server for translation and is not stored. History stays on this device only.',
+  'set.privacy': 'Translation: Cloudflare Workers AI (Gemma 4) · Speech recognition: browser / Whisper large-v3 turbo · Read-aloud: device voices. What you say is sent to the server for translation, reply suggestions and summaries, and is not stored. History and My phrases stay on this device only.',
   'set.install': 'Add it to your home screen to use it like an app (iPhone: Safari Share → Add to Home Screen · Android: Chrome menu → Install app).',
 
   'pair.title': 'Languages',
@@ -968,7 +968,7 @@ const ja = {
   'set.offline': 'インターネットに接続されていません',
   'set.latest': '最新バージョンです（v{v}）',
   'set.about': '{date} · 韓国語・トルコ語・英語・日本語・中国語の通訳',
-  'set.privacy': '翻訳：Cloudflare Workers AI（Gemma 4）・音声認識：ブラウザ / Whisper large-v3 turbo・読み上げ：端末の音声。話した内容は翻訳のためにサーバーへ送られますが、保存はされません。履歴はこの端末にだけ残ります。',
+  'set.privacy': '翻訳：Cloudflare Workers AI（Gemma 4）・音声認識：ブラウザ / Whisper large-v3 turbo・読み上げ：端末の音声。話した内容は翻訳・返事の候補・まとめのためにサーバーへ送られますが、保存はされません。履歴とマイフレーズはこの端末にだけ残ります。',
   'set.install': 'ホーム画面に追加すると、アプリのように使えます（iPhone：Safari の共有 →「ホーム画面に追加」・Android：Chrome のメニュー →「アプリをインストール」）。',
 
   'pair.title': '通訳する言語',
@@ -1219,7 +1219,7 @@ const zh = {
   'set.offline': '没有连接网络',
   'set.latest': '已是最新版本（v{v}）',
   'set.about': '{date} · 韩语 · 土耳其语 · 英语 · 日语 · 中文翻译',
-  'set.privacy': '翻译：Cloudflare Workers AI（Gemma 4）· 语音识别：浏览器 / Whisper large-v3 turbo · 朗读：设备语音。你说的话会发送到服务器进行翻译，不会被保存。记录只保留在这台设备上。',
+  'set.privacy': '翻译：Cloudflare Workers AI（Gemma 4）· 语音识别：浏览器 / Whisper large-v3 turbo · 朗读：设备语音。你说的话会发送到服务器，用于翻译、推荐回复和摘要，不会被保存。记录和我的常用语只保留在这台设备上。',
   'set.install': '添加到主屏幕后可以像应用一样使用（iPhone：Safari 分享 → 添加到主屏幕 · Android：Chrome 菜单 → 安装应用）。',
 
   'pair.title': '翻译语言',
