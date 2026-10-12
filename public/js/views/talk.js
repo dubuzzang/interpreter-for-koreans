@@ -5,8 +5,8 @@ import { LANGS, sideFor } from '../lang.js';
 import { t, tl, langName } from '../i18n.js';
 import { state, setSetting, addHistory, updateHistory } from '../store.js';
 import { listen, speak, stopSpeaking, unlockSpeech, hasVoice, sttMode } from '../speech.js';
-import { translate, kana as kanaReading } from '../api.js';
-import { readingFor, needsKana } from '../reading.js';
+import { translate, sound as fetchSound } from '../api.js';
+import { readingFor, needsSound } from '../reading.js';
 
 const START_KEY = 'tercuman.convoStart';
 const session = (() => {
@@ -25,6 +25,8 @@ const otherOf = (side) => (side === 'me' ? 'partner' : 'me');
 const redraw = () => draw?.();
 /** 지난 대화 한 줄이 지금 '나' 기준으로 어느 쪽인지 (내 언어를 바꿨어도 맞게) */
 const sideOf = (turn) => sideFor(turn, state.settings.me);
+/** 번역의 소리 표기 (일본어 히라가나 · 중국어 병음). v1.2.0까지의 기록은 kana에 */
+const soundOf = (turn) => turn.sound ?? turn.kana ?? '';
 
 function context(beforeTurn) {
   const i = session.indexOf(beforeTurn);
@@ -37,13 +39,13 @@ async function translateTurn(turn) {
   try {
     const out = await translate(turn.text, turn.from, turn.to, { context: context(turn), formal: state.settings.formal });
     turn.translation = out;
-    turn.kana = '';
+    turn.sound = '';
     turn.pending = false;
-    updateHistory(turn.id, { translation: out, text: turn.text, kana: '' });
+    updateHistory(turn.id, { translation: out, text: turn.text, sound: '' });
     redraw();
-    // 일본어로 옮겼으면 읽는 법(한글 발음 · 로마자)을 보여 주려고 읽기(히라가나)를 따로 받는다 (번역은 먼저 보여 줌)
-    if (state.settings.reading && needsKana(turn.to, state.settings.me)) {
-      kanaReading(out).then((k) => { if (k && turn.translation === out) { turn.kana = k; updateHistory(turn.id, { kana: k }); redraw(); } });
+    // 일본어·중국어로 옮겼으면 읽는 법(한글 발음 · 로마자 · 병음)을 보여 주려고 소리 표기(히라가나 · 병음)를 따로 받는다 (번역은 먼저 보여 줌)
+    if (state.settings.reading && needsSound(turn.to, state.settings.me)) {
+      fetchSound(out, turn.to).then((k) => { if (k && turn.translation === out) { turn.sound = k; updateHistory(turn.id, { sound: k }); redraw(); } });
     }
     if (state.settings.autoSpeak) {
       if (!hasVoice(turn.to) && !warnedVoice.has(turn.to)) {
@@ -117,7 +119,7 @@ function bubble(turn) {
         h('button', { class: 'btn ghost sm', type: 'button', onclick: () => { turn.editing = false; redraw(); } }, t('common.cancel')),
       ));
   }
-  const reading = s.reading && turn.translation ? readingFor(turn.translation, turn.to, s.me, turn.kana) : '';
+  const reading = s.reading && turn.translation ? readingFor(turn.translation, turn.to, s.me, soundOf(turn)) : '';
   return h('div', { class: `bubble ${sideOf(turn)}` },
     h('div', { class: 'b-orig', lang: turn.from }, h('span', { class: 'flag' }, LANGS[turn.from].flag), ' ', turn.text, turn.edited ? h('em', null, ' · ', t('talk.edited')) : null),
     turn.pending ? h('div', { class: 'b-trans pending', lang: turn.to }, h('span', { class: 'dots' }), tl(turn.to, 'mic.thinking'))
@@ -200,7 +202,7 @@ function f2fPanel(side) {
     const text = own ? turn.text : turn.translation;
     const lineLang = own ? turn.from : turn.to;
     const pending = !own && turn.pending;
-    const reading = state.settings.reading && text && !pending ? readingFor(text, lineLang, L, own ? '' : turn.kana) : '';
+    const reading = state.settings.reading && text && !pending ? readingFor(text, lineLang, L, own ? '' : soundOf(turn)) : '';
     return h('div', { class: `f-line${own ? ' own' : ''}`, lang: lineLang },
       pending ? h('span', { class: 'muted' }, tl(L, 'mic.thinking')) : text || (turn.error ? '⚠️' : ''),
       reading ? h('div', { class: 'b-reading' }, reading) : null);

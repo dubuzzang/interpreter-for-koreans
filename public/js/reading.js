@@ -1,7 +1,8 @@
 // 읽는 법 표시 — 보는 사람이 읽을 수 있는 글자로:
-// 한국어 사용자에게 튀르키예어·일본어 → 한글 발음, 튀르키예어·영어·일본어 사용자에게 한국어 → 로마자,
-// 튀르키예어·영어 사용자에게 일본어 → 로마자. 라틴 문자 언어끼리는 적지 않는다.
-// 튀르키예어 규칙은 Merhaba(한국인을 위한 튀르키예어) 앱의 변환기와 같다.
+// 한국어 사용자에게 튀르키예어·일본어·중국어 → 한글 발음 (중국어는 병음도), 다른 언어 사용자에게 한국어 → 로마자,
+// 일본어 → 로마자, 중국어 → 병음. 라틴 문자 언어끼리는 적지 않는다.
+// 튀르키예어 규칙은 Merhaba(한국인을 위한 튀르키예어) 앱의 변환기와 같다. 중국어 병음 → 한글은 pinyin.js.
+import { pinyinToHangul, pinyinText } from './pinyin.js';
 
 const trLower = (s) => String(s ?? '').normalize('NFC').toLocaleLowerCase('tr-TR').replace(/̇/g, '');
 
@@ -265,22 +266,30 @@ export function jaKanaToRomaji(kana) {
 }
 
 /**
- * 화면에 같이 보일 읽는 법 — 그 글을 보는 사람(viewer)이 읽을 수 있는 글자로, 필요할 때만:
- * - 한국어 사용자: 튀르키예어 → 한글 발음, 일본어 → 한글 발음 (서버에서 받은 히라가나 읽기 kana가 있어야)
- * - 튀르키예어·영어 사용자: 한국어 → 로마자, 일본어 → 로마자 (kana가 있어야). 튀르키예어↔영어는 적지 않음
- * - 일본어 사용자: 한국어 → 로마자. 튀르키예어·영어는 적지 않음 (가타카나 표기는 정확하게 만들기 어려워서)
+ * 화면에 같이 보일 읽는 법 — 그 글을 보는 사람(viewer)이 읽을 수 있는 글자로, 필요할 때만.
+ * sound: 서버에서 받아 둔 소리 표기 (일본어 → 히라가나 읽기, 중국어 → 병음). 아직 없으면 그 언어는 비운다.
+ * - 한국어 사용자: 튀르키예어 → 한글 발음, 일본어 → 한글 발음, 중국어 → 한글 발음 + 병음 (두 줄)
+ * - 튀르키예어·영어 사용자: 한국어 → 로마자, 일본어 → 로마자, 중국어 → 병음. 튀르키예어↔영어는 적지 않음
+ * - 일본어 사용자: 한국어 → 로마자, 중국어 → 병음. 튀르키예어·영어는 적지 않음 (가타카나 표기는 정확하게 만들기 어려워서)
+ * - 중국어 사용자: 한국어 → 로마자, 일본어 → 로마자. 튀르키예어·영어는 적지 않음
  */
-export function readingFor(text, lang, viewer = 'ko', kana = '') {
+export function readingFor(text, lang, viewer = 'ko', sound = '') {
   if (lang === viewer) return '';
+  if (lang === 'zh') {
+    if (!sound) return '';
+    return viewer === 'ko' ? `${pinyinToHangul(sound)}\n${pinyinText(sound)}` : pinyinText(sound);
+  }
   if (viewer === 'ko') {
     if (lang === 'tr') return trToHangul(text);
-    if (lang === 'ja') return kana ? jaKanaToHangul(kana) : '';
+    if (lang === 'ja') return sound ? jaKanaToHangul(sound) : '';
     return '';
   }
   if (lang === 'ko') return koToRoman(text);
-  if (lang === 'ja') return kana ? jaKanaToRomaji(kana) : '';
+  if (lang === 'ja') return sound ? jaKanaToRomaji(sound) : '';
   return '';
 }
 
 /** 이 사람에게 일본어 읽는 법을 보이려면 서버에서 히라가나 읽기를 받아야 하나 */
 export const needsKana = (lang, viewer) => lang === 'ja' && viewer !== 'ja';
+/** 이 사람에게 읽는 법을 보이려면 서버에서 소리 표기를 받아야 하나 (일본어 → 히라가나 · 중국어 → 병음) */
+export const needsSound = (lang, viewer) => (lang === 'ja' || lang === 'zh') && lang !== viewer;

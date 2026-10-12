@@ -3,7 +3,7 @@ import { h, icon, showBig } from '../ui.js';
 import { LANGS } from '../lang.js';
 import { t, langName } from '../i18n.js';
 import { state } from '../store.js';
-import { PHRASE_CATS, phrasesFor } from '../phrases.js';
+import { PHRASE_CATS, phrasesFor, phraseSound } from '../phrases.js';
 import { speak, unlockSpeech } from '../speech.js';
 import { readingFor } from '../reading.js';
 
@@ -21,7 +21,7 @@ export default {
       }, c.icon, ' ', t(`cat.${c.id}`))));
       list.replaceChildren(...phrasesFor(cat, partner, me).map((p) => {
         const say = p[partner];
-        const read = reading ? readingFor(say, partner, me, p.jaKana) : '';
+        const read = reading ? readingFor(say, partner, me, phraseSound(p, partner)) : '';
         return h('div', { class: 'phrase card' },
           h('button', { class: 'phrase-main', type: 'button', onclick: () => { unlockSpeech(); speak(say, partner); } },
             h('div', { class: 'phrase-me', lang: me }, p[me]),

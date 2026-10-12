@@ -46,16 +46,22 @@ export async function translate(text, from, to, { context = [], formal = true } 
   return data.text;
 }
 
-/** 일본어 → 히라가나 읽기 (한글 발음 · 로마자를 보여 주려고). 실패해도 번역은 그대로라 빈 값 */
-const kanaCache = new Map();
-export async function kana(text) {
+/**
+ * 읽는 법을 만들 소리 표기: 일본어 → 히라가나 읽기(/api/kana), 중국어 → 병음(/api/pinyin).
+ * 화면에서 한글 발음 · 로마자 · 병음으로 바꿔 보여 준다. 실패해도 번역은 그대로라 빈 값
+ */
+const SOUND_API = { ja: 'kana', zh: 'pinyin' };
+const soundCache = new Map();
+export async function sound(text, lang) {
+  const kind = SOUND_API[lang];
   const t = String(text).trim();
-  if (!t) return '';
-  if (kanaCache.has(t)) return kanaCache.get(t);
+  if (!kind || !t) return '';
+  const key = `${lang}|${t}`;
+  if (soundCache.has(key)) return soundCache.get(key);
   try {
-    const data = await call('/api/kana', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: t }) }, 20000);
-    kanaCache.set(t, data.kana || '');
-    return data.kana || '';
+    const data = await call(`/api/${kind}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: t }) }, 20000);
+    soundCache.set(key, data[kind] || '');
+    return data[kind] || '';
   } catch { return ''; }
 }
 

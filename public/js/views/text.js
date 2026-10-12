@@ -4,9 +4,9 @@ import { h, icon, toast, copyText, showBig } from '../ui.js';
 import { LANGS, CODES, detectLang } from '../lang.js';
 import { t, tl, langName } from '../i18n.js';
 import { state, addHistory } from '../store.js';
-import { translate, kana as kanaReading } from '../api.js';
+import { translate, sound as fetchSound } from '../api.js';
 import { listen, speak, unlockSpeech, sttMode } from '../speech.js';
-import { readingFor, needsKana } from '../reading.js';
+import { readingFor, needsSound } from '../reading.js';
 
 const memo = { from: 'auto', to: null, text: '', result: null, me: null };
 
@@ -63,7 +63,7 @@ export default {
 
     function showResult(r) {
       if (!r) { result.replaceChildren(); return; }
-      const reading = s.reading ? readingFor(r.translation, r.to, s.me, r.kana) : '';
+      const reading = s.reading ? readingFor(r.translation, r.to, s.me, r.sound) : '';
       result.replaceChildren(h('div', { class: 'card result-card' },
         h('div', { class: 'muted small' }, `${LANGS[r.from].flag} ${langName(r.from)} → ${LANGS[r.to].flag} ${langName(r.to)}`),
         h('div', { class: 'result-text', lang: r.to }, r.translation),
@@ -86,12 +86,12 @@ export default {
       goBtn.disabled = true; goBtn.textContent = t('text.going');
       try {
         const translation = await translate(text, from, to, { formal: s.formal });
-        const r = { from, to, text, translation, kana: '' };
+        const r = { from, to, text, translation, sound: '' };
         memo.result = r;
         const entry = addHistory({ side: 'text', from, to, text, translation });
         showResult(r);
-        if (s.reading && needsKana(to, s.me)) {
-          kanaReading(translation).then((k) => { if (k && memo.result === r) { r.kana = k; entry.kana = k; showResult(r); } });
+        if (s.reading && needsSound(to, s.me)) {
+          fetchSound(translation, to).then((k) => { if (k && memo.result === r) { r.sound = k; entry.sound = k; showResult(r); } });
         }
       } catch (e) {
         result.replaceChildren(h('div', { class: 'card b-error' }, e.message));

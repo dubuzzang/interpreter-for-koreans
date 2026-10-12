@@ -121,5 +121,8 @@ export const PHRASES = [
   { cat: 'help', me: 'en', ko: '저희 나라 대사관에 연락해 주세요.', tr: 'Lütfen ülkemin büyükelçiliğini arayın.', en: 'Please contact my embassy.', ja: '私の国の大使館に連絡してください。', jaKana: 'わたしの くにの たいしかんに れんらく して ください', zh: '请联系我们国家的大使馆。', zhPinyin: 'qǐng liánxì wǒmen guójiā de dàshǐguǎn.' },
 ];
 
+/** 표현에 붙여 둔 소리 표기 (일본어 → 히라가나 읽기, 중국어 → 병음) — 읽는 법을 인터넷 없이 보여 준다 */
+export const phraseSound = (p, lang) => ({ ja: p.jaKana, zh: p.zhPinyin })[lang] || '';
+
 /** 상대 언어 · 내 언어에 맞는 표현 */
 export const phrasesFor = (cat, partner, me = 'ko') => PHRASES.filter((p) => p.cat === cat && (!p.only || p.only === partner) && (!p.me || p.me === me));
