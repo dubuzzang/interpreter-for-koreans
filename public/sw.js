@@ -18,6 +18,7 @@ const ASSETS = [
   "/js/phrases.js",
   "/js/pinyin.js",
   "/js/reading.js",
+  "/js/share.js",
   "/js/speech.js",
   "/js/store.js",
   "/js/ui.js",
@@ -27,6 +28,7 @@ const ASSETS = [
   "/js/views/langpicker.js",
   "/js/views/phrases.js",
   "/js/views/settings.js",
+  "/js/views/share.js",
   "/js/views/talk.js",
   "/js/views/text.js",
   "/manifest.webmanifest"

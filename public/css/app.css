@@ -298,6 +298,47 @@ input[type="range"] { width: 100%; accent-color: var(--primary); }
 .lang-menu button[aria-checked="true"] { background: var(--me-soft); color: var(--me); }
 .lm-check { margin-left: auto; font-weight: 800; }
 
+/* 대화 공유 (고르기 → 요약 · 미리 보기 · 공유) */
+.share-wrap { position: fixed; inset: 0; z-index: 30; background: rgba(0, 0, 0, .4); display: flex; justify-content: center; }
+.share-sheet { width: 100%; max-width: 560px; height: 100%; background: var(--bg); display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); animation: up .18s ease-out; }
+.share-head { display: flex; align-items: center; gap: 4px; padding: 6px 6px 6px 4px; background: var(--card); border-bottom: 1px solid var(--line); font-size: 17px; }
+.share-head b { flex: 1; }
+.share-quick { display: flex; gap: 6px; padding: 10px 12px 8px; flex-wrap: wrap; }
+.share-hint { margin: 0 12px 8px; padding: 8px 12px; border-radius: 10px; background: var(--partner-soft); color: var(--partner); font-size: 14px; font-weight: 700; }
+.share-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 0 12px 12px; display: flex; flex-direction: column; gap: 8px; -webkit-overflow-scrolling: touch; }
+.share-scroll.pad { display: block; padding-top: 12px; }
+.share-scroll .group-date { margin: 8px 4px 0; }
+.share-row { display: flex; gap: 10px; text-align: left; padding: 10px 12px; border-radius: 14px; border: 1.5px solid var(--line); background: var(--card); color: var(--text); }
+.share-row.on { border-color: var(--primary); background: var(--me-soft); }
+.share-row.mark { outline: 2px dashed var(--partner); outline-offset: 2px; }
+.share-check { flex: none; width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--line); display: inline-flex; align-items: center; justify-content: center; margin-top: 2px; color: #fff; background: var(--card); }
+.share-row.on .share-check { background: var(--primary); border-color: var(--primary); }
+[data-theme="dark"] .share-row.on .share-check { color: #0f1220; }
+.share-body { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.share-meta { font-size: 12px; color: var(--muted); }
+.share-orig, .share-trans { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.share-orig { font-size: 14px; color: var(--muted); }
+.share-trans { font-size: 15.5px; font-weight: 700; }
+.share-row.me .share-trans { color: var(--me); }
+.share-row.partner .share-trans { color: var(--partner); }
+.share-foot { padding: 10px 12px calc(12px + env(safe-area-inset-bottom)); background: var(--card); border-top: 1px solid var(--line); }
+.share-actions .btn { flex: 1; }
+.share-gate { margin: 0 0 8px; text-align: center; color: var(--warn); }
+.share-gate:empty { display: none; }
+.share-label { margin: 4px 2px 6px; color: var(--muted); }
+.share-preview {
+  white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font-size: 13.5px; line-height: 1.5; margin: 0;
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px;
+}
+.sum-form { display: flex; flex-direction: column; gap: 12px; padding-top: 10px; }
+.sum-form p { margin: 0; }
+.sum-field { display: flex; flex-direction: column; gap: 6px; }
+.sum-input { display: flex; align-items: center; gap: 8px; }
+.sum-input .type-input { padding: 9px 10px; font-size: 15px; }
+.link.small { font-size: 13px; }
+.sum-confirm { display: flex; align-items: center; gap: 10px; font-weight: 700; padding: 11px 12px; border-radius: 12px; background: var(--me-soft); color: var(--me); cursor: pointer; }
+.sum-confirm input { width: 20px; height: 20px; margin: 0; accent-color: var(--primary); flex: none; }
+
 /* 크게 보기 (마이크 .mic.big 과 이름이 겹치지 않게 bigview) */
 .bigview {
   position: fixed; inset: 0; z-index: 40; background: #0b0d18; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;

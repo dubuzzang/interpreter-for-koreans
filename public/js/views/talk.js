@@ -8,6 +8,7 @@ import { state, setSetting, addHistory, updateHistory } from '../store.js';
 import { listen, speak, stopSpeaking, unlockSpeech, hasVoice, sttMode } from '../speech.js';
 import { translate, sound as fetchSound, suggestReplies } from '../api.js';
 import { readingFor, needsSound } from '../reading.js';
+import { openShare } from './share.js';
 
 const START_KEY = 'tercuman.convoStart';
 const session = (() => {
@@ -257,9 +258,12 @@ function newConversation() {
 
 function toolbar() {
   const f2f = state.settings.faceToFace;
+  const done = session.filter((x) => x.translation && !x.pending);
   return h('div', { class: 'toolbar' },
     h('button', { class: `chip${f2f ? ' on' : ''}`, type: 'button', 'aria-pressed': String(f2f), onclick: () => { setSetting('faceToFace', !f2f); redraw(); } }, icon('faces', 16), ' ', t('talk.faceToFace')),
     h('div', { class: 'spacer' }),
+    // 지금 대화를 공유 (원문 + 번역, 합의 내용 요약은 골라서) — 처음엔 모두 고른 채로
+    done.length ? h('button', { class: 'chip', type: 'button', onclick: () => openShare({ items: done, select: 'all' }) }, icon('share', 16), ' ', t('share.button')) : null,
     h('button', { class: 'chip', type: 'button', onclick: newConversation }, icon('plus', 16), ' ', t('talk.new')));
 }
 
