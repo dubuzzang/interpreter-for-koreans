@@ -1,6 +1,6 @@
 // 글 번역: 언어 고르기(자동 감지) · 받아쓰기 · 결과 읽어 주기 · 복사 · 크게 보기 · 📷 사진 번역(v1.5.0, views/photo.js)
 // 기본 방향: (자동 감지, 모르면 내 언어) → 상대 언어
-import { h, icon, toast, copyText, showBig } from '../ui.js';
+import { h, icon, toast, copyText, showBig, arrow } from '../ui.js';
 import { openPhotoPicker } from './photo.js';
 import { LANGS, CODES, detectLang } from '../lang.js';
 import { t, tl, langName } from '../i18n.js';
@@ -66,7 +66,7 @@ export default {
       if (!r) { result.replaceChildren(); return; }
       const reading = s.reading ? readingFor(r.translation, r.to, s.me, r.sound) : '';
       result.replaceChildren(h('div', { class: 'card result-card' },
-        h('div', { class: 'muted small' }, `${LANGS[r.from].flag} ${langName(r.from)} → ${LANGS[r.to].flag} ${langName(r.to)}`),
+        h('div', { class: 'muted small' }, arrow(`${LANGS[r.from].flag} ${langName(r.from)}`, `${LANGS[r.to].flag} ${langName(r.to)}`)),
         h('div', { class: 'result-text', lang: r.to }, r.translation),
         reading ? h('div', { class: 'b-reading' }, reading) : null,
         h('div', { class: 'b-actions' },

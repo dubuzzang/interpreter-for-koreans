@@ -12,10 +12,11 @@ export function openLangMenu(anchor, current, onPick) {
     anchor.setAttribute('aria-expanded', 'false');
     if (focusBack) anchor.focus();
   };
+  // lang(글 방향)은 이름에만 — 줄 배치(✓ 자리)는 화면 방향을 따라 모든 줄이 같게
   const items = CODES.map((c) => h('button', {
-    type: 'button', role: 'menuitemradio', lang: c, 'aria-checked': String(c === current),
+    type: 'button', role: 'menuitemradio', 'aria-checked': String(c === current),
     onclick: () => { close(false); if (c !== current) onPick(c); anchor.focus(); },
-  }, h('span', null, LANGS[c].native), c === current ? h('span', { class: 'lm-check', 'aria-hidden': 'true' }, '✓') : null));
+  }, h('span', { lang: c }, LANGS[c].native), c === current ? h('span', { class: 'lm-check', 'aria-hidden': 'true' }, '✓') : null));
   const r = anchor.getBoundingClientRect();
   // 버튼 끝에 맞춰 연다 (아랍어 화면은 위 막대가 뒤집혀 버튼이 왼쪽 끝에 있다). 언어가 많아 길면 메뉴 안에서 스크롤
   const side = document.documentElement.dir === 'rtl' ? { left: `${Math.max(8, Math.round(r.left))}px` } : { right: `${Math.max(8, Math.round(innerWidth - r.right))}px` };

@@ -54,7 +54,7 @@ const EN_WORDS = new Set('the a an and is are was were be been to of in on at fo
 const VI_LETTERS = /[ăđơưạảấầẩẫậắằẳẵặẹẻẽếềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹ]/i;
 // 프랑스어: 튀르키예어 · 영어에 없는 글자(é è à ù œ ë ï — ç는 튀르키예어에도 있어서 뺀다)와 흔한 낱말
 const FR_LETTERS = /[éèàùœëïÿ]/i;
-const FR_WORDS = new Set("le la les un une des du de et est je tu il elle nous vous ils elles sont pas ne que qui où quoi combien merci bonjour bonsoir salut oui non avec pour dans sur ce cette ces c'est je voudrais voudrais s'il plaît madame monsieur au aux mon ma mes votre vos très bien aussi encore l'addition prix euros ça".split(' '));
+const FR_WORDS = new Set("le la les un une des du de et est je tu il elle nous vous ils elles sont pas ne que qui où quoi combien merci bonjour bonsoir salut oui non avec pour dans sur ce cette ces c'est je voudrais voudrais s'il plaît madame monsieur au aux mon ma mes votre vos très bien aussi encore l'addition prix euros ça suis sommes êtes ai avons avez peux peut pouvez veux voulez faut faire allez vais sais comprends parle parlez comment pourquoi quand beaucoup peu trop rien tout toutes tous ici demain gare rue j'ai n'est".split(' '));
 
 // 베트남어 낱말 (글자만으로 모를 때: Xin chào · Bánh mì · 부호 없이 쓴 xin chao): 부호까지 그대로 쓴 흔한 낱말은 2점(부호 없는 것 1점),
 // 부호 없이 쓴 흔한 낱말은 1점 — 프랑스어 · 튀르키예어 · 영어와 겹치는 낱말(là · toi · tien · on · can …)은 넣지 않는다
@@ -140,12 +140,13 @@ export function detectLang(text, fallback = 'en') {
   if ((kana + han) / n >= 0.3) return kana ? 'ja' : hanOnlyLang(s, fallback);
   if (count(s, /[฀-๿]/g) / n >= 0.3) return 'th';
   if (count(s, /[Ѐ-ӿ]/g) / n >= 0.3) return 'ru';
-  if (count(s, /[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]/g) / n >= 0.3) return 'ar';
+  if (count(s, /[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]/g) / n >= 0.2) return 'ar'; // 아랍 문자는 다른 앱 언어가 안 써서 낮게 (كم سعر Samsung Galaxy S24؟)
   if (VI_LETTERS.test(s.normalize('NFC')) || viScore(s) >= 2) return 'vi'; // 프랑스어 글자(à · é)보다 먼저: Xin chào · Cà phê
-  if (FR_LETTERS.test(s) && !/[ğışİ]/i.test(s)) return 'fr';
-  if (TR_LETTERS.test(s) && !/[ç]/i.test(s.replace(/[ğıöşüİĞŞ]/g, ''))) return 'tr';
-  const words = s.toLowerCase().match(/[a-zçğıöşüâêîôûéèàùœëï']+/g) || []; // tr-TR 소문자는 영어 I를 ı로 바꿔 버린다
-  let tr = TR_LETTERS.test(s) ? 1 : 0, en = 0, fr = 0;
+  // 프랑스어 글자(é · à …)는 바로 정하지 않고 점수로 — 영어 글의 café · résumé 를 프랑스어로 보지 않게. ’(둥근 아포스트로피)는 '로
+  const frLetters = FR_LETTERS.test(s) && !/[ğışİ]/i.test(s);
+  if (TR_LETTERS.test(s) && !frLetters && !/[ç]/i.test(s.replace(/[ğıöşüİĞŞ]/g, ''))) return 'tr';
+  const words = s.toLowerCase().replace(/’/g, "'").match(/[a-zçğıöşüâêîôûéèàùœëï']+/g) || []; // tr-TR 소문자는 영어 I를 ı로 바꿔 버린다
+  let tr = TR_LETTERS.test(s) ? 1 : 0, en = 0, fr = frLetters ? 1.5 : 0;
   for (const w of words) {
     if (TR_WORDS.has(w)) tr++;
     if (EN_WORDS.has(w.replace(/'.*$/, ''))) en++;

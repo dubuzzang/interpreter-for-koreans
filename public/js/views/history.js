@@ -1,6 +1,6 @@
 // 기록: 지난 통역을 날짜별로 (이 기기에만 저장). 나·상대는 지금 내 언어 기준 (lang.js sideFor)
 // 공유(v1.4.0): 말을 골라 원문 + 번역을 한 묶음 글로 (views/share.js)
-import { h, icon, toast, copyText, fmtTime, fmtDate } from '../ui.js';
+import { h, icon, toast, copyText, fmtTime, fmtDate, arrow } from '../ui.js';
 import { LANGS, sideFor } from '../lang.js';
 import { t } from '../i18n.js';
 import { state, clearHistory } from '../store.js';
@@ -36,7 +36,7 @@ export default {
       ...[...groups].map(([date, list]) => h('section', null,
         h('h2', { class: 'group-date' }, date),
         list.map((it) => h('div', { class: 'card hist' },
-          h('div', { class: 'hist-meta muted small' }, `${t(SIDE[sideFor(it, state.settings.me)] || 'hist.text')} · ${LANGS[it.from]?.flag || ''} → ${LANGS[it.to]?.flag || ''} · ${fmtTime(it.at)}`),
+          h('div', { class: 'hist-meta muted small' }, `${t(SIDE[sideFor(it, state.settings.me)] || 'hist.text')} · ${arrow(LANGS[it.from]?.flag || '', LANGS[it.to]?.flag || '')} · ${fmtTime(it.at)}`),
           h('div', { class: 'hist-orig', lang: it.from }, it.text),
           h('div', { class: 'hist-trans', lang: it.to }, it.translation),
           h('div', { class: 'b-actions' },

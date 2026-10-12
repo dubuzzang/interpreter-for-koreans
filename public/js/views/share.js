@@ -2,7 +2,7 @@
 // 휴대폰 공유 시트(카톡 · 메일, navigator.share) · 안 되면 복사.
 // 합의 내용 요약(선택): AI가 단가 · 수량 · 배송일 · 기타 조건을 두 언어로 뽑는다(대화에 없는 값은 빈칸).
 // 사용자가 확인 표시를 해야만 공유 버튼이 켜진다 — 고친 값이 그대로 들어간다.
-import { h, icon, toast, copyText, fmtTime, fmtDate } from '../ui.js';
+import { h, icon, toast, copyText, fmtTime, fmtDate, arrow } from '../ui.js';
 import { LANGS, sideFor } from '../lang.js';
 import { t, tl, langName } from '../i18n.js';
 import { state } from '../store.js';
@@ -57,7 +57,7 @@ export function openShare({ items, select = 'none' } = {}) {
     },
     h('span', { class: 'share-check', 'aria-hidden': 'true' }, on ? icon('check', 16) : null),
     h('span', { class: 'share-body' },
-      h('span', { class: 'share-meta' }, `${t(side === 'me' ? 'talk.me' : side === 'partner' ? 'talk.partner' : 'hist.text')} · ${LANGS[it.from]?.flag || ''} → ${LANGS[it.to]?.flag || ''} · ${fmtTime(it.at)}`),
+      h('span', { class: 'share-meta' }, `${t(side === 'me' ? 'talk.me' : side === 'partner' ? 'talk.partner' : 'hist.text')} · ${arrow(LANGS[it.from]?.flag || '', LANGS[it.to]?.flag || '')} · ${fmtTime(it.at)}`),
       h('span', { class: 'share-orig', lang: it.from }, it.text),
       h('span', { class: 'share-trans', lang: it.to }, it.translation)));
   }
@@ -149,7 +149,7 @@ export function openShare({ items, select = 'none' } = {}) {
       fill.disabled = false;
     } }, t('share.translateTo', { lang: langName(o) }));
     return h('div', { class: 'sum-field' },
-      h('div', { class: 'row between' }, h('span', { class: 'set-label small' }, t(`share.${f}`), o !== me ? h('span', { class: 'muted', lang: o }, ` · ${tl(o, `share.${f}`)}`) : null), fill),
+      h('div', { class: 'row between' }, h('span', { class: 'set-label small' }, t(`share.${f}`), o !== me ? h('span', { class: 'muted' }, ' · ', h('span', { lang: o }, tl(o, `share.${f}`))) : null), fill),
       h('label', { class: 'sum-input' }, h('span', { 'aria-hidden': 'true' }, LANGS[me].flag), mineEl),
       h('label', { class: 'sum-input' }, h('span', { 'aria-hidden': 'true' }, LANGS[o].flag), otherEl));
   }

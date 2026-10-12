@@ -214,7 +214,7 @@ function micButton(side, { big = false } = {}) {
   },
   h('span', { class: 'mic-ring', 'aria-hidden': 'true' }),
   icon(on ? 'stop' : 'mic', big ? 34 : 28),
-  h('span', { class: 'mic-text' }, h('b', null, LANGS[lang].flag, ' ', tl(lang, on ? 'mic.listening' : 'mic.speak')), h('small', null, on ? tl(lang, 'mic.stop') : LANGS[lang].native)));
+  h('span', { class: 'mic-text', lang }, h('b', null, LANGS[lang].flag, ' ', tl(lang, on ? 'mic.listening' : 'mic.speak')), h('small', null, on ? tl(lang, 'mic.stop') : LANGS[lang].native)));
   if (on) levelEl = btn;
   return btn;
 }

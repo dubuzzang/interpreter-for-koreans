@@ -1,6 +1,6 @@
 // 화면 도우미: 요소 만들기 · 아이콘 · 알림 · 큰 글씨 보여 주기
-import { t, locale } from './i18n.js';
-import { LANGS, dirOf } from './lang.js';
+import { t, locale, uiLang } from './i18n.js';
+import { LANGS, dirOf, isRtl } from './lang.js';
 
 /**
  * 요소 만들기. lang 속성(앱의 언어 코드)을 주면 글 방향 dir도 같이 단다 (v1.6.0, 아랍어 rtl) —
@@ -96,5 +96,12 @@ export function showBig(text, { lang, reading, onSpeak } = {}) {
   document.body.append(overlay);
 }
 
+/**
+ * "A → B" (번역 방향 · 언어 짝). 아랍어 화면은 오른쪽에서 왼쪽으로 읽으니 화살표도 ← 이고, A가 오른쪽(먼저)에 오도록
+ * 오른쪽→왼쪽 표시(U+200F)로 묶는다 — 국기(🇸🇦 🇰🇷)는 왼쪽→오른쪽 글자라 그냥 두면 순서가 뒤집혀 보인다
+ */
+export const arrow = (a, b) => (isRtl(uiLang()) ? `${a}‏ ← ‏${b}` : `${a} → ${b}`);
+
 export const fmtTime = (at) => new Date(at).toLocaleTimeString(locale(), { hour: 'numeric', minute: '2-digit' });
-export const fmtDate = (at) => new Date(at).toLocaleDateString(locale(), { month: 'long', day: 'numeric', weekday: 'short' });
+// 양력으로 (ar-SA의 기본 달력은 이슬람력이라 기록 날짜가 다른 달로 보인다)
+export const fmtDate = (at) => new Date(at).toLocaleDateString(locale(), { month: 'long', day: 'numeric', weekday: 'short', calendar: 'gregory' });
