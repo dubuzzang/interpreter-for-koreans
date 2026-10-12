@@ -10,7 +10,7 @@ import { onRequestPost as photo } from '../functions/api/photo.js';
 import { onRequestPost as photoSum } from '../functions/api/photo-summary.js';
 import { onRequestPost as translate } from '../functions/api/translate.js';
 import { _resetBuckets } from '../lib/guard.mjs';
-import { responseText } from '../lib/translate-core.mjs';
+import { responseText, MODELS } from '../lib/translate-core.mjs';
 import { planPieces, mergeParts, sameLine, isPriceOnly, allText, MAX_SIDE, MAX_PARTS as CLIENT_PARTS, OVERLAP } from '../public/js/photo.js';
 import { fromPhotoLine, togglePhotoLine, hasPhotoLine, loadMine, saveMine, myText, sayText } from '../public/js/mine.js';
 import { MESSAGES, setUiLang } from '../public/js/i18n.js';
@@ -203,7 +203,7 @@ test('지어내기 거르기: 글자 없는 사진에 요약 X · 되풀이 · �
   assert.deepEqual(loop.lines.map((l) => l.text), ['正品保证', '新品上市', '新品上市'], '되풀이 줄 빼기 · 같은 줄은 두 번까지');
   assert.equal(loop.lines[0].tr, '', '번역이 되풀이면 번역만 비움');
   assert.equal(loop.notes.repeats, 4);
-  assert.equal(cleanPhoto('죄송해요, 읽을 수 없어요.', { me: 'ko' }), null, 'JSON이 아니면 null → 예비 모델');
+  assert.equal(cleanPhoto('죄송해요, 읽을 수 없어요.', { me: 'ko' }), null, 'JSON이 아니면 null → photo_failed (v1.6.0부터 예비 모델 없음)');
   const cut = parsePhotoJson('{"lines":[{"text":"原价 ¥129","lang":"zh","tr":"정가 ¥129"},{"text":"券后 ¥89","lang":"zh","tr":"쿠폰가 ¥89"},{"text":"第二件半');
   assert.equal(cut.lines.length, 2, '답 길이 상한에 잘린 JSON에서 끝까지 온 줄만');
   assert.equal(cut.truncated, true);
@@ -240,7 +240,7 @@ test('/api/photo: 그림을 image_url로 생각 끈 Gemma에 한 번, 줄 정리
   assert.match(AI.calls.at(-1).input.messages[1].content[0].image_url.url, /^data:image\/png;base64,/);
 });
 
-test('/api/photo: 검사 실패 · 크기 상한 · 예비 모델 · 한도 · 오류 코드', async () => {
+test('/api/photo: 검사 실패 · 크기 상한 · 예비 모델 없음(v1.6.0) · 한도 · 오류 코드', async () => {
   let AI = fakeAI(() => ({ response: ANSWER }));
   const img = jpeg(1200, 1600);
   assert.equal((await photo({ request: req('/api/photo?me=ko', img, { origin: 'https://evil.example' }), env: { AI } })).status, 403);
@@ -258,19 +258,22 @@ test('/api/photo: 검사 실패 · 크기 상한 · 예비 모델 · 한도 · �
   assert.equal((await photo({ request: req('/api/photo?me=ko', img), env: {} })).status, 500);
   assert.equal(AI.calls.length, 0, '검사에 걸리면 AI를 부르지 않는다');
 
-  // 첫 모델이 JSON이 아닌 답 → 예비 모델(Mistral) 한 번
+  // 기본 모델이 JSON이 아닌 답 → 예비 모델(Mistral, 한 장에 뉴런 4~6배) 대신 "사진을 읽지 못했어요. 잠시 뒤 다시 해 주세요." (무료 요금제 안전장치)
+  assert.deepEqual(PHOTO_MODELS.map((m) => m.id), ['@cf/google/gemma-4-26b-a4b-it'], '사진은 Gemma 하나뿐');
+  assert.ok(MODELS.some((m) => /mistral/.test(m.id)), '번역의 예비 모델 순서는 그대로');
   AI = fakeAI((m, i, n) => (n === 1 ? { response: '죄송합니다. 이미지를 볼 수 없습니다.' } : { choices: [{ message: { content: ANSWER } }] }));
   res = await photo({ request: req('/api/photo?me=ko', img), env: { AI } });
-  assert.equal(res.status, 200);
-  assert.equal((await res.json()).model, '@cf/mistralai/mistral-small-3.1-24b-instruct');
-  assert.deepEqual(AI.calls.map((c) => c.model), PHOTO_MODELS.map((m) => m.id));
-  assert.equal(AI.calls[1].input.chat_template_kwargs, undefined, '예비 모델에는 Gemma 설정을 넘기지 않음');
+  assert.equal(res.status, 502);
+  const problem = await res.json();
+  assert.equal(problem.code, 'failed');
+  assert.equal(serverError(problem, 502, 'photo'), MESSAGES.ko['err.photo_failed']);
+  assert.deepEqual(AI.calls.map((c) => c.model), [PHOTO_MODELS[0].id], 'JSON이 아니면 다시 부르지 않고 예비 모델도 안 부른다');
 
   AI = fakeAI(() => { throw new Error('4006: you have used up your daily free allocation of 10,000 neurons'); });
   res = await photo({ request: req('/api/photo?me=ko', img), env: { AI } });
   assert.equal(res.status, 503);
   assert.equal((await res.json()).code, 'quota');
-  assert.equal(AI.calls.length, 1, '한도면 예비 모델도 같다');
+  assert.equal(AI.calls.length, 1, '한도면 다시 부르지 않는다');
 
   AI = fakeAI(() => { throw new Error('upstream error'); });
   res = await photo({ request: req('/api/photo?me=ko', img), env: { AI } });
@@ -278,24 +281,30 @@ test('/api/photo: 검사 실패 · 크기 상한 · 예비 모델 · 한도 · �
   const body = await res.json();
   assert.equal(body.code, 'failed');
   assert.equal(serverError(body, 502, 'photo'), MESSAGES.ko['err.photo_failed'], '화면은 사진 오류 문장으로');
-  assert.equal(AI.calls.length, 2);
+  assert.equal(AI.calls.length, 1, '예비 모델 없음');
 });
 
-test('/api/photo: 기본 모델이 잠시 바쁘면(3040) 한 번 더, JSON 답을 객체로 풀어 준 응답(Mistral)도 읽는다', async () => {
+test('/api/photo: 기본 모델이 잠시 바쁘면(3040) 한 번 더, 그래도 바쁘면 예비 모델 대신 busy · JSON 답을 객체로 풀어 준 응답도 읽는다', async () => {
   const img = jpeg(1200, 1600);
   let AI = fakeAI((m, i, n) => { if (n === 1) throw new Error('3040: Capacity temporarily exceeded, please try again.'); return { response: ANSWER }; });
   let res = await photo({ request: req('/api/photo?me=ko', img), env: { AI } });
   assert.equal(res.status, 200);
-  assert.deepEqual(AI.calls.map((c) => c.model), [PHOTO_MODELS[0].id, PHOTO_MODELS[0].id], '예비 모델(뉴런 4~6배)로 가기 전에 기본 모델 한 번 더');
-  // 두 번 다 바쁘면 예비 모델 — Workers AI가 JSON 답을 response 객체로 풀어 주고 원래 글은 choices에 둔다
-  const parsed = JSON.parse(ANSWER);
-  AI = fakeAI((m) => { if (m === PHOTO_MODELS[0].id) throw new Error('3040: Capacity temporarily exceeded'); return { response: parsed, choices: [{ message: { content: ANSWER } }] }; });
+  assert.deepEqual(AI.calls.map((c) => c.model), [PHOTO_MODELS[0].id, PHOTO_MODELS[0].id], '기본 모델 한 번 더');
+  assert.equal((await res.json()).backup, undefined, '예비 AI 안내(photo.backup)는 더 이상 없다');
+  // 두 번 다 바쁘면 예비 모델(v1.5.x) 대신 "서버가 바빠요. 잠시 뒤 다시 해 주세요." (v1.6.0 무료 요금제 안전장치)
+  AI = fakeAI((m) => { if (m === PHOTO_MODELS[0].id) throw new Error('3040: Capacity temporarily exceeded'); return { response: ANSWER }; });
   res = await photo({ request: req('/api/photo?me=ko', img), env: { AI } });
-  const data = await res.json();
-  assert.equal(data.model, PHOTO_MODELS[1].id);
-  assert.equal(data.backup, true, '화면이 "예비 AI로 읽어 더 틀릴 수 있어요"를 띄운다');
+  assert.equal(res.status, 503);
+  const busy = await res.json();
+  assert.equal(busy.code, 'busy');
+  assert.equal(serverError(busy, 503, 'photo'), MESSAGES.ko['err.busy']);
+  assert.deepEqual(AI.calls.map((c) => c.model), [PHOTO_MODELS[0].id, PHOTO_MODELS[0].id], '예비 모델은 부르지 않는다');
+  // Workers AI가 JSON 답을 response 객체로 풀어 주고 원래 글은 choices에 둔 응답
+  const parsed = JSON.parse(ANSWER);
+  AI = fakeAI(() => ({ response: parsed, choices: [{ message: { content: ANSWER } }] }));
+  const data = await (await photo({ request: req('/api/photo?me=ko', img), env: { AI } })).json();
   assert.equal(data.lines.length, 3);
-  assert.equal(AI.calls.length, 3);
+  assert.equal(AI.calls.length, 1);
   // 객체로만 온 응답도
   AI = fakeAI(() => ({ response: parsed }));
   assert.equal((await (await photo({ request: req('/api/photo?me=ko', img), env: { AI } })).json()).lines.length, 3);
