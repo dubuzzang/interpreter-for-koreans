@@ -73,6 +73,7 @@ export function mergeParts(parts) {
         if (sameLine(out[ti].text, lines[j].text)) { pairs.push([ti, j]); ti += 1; j += 1; }
         else if (ti + 1 < out.length && sameLine(out[ti + 1].text, lines[j].text)) { pairs.push([ti + 1, j]); ti += 2; j += 1; } // 앞 조각에만 있는 줄
         else if (pairs.length === 0 && j + 1 < lines.length && sameLine(out[ti].text, lines[j + 1].text)) { extra.push([ti, j]); pairs.push([ti, j + 1]); ti += 1; j += 2; } // 뒤 조각에만 있는 첫 줄
+        else if (pairs.length && norm(lines[j].text) && norm(out[ti - 1].text).includes(norm(lines[j].text))) { pairs.push([ti - 1, j]); j += 1; } // 앞 조각은 한 줄, 뒤 조각은 두 줄로 나눠 읽음 (加一勺生抽 葱段 = 加一勺生抽 + 葱段)
         else break;
       }
       const reachesEnd = ti >= out.length || (ti === out.length - 1 && (pairs.length >= 2 || norm(lines[pairs.at(-1)?.[1]]?.text).length >= 4));

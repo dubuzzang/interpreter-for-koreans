@@ -293,6 +293,7 @@ a.btn { text-decoration: none; }
 .text-go .btn.primary { flex: 1; }
 .photo-btn { flex: none; white-space: nowrap; }
 .photo-sheet label.btn { position: relative; cursor: pointer; }
+.photo-sheet label.btn:focus-within { outline: 2px solid var(--primary); outline-offset: 2px; } /* 키보드: 숨긴 file 입력에 초점이 가면 버튼에 표시 */
 .photo-sheet .btn + .btn { margin-top: 10px; }
 .photo-privacy { margin: 12px 2px 0; }
 .photo-top { margin-bottom: 8px; }

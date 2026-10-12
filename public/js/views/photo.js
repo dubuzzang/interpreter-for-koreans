@@ -49,6 +49,7 @@ async function readPiece(my, blob, i) {
       if (e.code !== 'rate_limited' || !(e.retry <= 60) || job !== my) return { error: e.message };
       for (my.wait = e.retry; my.wait > 0 && job === my; my.wait--) { changed(); await sleep(1000); }
       my.wait = 0;
+      if (job !== my) return { error: '' }; // 기다리는 사이 다른 사진을 골랐다
     }
   }
   return { error: t('err.rate_limited', { retry: 60 }) };
