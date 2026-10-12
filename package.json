@@ -1,9 +1,9 @@
 {
   "name": "interpreter-for-koreans",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "private": true,
   "type": "module",
-  "description": "Tercüman — 한국어 · 튀르키예어 · 영어 · 일본어 · 중국어 통역 웹앱 (Cloudflare Pages + Workers AI)",
+  "description": "Tercüman — 11개 언어 통역 웹앱 (한국어 · 튀르키예어 · 영어 · 일본어 · 중국어 간체/번체 · 베트남어 · 태국어 · 러시아어 · 아랍어 · 프랑스어, Cloudflare Pages + Workers AI)",
   "engines": { "node": ">=20" },
   "scripts": {
     "dev": "npx --yes wrangler@4 pages dev public --port 8788 --ip 127.0.0.1",
