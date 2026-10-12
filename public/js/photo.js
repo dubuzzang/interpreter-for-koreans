@@ -99,9 +99,18 @@ const CURRENCY = new RegExp(['円', '元', '块', '塊', String.fromCharCode(0xc
   'đồng', 'vnđ', 'vnd', 'บาท', 'thb', 'руб', 'rub', 'ريال', 'درهم', 'جنيه', 'sar', 'aed', 'egp', 'twd', 'ntd', 'hkd'].join('|'), 'gi');
 export const isPriceOnly = (text) => /[0-9๐-๙٠-٩۰-۹]/.test(text) && !/\p{L}{2,}/u.test(String(text).replace(CURRENCY, ''));
 
-/** 공유 · 복사용 글 */
-export const lineText = (line) => (line.tr ? `${line.text}\n${line.tr}` : line.text);
-export const allText = (lines, summary = '') => [summary, ...lines.map(lineText)].filter(Boolean).join('\n\n');
+/**
+ * 공유 · 복사용 글. 아랍어 같은 오른쪽→왼쪽 글 줄은 앞에 RLM(U+200F)을 붙인다 (v1.6.0) —
+ * 상표 · 숫자로 시작하는 줄(iPhone 15 بسعر …)도 붙여 넣은 곳(카카오톡 · 메일)에서 오른쪽부터 읽히게
+ */
+const RTL_LANGS = new Set(['ar', 'fa', 'ur', 'he', 'ps', 'ckb', 'yi']);
+const rtlMostly = (s) => {
+  const r = (s.match(/[֐-׿؀-ۿݐ-ݿ]/g) || []).length;
+  return r > 0 && r >= (s.match(/\p{Script=Latin}/gu) || []).length;
+};
+const dirMark = (s, lang) => (s && (RTL_LANGS.has(lang) || (!lang && rtlMostly(s))) ? `‏${s}` : s);
+export const lineText = (line) => (line.tr ? `${dirMark(line.text, line.lang)}\n${dirMark(line.tr)}` : dirMark(line.text, line.lang));
+export const allText = (lines, summary = '') => [dirMark(summary), ...lines.map(lineText)].filter(Boolean).join('\n\n');
 
 // ---------- 브라우저: 사진 열기 · 줄이기 · 자르기 ----------
 async function decode(file) {

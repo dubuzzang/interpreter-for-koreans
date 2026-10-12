@@ -45,7 +45,8 @@ export function renderPair() {
   pairBtn.replaceChildren(
     h('span', { class: 'pair-lang' }, LANGS[me].flag),
     icon('swap', 16),
-    h('span', { class: 'pair-lang', lang: partner }, LANGS[partner].flag, ' ', LANGS[partner].native),
+    // lang은 이름에만: 아랍어 이름이어도 국기는 바꾸기 아이콘 옆에 (버튼 전체가 뒤집히지 않게)
+    h('span', { class: 'pair-lang' }, LANGS[partner].flag, ' ', h('span', { lang: partner }, LANGS[partner].native)),
   );
   pairBtn.setAttribute('aria-label', t('app.pair', { me: langName(me), partner: langName(partner) }));
 }

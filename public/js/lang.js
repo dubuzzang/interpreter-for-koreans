@@ -93,7 +93,7 @@ export function detectLang(text, fallback = 'en') {
   if ((kana + han) / n >= 0.3) return kana ? 'ja' : hanOnlyLang(s, fallback);
   if (count(s, /[฀-๿]/g) / n >= 0.3) return 'th';
   if (count(s, /[Ѐ-ӿ]/g) / n >= 0.3) return 'ru';
-  if (count(s, /[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]/g) / n >= 0.3) return 'ar';
+  if (count(s, /[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]/g) / n >= 0.2) return 'ar'; // 아랍 문자는 다른 앱 언어가 안 써서 낮게 (كم سعر Samsung Galaxy S24؟)
   if (VI_LETTERS.test(s)) return 'vi';
   if (FR_LETTERS.test(s) && !/[ğışİ]/i.test(s)) return 'fr';
   if (TR_LETTERS.test(s) && !/[ç]/i.test(s.replace(/[ğıöşüİĞŞ]/g, ''))) return 'tr';
